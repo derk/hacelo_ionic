@@ -155,8 +155,8 @@ angular.module('starter.controllers', [])
       Nacion_Service.set_entire_ins_pics($scope.instagram_pics);
       $scope.$apply();
       if($scope.instagram_pics.length >0){
-        window.location.hash="#/app/instagram"
-      }  
+        window.location.hash="#/app/instagram";
+      }; 
     },100);
     
   });
@@ -168,7 +168,14 @@ angular.module('starter.controllers', [])
    */
 .controller('checkCrtl', function($scope, Nacion_Service){
     
-});
+})
 
+  /* confirmCrtl para controlar la pantalla de confirm
+   * $scope - Scope de la pantalla
+   * Nacion_Service - Servicio de datos de nacion, service.js
+   */
+.controller('confirmCtrl', function($scope, Nacion_Service){
+    
+});
 
 

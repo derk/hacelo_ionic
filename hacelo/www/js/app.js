@@ -117,6 +117,15 @@ angular.module('starter', ['ionic', 'starter.controllers','starter.service'])
           controller: 'PlaylistCtrl'
         }
       }
+    })
+    .state('app.confirm', {
+      url: "/confirm",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/confirm.html",
+          controller: 'confirmCtrl'
+        }
+      }
     });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/index');
