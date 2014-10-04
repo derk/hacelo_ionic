@@ -1,0 +1,28 @@
+<ion-view title="SELECCIONAR" class="photo-pick-page" >
+	<ion-nav-buttons side="right">
+	    <a style="color: black;" class="button button-icon icon ion-forward available-{{all_pics_for_print.length<=0}}"></a> 
+	</ion-nav-buttons>
+  	<ion-content class="has-header">
+    	<div class="photo-pick-container">
+			<a class="button-picker" ng-click="call_popup()">Instagram</a>
+			<div class="images-hidden" style="display:none;"></div>
+			<!--div class="instagram-pics">
+				<div class="imagen" ng-animate="'animate'" ng-repeat="item in instagram_pics track by $index">
+					<button class="pick-img"></button>
+				    <img width="" src="{{ item.img }}" class="{{item.picked}}" id="img_{{ $index }}"/>
+				 </div>
+			</div-->
+			<a class="button-picker">Album</a>
+			<div class="normal-pics"></div>
+		</div>
+  	</ion-content>
+</ion-view>
+
+
+
+
+
+<div class="photo-page-picker">
+
+	
+</div> 
