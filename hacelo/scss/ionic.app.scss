@@ -1,0 +1,201 @@
+/*
+To customize the look and feel of Ionic, you can override the variables
+in ionic's _variables.scss file.
+
+For example, you might change some of the default colors:
+
+$light:                           #fff !default;
+$stable:                          #f8f8f8 !default;
+$positive:                        #4a87ee !default;
+$calm:                            #43cee6 !default;
+$balanced:                        #66cc33 !default;
+$energized:                       #f0b840 !default;
+$assertive:                       #ef4e3a !default;
+$royal:                           #8a6de9 !default;
+$dark:                            #444 !default;
+*/
+
+@mixin center-element($position){
+    position: $position;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+// The path for our ionicons font files, relative to the built CSS in www/css
+$ionicons-font-path: "../lib/ionic/fonts" !default;
+
+// Include all of Ionic
+@import "www/lib/ionic/scss/ionic";
+
+.options-index {
+          position: absolute;
+          height: 35%;
+          bottom: 0;
+          width: 100%;
+          a{
+            position: relative;
+            width: 90%;
+            display: inline-block;
+            margin: 3% 5%;
+            background: white;
+            padding: 5% 0;
+            float: left;
+            text-align: center;
+          }
+        }
+
+.products-container{
+	height: 100%;
+	width: 100%;
+	position: relative;
+	box-sizing: border-box;
+    & > div {
+      height: 33.3%;
+      width:100%;
+      border-bottom: 1px solid #000;
+      background: #c2c2c2;
+      position: relative;
+      & > div{
+      	height: 100%;
+		width: 100%;
+		position: relative;
+		padding: 20% 0;
+		box-sizing: border-box;
+		display: inline-block;
+		text-align: center;
+      	a {
+	        padding: 3% 0;
+	        border: 1px solid #000;
+	        width: 80%;
+	        display: inline-block;
+      	}
+      }
+    } 	
+
+ }
+.available-true {
+    visibility: hidden;
+}
+ .photo-page{
+	    .photo-cover{
+	      background: #c2c2c2;
+	      height: 60%;
+	      width: 100%;
+	    }
+	    .cover {
+	      color:white;
+	      height: 10%;
+	      background: red;
+	      position: relative;
+
+	      span {
+	        @include center-element(absolute);
+	        width: 100%;
+	        height: 12px;
+	        text-align: center;
+	      }
+	    }
+
+	    .menu {
+	      height:30%;
+	      text-align: center;
+	      padding-top: 5%;
+	      p{
+	        text-transform: capitalize;
+	        font-size: 1em;
+	        padding: 0.5% 0;
+	        span {
+	          font-size: 1.2em;
+	          font-weight: bold;
+	          margin-right: 2%; 
+	        }
+	      }
+	      .pick-container {
+	        padding: 0;
+	        a { 
+	          border: 1px solid #000;
+	          padding: 5%;
+	          margin: 2% 0 0;
+	          display: inline-block;
+	          width: 50%;
+	        }
+	      }
+	      
+	    }
+ }
+
+.photo-pick-page{
+	div.imagen{
+      width: 25%;
+      float:left;
+      position: relative;
+      box-sizing:border-box;
+      &.true{
+        border: 5px solid red;
+      }
+      img{
+        width: 100%;
+      }
+      .pick-img {
+        position: absolute;
+        right: 0;
+        width: 30%;
+        height: 30%;
+        background: url("http://www.prudentialvanlines.com/moving-services/images/checkmark.png");
+        background-size: 100% 100%;
+        outline: none;
+        border: 0;
+      }
+    }
+    a {
+      width: 100%;
+      background: red;
+      text-align: center;
+      display: inline-block;
+      padding: 3% 0;
+      margin-bottom: 0.5%;
+    }
+}
+
+.instagram-page {
+  .instagram-container{
+    div.imagen{
+      width: 33.3%;
+      float:left;
+      position: relative;
+      box-sizing:border-box;
+      &.true{
+        border: 5px solid red;
+      }
+      img{
+        width: 100%;
+        float:left;
+      }
+      .pick-img {
+        position: absolute;
+        right: 0;
+        width: 30%;
+        height: 30%;
+        background: url("http://www.prudentialvanlines.com/moving-services/images/checkmark.png");
+        background-size: 100% 100%;
+        outline: none;
+        border: 0;
+      }
+    }
+  }
+}
+
+
+
+ .index-page, .products-page, .photo-page{
+ 	.scroll {
+		height: 100%;
+		width: 100%;
+	}
+ } 
+
+ .ng-enter {
+    /*border-left:1px solid #000; */
+  }
