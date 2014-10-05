@@ -126,6 +126,51 @@ angular.module('starter', ['ionic', 'starter.controllers','starter.service'])
           controller: 'confirmCtrl'
         }
       }
+    })
+    .state('app.added', {
+      url: "/added",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/added-cart.html",
+          controller: 'addedCartCtrl'
+        }
+      }
+    })
+    .state('app.cart', {
+      url: "/cart",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/cart.html",
+          controller: 'cartCtrl'
+        }
+      }
+    })
+    .state('app.cart-checkout', {
+      url: "/cart-checkout",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/cart-checkout.html",
+          controller: 'cartCheckoutCtrl'
+        }
+      }
+    })
+    .state('app.cart-empty', {
+      url: "/cart-empty",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/cart-empty.html",
+          controller: 'cartEmptyCtrl'
+        }
+      }
+    })
+    .state('app.congrats', {
+      url: "/congrats",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/congrats.html",
+          controller: 'congratsCtrl'
+        }
+      }
     });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/index');

@@ -7948,3 +7948,58 @@ $ios-transition-box-shadow-end: -200px 0px 200px rgba(0,0,0,0.15), -5px 0px 5px 
   height: 100%;
   width: 100%; }
 
+/* 
+   =============  Confirm page  ============= 
+*/
+.confirm-container {
+  text-align: center;
+  text-transform: uppercase;
+  position: relative; }
+  .confirm-container .image {
+    width: 100%;
+    background: #ccc;
+    height: 300px; }
+  .confirm-container h2 {
+    font-size: 1.2em;
+    margin-top: 4%;
+    color: red; }
+  .confirm-container .button {
+    display: block;
+    width: 92%;
+    margin: auto; }
+
+/* 
+   =============  Added-cart page  ============= 
+*/
+.added-cart {
+  background: blue;
+  text-transform: uppercase;
+  text-align: center;
+  color: #FFF; }
+  .added-cart h3:first-child {
+    font-size: 1.2em;
+    margin: 15% 0 20% 0;
+    color: #FFF; }
+  .added-cart p {
+    margin-bottom: 15%; }
+  .added-cart .button {
+    display: block;
+    width: 92%;
+    margin: auto;
+    font-weight: bold; }
+    .added-cart .button.button-light {
+      margin-bottom: 10px;
+      color: green; }
+
+/* 
+   =============  Added-cart page  ============= 
+*/
+.cart-container {
+  text-align: center;
+  text-transform: uppercase; }
+  .cart-container p {
+    margin-bottom: 15%; }
+  .cart-container .button {
+    display: block;
+    width: 92%;
+    margin: auto; }

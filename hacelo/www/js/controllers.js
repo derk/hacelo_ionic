@@ -172,10 +172,40 @@ angular.module('starter.controllers', [])
 
   /* confirmCrtl para controlar la pantalla de confirm
    * $scope - Scope de la pantalla
-   * Nacion_Service - Servicio de datos de nacion, service.js
    */
-.controller('confirmCtrl', function($scope, Nacion_Service){
+.controller('confirmCtrl', function($scope){
     
+})
+
+  /* addedCartCtrl para controlar la pantalla de added
+   * $scope - Scope de la pantalla
+   */
+.controller('addedCartCtrl', function($scope){
+    
+})
+
+  /* CartCtrl para controlar la pantalla de carrito
+   * $scope - Scope de la pantalla
+   */
+.controller('CartCtrl', function($scope){
+})
+
+  /* cartCheckoutCtrl para controlar la pantalla de carrito form
+   * $scope - Scope de la pantalla
+   */
+.controller('cartCheckoutCtrl', function($scope){
+})
+
+  /* cartEmptyCtrl para controlar la pantalla de carrito vacio
+   * $scope - Scope de la pantalla
+   */
+.controller('cartEmptyCtrl', function($scope){
+})
+
+  /* congratsCtrl para controlar la pantalla de felicidades
+   * $scope - Scope de la pantalla
+   */
+.controller('congratsCtrl', function($scope){
 });
 
 

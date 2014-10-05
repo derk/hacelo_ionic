@@ -199,3 +199,83 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
  .ng-enter {
     /*border-left:1px solid #000; */
   }
+
+/* 
+   =============  Confirm page  ============= 
+*/
+.confirm-container{
+  text-align: center;
+  text-transform: uppercase;
+  position: relative;
+  
+  //REPLACE FOR THE IMAGE
+  .image{
+    width: 100%;
+    background: #ccc;
+    height: 300px;
+  }
+
+  h2{
+    font-size: 1.2em;
+    margin-top: 4%;
+    color: red;
+  }
+
+  .button{
+    display: block;
+    width: 92%;
+    margin: auto;
+  }
+}
+
+/* 
+   =============  Added-cart page  ============= 
+*/
+.added-cart{
+  background: blue;
+  text-transform: uppercase;
+  text-align: center;
+  color: #FFF;
+
+  h3:first-child{
+    font-size: 1.2em;
+    margin: 15% 0 20% 0;
+    color: #FFF;
+  }
+
+  p{
+    margin-bottom: 15%;
+  }
+
+  .button{
+    display: block;
+    width: 92%;
+    margin: auto;
+    font-weight: bold;
+
+    &.button-light{
+      margin-bottom: 10px;
+      color: green;
+    }
+  }
+
+}
+
+/* 
+   =============  Added-cart page  ============= 
+*/
+
+.cart-container{
+  text-align: center;
+  text-transform: uppercase;
+
+  p{
+    margin-bottom: 15%;
+  }
+
+  .button{
+    display: block;
+    width: 92%;
+    margin: auto;
+  }
+}
