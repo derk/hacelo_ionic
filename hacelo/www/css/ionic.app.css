@@ -8003,3 +8003,35 @@ $ios-transition-box-shadow-end: -200px 0px 200px rgba(0,0,0,0.15), -5px 0px 5px 
     display: block;
     width: 92%;
     margin: auto; }
+
+/* 
+   =============  cart-checkout page  ============= 
+*/
+.cart-checkout-container {
+  margin: 3% 0;
+  color: #999;
+  text-transform: uppercase; }
+  .cart-checkout-container ul {
+    margin: 0 3%; }
+    .cart-checkout-container ul li {
+      list-style-type: circle; }
+  .cart-checkout-container a {
+    margin: 0 3%;
+    color: red;
+    text-decoration: underline;
+    font-size: 0.8em; }
+  .cart-checkout-container .list select {
+    width: 99%;
+    margin: auto;
+    display: block;
+    font-size: 1.3em; }
+  .cart-checkout-container .list .maininfo {
+    overflow: hidden; }
+  .cart-checkout-container .list label {
+    margin: 5% 0; }
+    .cart-checkout-container .list label.name, .cart-checkout-container .list label.lastname {
+      width: 48%;
+      float: left;
+      margin: 5% 0 0 0; }
+    .cart-checkout-container .list label.name {
+      margin-right: 4%; }

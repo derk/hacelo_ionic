@@ -279,3 +279,51 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
     margin: auto;
   }
 }
+
+/* 
+   =============  cart-checkout page  ============= 
+*/
+
+.cart-checkout-container{
+  margin: 3% 0;
+  color: #999;
+  text-transform: uppercase;
+
+  ul{
+    margin: 0 3%;
+
+    li{
+      list-style-type: circle;
+    }
+  }
+  a{
+    margin: 0 3%;
+    color: red;
+    text-decoration: underline;
+    font-size: 0.8em;
+  }
+
+  .list{
+    select{
+      width: 99%;
+      margin: auto;
+      display: block;
+      font-size: 1.3em;
+    }
+    .maininfo{
+      overflow: hidden;
+    }
+    label{
+      margin: 5% 0;
+
+      &.name, &.lastname{
+        width: 48%;
+        float: left;
+        margin: 5% 0 0 0;
+      }
+      &.name{
+        margin-right: 4%;
+      }
+    }
+  }
+}
