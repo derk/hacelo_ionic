@@ -327,3 +327,73 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
     }
   }
 }
+
+/* 
+   =============  cart-empty page  ============= 
+*/
+.cart-empty-container{
+  text-transform: uppercase;
+  //REPLACE FOR THE IMAGE
+  .image{
+    width: 100%;
+    background: #ccc;
+    height: 150px;
+    margin-bottom: 30px;
+  }
+
+  h3{
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 50px;
+    font-weight: normal;
+    color: #999;
+  }
+
+  p{
+    margin: auto;
+    width: 85%;
+    color: #999;
+
+    &.subt{
+      font-weight: bold;
+    }
+  }
+
+  .button{
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 21px;
+    width: 85%;
+    margin: auto;
+    display: block;
+    margin-bottom: 30px;
+  }
+
+}
+
+/* 
+   =============  cart-empty page  ============= 
+*/
+.congrats-page{
+  background: green;
+  color: #FFF;
+  text-transform: uppercase;
+
+  h2{
+    margin-top: 30px;
+    text-align: center;
+    font-size: 22px;
+  }
+
+  h1{
+    text-align: center;
+    font-size: 26px;
+  }
+
+  .button{
+    width: 90%;
+    margin: auto;
+    font-size: 20px;
+    margin-top: 40px;
+  }
+}
