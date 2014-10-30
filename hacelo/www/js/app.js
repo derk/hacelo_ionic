@@ -1,7 +1,10 @@
-angular.module('starter', [
+angular.module('hacelo', [
     'ionic',
-    'starter.controllers',
-    'starter.service'
+    'hacelo.config',
+    'hacelo.models',
+    'hacelo.controllers',
+    'hacelo.providers',
+    'hacelo.services'
 ])
 
 .run(function($ionicPlatform) {
@@ -32,8 +35,7 @@ angular.module('starter', [
         url: "/landing",
         views: {
             'haceloContent': {
-                templateUrl: "templates/landing.html",
-                controller: 'indexCtrl'
+                templateUrl: "templates/landing.html"
             }
         }
     })
@@ -42,7 +44,7 @@ angular.module('starter', [
         views: {
             'haceloContent': {
                 templateUrl: "templates/instagram.html",
-                controller: 'instagramCrtl'
+                controller: 'InstagramCrtl'
             }
         }
     })
@@ -50,8 +52,7 @@ angular.module('starter', [
         url: "/products",
         views: {
             'haceloContent': {
-                templateUrl: "templates/product.html",
-                controller: 'productsCtrl'
+                templateUrl: "templates/product.html"
             }
         }
     })
@@ -59,8 +60,7 @@ angular.module('starter', [
         url: "/photo",
         views: {
             'haceloContent': {
-                templateUrl: "templates/photo.html",
-                controller: 'photoCtrl'
+                templateUrl: "templates/photo.html"
             }
         }
     })

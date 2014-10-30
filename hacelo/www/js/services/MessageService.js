@@ -1,11 +1,9 @@
-var messageService = angular.module('hacelo.messageService', []);
-
-messageService.service('messageService', ['$http', function ($http) {
+services.service('MessageService', ['$http', function ($http) {
     // Private stuff
     var messages =          null,
         messageDBlocation = "js/common/messagesDB.json",
         self =              this,
-        callbackResult =          function(json) {
+        callbackResult =    function(json) {
             self.messages = json ? angular.fromJson(json) : {};
         },
         initMessages =      function() {
@@ -34,4 +32,4 @@ messageService.service('messageService', ['$http', function ($http) {
     };
     // Load the messages from JSON file
     initMessages();
-}])
+}]);

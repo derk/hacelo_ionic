@@ -1,5 +1,4 @@
-angular.module('starter.service', []).
-service('Nacion_Service',['$ionicLoading',function($ionicLoading){
+services.service('Nacion_Service',['$ionicLoading',function($ionicLoading){
 	this.username = '';
 	this.instagram_pics = [];
   this.instagram_pics_on_queue = [];
