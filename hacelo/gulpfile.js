@@ -16,8 +16,7 @@ gulp.task('default', ['sass', 'concat']);
 
 gulp.task('sass', function(done) {
   gulp.src('./scss/ionic.app.scss')
-    .pipe(sass())
-    .pipe(gulp.dest('./www/css/'))
+    .pipe(sass({errLogToConsole: true}))
     .pipe(minifyCss({
       keepSpecialComments: 0
     }))
@@ -32,8 +31,8 @@ gulp.task('concat', function () {
       './www/js/*/module.js',
       './www/js/*/*.js'])
     .pipe(concat('hacelo-digital.js'))
-    .pipe(gulp.dest('./www/js/'))
-})
+    .pipe(gulp.dest('./www/js/'));
+});
 
 gulp.task('watch', function() {
   gulp.watch(paths.sass, ['sass']);

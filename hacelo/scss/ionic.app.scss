@@ -195,7 +195,8 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
     text-align: center;
     text-transform: uppercase;
     position: relative;
-    //REPLACE FOR THE IMAGE .image {
+    //REPLACE FOR THE IMAGE 
+    .image {
         width: 100%;
         background: #ccc;
         height: 300px;
@@ -300,7 +301,8 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 */
  .cart-empty-container {
     text-transform: uppercase;
-    //REPLACE FOR THE IMAGE .image {
+    //REPLACE FOR THE IMAGE 
+    .image {
         width: 100%;
         background: #ccc;
         height: 150px;
@@ -332,14 +334,14 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
     }
 }
 /* 
-   =============  cart-empty page  ============= 
+   =============  congrats page  ============= 
 */
  .congrats-page {
     background: green;
     color: #FFF;
     text-transform: uppercase;
     h2 {
-        margin-top: 30px;
+        margin-top: 50px;
         text-align: center;
         font-size: 22px;
     }
