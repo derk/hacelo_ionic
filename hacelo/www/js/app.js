@@ -39,12 +39,11 @@ angular.module('hacelo', [
             }
         }
     })
-    .state('app.instagram', {
-        url: "/instagram",
+    .state('app.info', {
+        url: "/info",
         views: {
             'haceloContent': {
-                templateUrl: "templates/instagram.html",
-                controller: 'InstagramCrtl'
+                templateUrl: "templates/info.html"
             }
         }
     })
