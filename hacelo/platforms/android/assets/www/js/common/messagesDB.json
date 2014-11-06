@@ -1,0 +1,21 @@
+{
+  "success-msjs":   {
+
+  },
+  "info-msjs":      {
+    "loading": "<span>Cargando...</span><i class='icon ion-looping'></i>"
+  },
+  "warning-msjs":   {
+
+  },
+  "danger-msjs":    {
+    "instagram-related": {
+      "no-pics": "No hay imágenes la cuenta!",
+      "no-user": "El usuario no existe!"
+    },
+    "incomplete-form": "Por favor, completar los espacios!"
+  },
+  "page-content":   {
+
+  }
+}
