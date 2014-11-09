@@ -15,6 +15,21 @@ $royal:                           #8a6de9 !default;
 $dark:                            #444 !default;
 */
 
+$green: #80b846;
+$darkerGreen: #6e9e3b;
+$waterGreen: #33e3a5;
+$blue: #0e619a;
+$darkerBlue: #0f5587;
+$red: #d6392c;
+$darkerRed: #b63223;
+$orange: #eb9e17;
+$darkerOrange: #c88812;
+$grey: #4a4a4b;
+$grey2: #666666;
+$lightGrey: #dadada;
+$darkerGrey: #353535;
+
+
 @mixin center-element($position){
     position: $position;
     margin: auto;
@@ -217,6 +232,143 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 .ng-enter {
     /*border-left:1px solid #000; */
 }
+
+/* 
+   =============  Info page  ============= 
+*/
+
+.info-container{
+    text-align: center;
+    text-transform: uppercase;
+    position: relative;
+
+    .list .item{
+        &.item-stable{
+            background: $green;
+            color: #FFF;
+            border: 2px solid #FFF;
+            font-size: 1.2em;
+            font-weight: bold;
+            &.activated, &.active{
+                background: $darkerGreen;
+            }
+        }
+        &.item-accordion{
+            line-height: 38px;
+            -webkit-transition:all linear 0.5s;
+            transition: 0.05s all linear;
+            padding: 4%;
+            text-align: left;
+            overflow: hidden;
+            font-style: italic;
+            text-transform: none;
+            border: none;
+            color: $grey;
+            p{
+                line-height: 18px;
+                text-overflow: initial;
+                white-space: normal;
+                &.center{
+                    text-align: center;
+                    font-weight: bold;
+                }
+                &.question{
+                    color: $green;
+                }
+                &.answer{
+                    margin-bottom: 12%;
+                    a{
+                        color: $blue;
+                        display: block;
+                        margin: auto;
+                        width: 50%;
+                    }
+                }
+            }
+            ul.list{
+                li{
+                    list-style-type: disc;
+                    list-style-position: inside;
+                    white-space: normal;
+                    text-overflow: inherit;
+                    border: none;
+                    font-size: 0.9em;
+                    line-height: 18px;
+                    margin-bottom: 5%;
+                }
+            }
+            .item-stable{
+                line-height: 5px;
+                text-align: center;
+                font-size: 1em;
+                margin-bottom: 3%;
+            }
+            a{
+                &.share{
+                    width: 80px;
+                    height: 80px;
+                    background: url('../img/share-sprite-smaller.png');
+                    background-position: 0 80px; 
+                    display: block;
+                    margin: 3%;
+                    border-radius: 50%;
+                    float: left;
+                    &:hover{
+                        background-position: 0 0; 
+                    }
+                }
+                &.twitter{
+                    background-position: -80px 80px;
+                    &:hover{
+                        background-position: -80px 0; 
+                    }
+                }
+                &.email{
+                    background-position: -160px 80px;
+                    &:hover{
+                        background-position: -160px 0; 
+                    }
+                }
+
+            }
+            .item-input{
+                border-radius: 4px;
+                margin-top: 5%;
+                margin-bottom: 8%;
+                display: block;
+                border-color: $green;
+                font-style: italic;
+                input, textarea{
+                   color: $green;
+                   font-style: italic; 
+                }
+                input-placeholder, textarea-placeholder{
+                    color: $green;
+                    font-style: italic; 
+                }
+                ::-webkit-input-placeholder {
+                    color: $green; 
+                }
+            }
+            button{
+                background: $green;
+                text-transform: uppercase;
+                color: #FFF;
+                font-weight: bold;
+            }
+        }//item-accordion
+        &.item-accordion.ng-hide{
+            line-height: 0px;
+            opacity: 0;
+        }
+        &.item-accordion.ng-hide-add,
+        &.item-accordion.ng-hide-remove{
+            display: block !important;  
+        } 
+
+    } // end .list .item
+}
+
 /* 
    =============  Confirm page  ============= 
 */

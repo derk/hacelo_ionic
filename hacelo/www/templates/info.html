@@ -1,13 +1,96 @@
 <ion-view title="HACELO DIGITAL" class="info-page" >
 	
   	<ion-content class="has-header">
-    	<div class="products-container">
-			<a class="button" href="#">Info</a>
-			<a class="button" href="#">Preguntas Frequentes</a>
-			<a class="button" href="#">Precios</a>
-			<a class="button" href="#">Envio</a>
-			<a class="button" href="#/app/share">Comparte</a>
-			<a class="button" href="#">Contactenos</a>
+    	<div class="info-container">
+			<ion-list>
+				<ion-item ng-model="info" class="item-stable" ng-click="toggleGroup('info')" ng-class="{active: isGroupShown('info')}">
+					Info
+				</ion-item>
+				<div class="item-accordion item" ng-show="isGroupShown('info')">
+					<p>Desde tu celular ahora podés imprimir todas tus fotografías con gran simplicidad con la nueva aplicación movil de Hacelo Digital. Todos nuestros productos son de la mejor calidad al ser impresos en papel fotográfico matte que es duradero y resistente. Además te ofrecemos otra facilidad ya que podemos enviarte cualquiera de nuestros productos a la puerta de tu casa y en muchos casos sin costo adicional.</p>
+					<p class="center">¿Qué estás esperando?</p>
+					<p>¡Ordená ya para que tus recuerdos perduren para toda la vida!</p>
+				</div>
+				<ion-item ng-model="faq" class="item-stable" ng-click="toggleGroup('faq')" ng-class="{active: isGroupShown('faq')}">
+				Preguntas frecuentes
+				</ion-item>
+				<div class="item-accordion item" ng-show="isGroupShown('faq')">
+					<p class="question center">¿Cómo se si se realizó mi orden?</p>
+					<p class="answer">Deberías de recibir un correo electrónico de
+					confirmación. No haremos ningún cobro si tu orden no se esta imprimiendo. Si todavía tenés alguna duda escribinos a <a href="mailto:info@hacelodigital.com">info@hacelodigital.com</a></p>
+					<p class="question center">¿Que hago si no se terminan de subir (upload) mis fotos?</p>
+					<p class="answer">Primero debes de revisar tu conexión a internet. Recomendamos que uses una conexión WIFI para garantizar mayor velocidad durante esta última etapa. También podés intentar cerrar otras aplicaciones que tengas abiertas que pueden estar compitiendo por el ancho de banda.</p>
+					<p class="question center">Cancelaciones y reembolsos</p>
+				</div>
+				<ion-item ng-model="price" class="item-stable" ng-click="toggleGroup('price')" ng-class="{active: isGroupShown('price')}">
+				precio
+				</ion-item>
+				<div class="item-accordion item" ng-show="isGroupShown('price')">
+					<p>Descripción Precio</p>
+				</div>
+				<ion-item ng-model="envio" class="item-stable" ng-click="toggleGroup('envio')" ng-class="{active: isGroupShown('envio')}">
+				Envio
+				</ion-item>
+				<div class="item-accordion item" ng-show="isGroupShown('envio')">
+					<p class="center question">¡Si, te lo enviamos a tu casa!</p>
+					<ul class="list">
+						<li>El costo del envío es calculado por peso y destino.</li>
+						<li>Todas nuestras ordenes requieren de la firma al ser entregadas.</li>
+						<li>Los pedidos toman entre 5-7 días hábiles en ser entregados</li>
+						<li>En la dirección de entrega debe haber alguien quien firme recibido el paquete de lunes a viernes de 9 a.m. a 5 p.m.</li>
+						<li>No podemos cambiar direcciones o combinar productos una vez que la orden haya sido establecida.</li>
+						<li>Recibirás un e-mail automatizado cuando tu orden salga para entrega.</li>
+						<li>No hay servicio de entrega en áreas peligrosas del país.</li>
+					</ul>
+					<ion-item class="item-stable envio">Sucursal Curridabat</ion-item>
+					<ion-item class="item-stable envio">Sucursal Desamparados</ion-item>
+					<ion-item class="item-stable envio">Sucursal Guadalupe</ion-item>
+					<ion-item class="item-stable envio">Sucursal Llorente</ion-item>
+					<p class="center question">Sucursal San José</p>
+					<p>
+						Av. 1a., calles 3 y 5, contiguo al Cine Omni.<br>
+						Horario: <br>
+						De Lunes a Viernes de 8am a 6pm y Sábados
+						de 8am a 1pm.<br>
+						Teléfono: (506) 2247-4541<br>
+						Fax: (506) 2222-9226
+					</p>
+					<p class="center question">Sucursal Rohrmoser</p>
+					<p>
+						Plaza Rohrmoser, segundo piso local #50 De
+						la Embajada Americana, 200 al este. <br>
+						Horario:<br>
+						De Lunes a Viernes de 8am a 6pm y Sábados
+						de 8am a 1pm.
+					</p>
+				</div>
+				<ion-item ng-model="share" class="item-stable" ng-click="toggleGroup('share')" ng-class="{active: isGroupShown('share')}">
+				Comparte
+				</ion-item>
+				<div class="item-accordion item" ng-show="isGroupShown('share')">
+					<a href="#" class="share fb"></a>
+					<a href="#" class="share twitter"></a>
+					<a href="3" class="share email"></a>
+				</div>
+				<ion-item ng-model="contacto" class="item-stable" ng-click="toggleGroup('contacto')" ng-class="{active: isGroupShown('contacto')}">
+				Contactenos
+				</ion-item>
+				<div class="item-accordion item" ng-show="isGroupShown('contacto')">
+					<label class="item item-input">
+						<input class="name" type="text" placeholder="nombre">
+					</label>
+					<label class="item item-input">
+						<input class="lastname" type="text" placeholder="apellido">
+					</label>
+					<label class="item item-input">
+						<input class="email" type="email" placeholder="correo electrónico">
+					</label>
+					<label class="item item-input">
+					    <textarea placeholder="consulta..." rows="8" cols="10"></textarea>
+					</label>
+					<button class="button button-block">Enviar</button>
+				</div>
+			</ion-list>
 		</div>
   	</ion-content>
 </ion-view>

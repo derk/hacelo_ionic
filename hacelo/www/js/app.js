@@ -51,7 +51,8 @@ angular.module('hacelo', [
         url: "/info",
         views: {
             'haceloContent': {
-                templateUrl: "templates/info.html"
+                templateUrl: "templates/info.html",
+                controller: "infoCtrl"
             }
         }
     })
