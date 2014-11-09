@@ -1,21 +1,32 @@
 {
-  "success-msjs":   {
+    "success-msjs": {
 
-  },
-  "info-msjs":      {
-    "loading": "<span>Cargando...</span><i class='icon ion-looping'></i>"
-  },
-  "warning-msjs":   {
-
-  },
-  "danger-msjs":    {
-    "instagram-related": {
-      "no-pics": "No hay imágenes la cuenta!",
-      "no-user": "El usuario no existe!"
     },
-    "incomplete-form": "Por favor, completar los espacios!"
-  },
-  "page-content":   {
+    "info-msjs": {
+        "loading": "<span>Cargando...</span><i class='icon ion-looping'></i>"
+    },
+    "warning-msjs": {
+        "cordova-related": {
+            "cordova-load-failed": {
+                "title": "¡Ups! Algo va mal aqu1",
+                "template": "Parece que no podemos imprimir esa imagen.",
+                "okText": "Entendido"
+            }
+        }
+    },
+    "danger-msjs": {
+        "instagram-related": {
+            "no-pics": "No hay imágenes la cuenta!",
+            "no-user": "El usuario no existe!",
+            "user-denied-access": {
+                "title": "¡Ups! Algo va mal aqu1",
+                "template": "Necesitamos de tu permiso para poder imprimir tus imagenes.",
+                "okText": "Entendido"
+            }
+        },
+        "incomplete-form": "Por favor, completar los espacios!"
+    },
+    "page-content": {
 
-  }
+    }
 }
