@@ -2,6 +2,7 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var bower = require('bower');
 var concat = require('gulp-concat');
+var clean = require('gulp-clean');
 var sass = require('gulp-sass');
 var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
@@ -26,12 +27,18 @@ gulp.task('sass', function(done) {
 });
 
 gulp.task('concat', function () {
+  var jsFilesRoot = './www/js/';
+  var outputFile = 'hacelo-digital.js';
+
+  gulp.src(jsFilesRoot+outputFile, {read: false})
+      .pipe(clean());
+
   gulp.src([
-      './www/js/*.js',
-      './www/js/*/module.js',
-      './www/js/*/*.js'])
-    .pipe(concat('hacelo-digital.js'))
-    .pipe(gulp.dest('./www/js/'));
+      jsFilesRoot + '*.js',
+      jsFilesRoot + '*/module.js',
+      jsFilesRoot + '*/**/*.js'])
+    .pipe(concat(outputFile))
+    .pipe(gulp.dest(jsFilesRoot));
 });
 
 gulp.task('watch', function() {
