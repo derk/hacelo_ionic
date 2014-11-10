@@ -1,0 +1,57 @@
+{
+  "customer": {
+    "name": "Joseph",
+    "firstName": "Montero",
+    "secondSurname": "Arguedas",
+    "phone": "86479946",
+    "address": {
+      "province": "",
+      "canton": "",
+      "district": ""
+    }
+  },
+  "shoppingCarts": [
+    {
+      "lineItem": "photo",
+      "coupon": {},
+      "items": [
+        {
+          "quantity": 1,
+          "fabricOptions": {}
+        },
+        {
+          "quantity": 1,
+          "fabricOptions": {}
+        }
+      ]
+    },
+    {
+      "lineItem": "photoAlbum",
+      "coupon": {},
+      "items": [
+        {
+          "quantity": 1,
+          "fabricOptions": {}
+        },
+        {
+          "quantity": 1,
+          "fabricOptions": {}
+        }
+      ]
+    },
+    {
+      "lineItem": "poster",
+      "coupon": {},
+      "items": [
+        {
+          "quantity": 1,
+          "fabricOptions": {}
+        },
+        {
+          "quantity": 1,
+          "fabricOptions": {}
+        }
+      ]
+    }
+  ]
+}

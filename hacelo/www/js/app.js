@@ -134,6 +134,15 @@ angular.module('hacelo', [
             }
         }
     })
+    .state('app.instagram', {
+        url: "/instagram",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/instagram.html",
+                controller: 'InstagramCrtl'
+            }
+        }
+    })
     .state('app.congrats', {
         url: "/congrats",
         views: {

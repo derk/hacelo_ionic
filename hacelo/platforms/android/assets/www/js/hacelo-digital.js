@@ -1,6 +1,5 @@
 angular.module('hacelo', [
     'ionic',
-    'hacelo.config',
     'hacelo.models',
     'hacelo.controllers',
     'hacelo.providers',
@@ -51,7 +50,8 @@ angular.module('hacelo', [
         url: "/info",
         views: {
             'haceloContent': {
-                templateUrl: "templates/info.html"
+                templateUrl: "templates/info.html",
+                controller: "infoCtrl"
             }
         }
     })
@@ -85,8 +85,7 @@ angular.module('hacelo', [
         url: "/confirm",
         views: {
             'haceloContent': {
-                templateUrl: "templates/confirm.html",
-                controller: 'confirmCtrl'
+                templateUrl: "templates/confirm.html"
             }
         }
     })
@@ -397,25 +396,6 @@ var controllers = angular.module('hacelo.controllers', []);
 var models = angular.module('hacelo.models', []);
 var providers = angular.module('hacelo.providers', []);
 var services = angular.module('hacelo.services', []);
-angular.module('hacelo.config', [])
-.constant('DB_CONFIG', {
-    name: 'HACELO_DB',
-    displayName: 'hacelo',
-    tables: [
-      {
-            name: 'documents',
-            columns: [
-                {name: 'id', type: 'integer primary key'},
-                {name: 'title', type: 'text'},
-                {name: 'keywords', type: 'text'},
-                {name: 'version', type: 'integer'},
-                {name: 'release_date', type: 'text'},
-                {name: 'filename', type: 'text'},
-                {name: 'context', type: 'text'}
-            ]
-        }
-    ]
-});
 controllers.controller('AppCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
     // Form data for the login modal
     $scope.loginData = {};
@@ -472,7 +452,6 @@ controllers.controller('chooseCtrl', function($scope, Nacion_Service) {
     $scope.username = '';
     $scope.instagram_pics = Nacion_Service.get_entire_ins_pics();
     $scope.all_pics_for_print = Nacion_Service.get_instagram_pics_on_queue();
-    console.debug($scope.all_pics_for_print);
 
     //Function for init the isntagram
     $scope.init_instagram = function(username) {
@@ -502,7 +481,6 @@ controllers.controller('chooseCtrl', function($scope, Nacion_Service) {
     });
     document.addEventListener('pagination', function(e) {
         Nacion_Service.setNextUrl(e.detail);
-        console.log(Nacion_Service.getNextUrl());
     });
     //Listener when the page just got the code and the images as well.
     document.addEventListener('finish', function(e) {
@@ -520,7 +498,6 @@ controllers.controller('chooseCtrl', function($scope, Nacion_Service) {
                 array.push(obj);
             }
             $scope.instagram_pics = array;
-            console.debug(array);
             Nacion_Service.set_entire_ins_pics($scope.instagram_pics);
             $scope.$apply();
             if ($scope.instagram_pics.length > 0) {
@@ -529,6 +506,25 @@ controllers.controller('chooseCtrl', function($scope, Nacion_Service) {
         }, 100);
 
     });
+});
+/* InfoCtrl Accordion List
+ * $scope - Scope de la pantalla
+ */
+
+controllers.controller('infoCtrl', function($scope) {
+
+	$scope.toggleGroup = function(group){
+		if($scope.isGroupShown(group)){
+			$scope.shownGroup = null;
+		}else{ 
+			$scope.shownGroup = group;	
+		}
+	};
+
+	$scope.isGroupShown = function(group){
+		return $scope.shownGroup === group;
+	};
+
 });
 /* Instagram para controlar la pantalla de isntagram
  * $scope - Scope de la pantalla
@@ -593,6 +589,22 @@ controllers.controller('InstagramCrtl', function($scope, Nacion_Service) {
         $scope.load_more = Nacion_Service.getNextUrl();
     });
 });
+controllers.controller('PhotoSourceCtrl', ['$scope', '$ionicPopup', 'MessageService', 'InstagramService', 'CordovaCameraService', 'ImageFactory', function ($scope, $ionicPopup, MessageService, InstagramService, CordovaCameraService, ImageFactory) {
+    $scope.pickedImages = [];
+
+    $scope.instagramPick = function() {
+        InstagramService.auth();
+    };
+    $scope.phonePick = function() {
+        CordovaCameraService.getPhonePic()
+        .then(function(result) {
+            alert(result);
+            $scope.pickedImages.push(result);
+        }, function(result) {
+            $ionicPopup.alert(MessageService.search("cordova-load-failed"));
+        });
+    };
+}]);
 controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
     
     $scope.shareFb = function(){
@@ -607,28 +619,222 @@ controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ion
         window.plugins.socialsharing.shareViaEmail('Hacelo','Hacelo');
     };
 });
-/*
- * Code pulled from https://gist.github.com/jgoux/10738978
- */
-models.factory('Document', ['DB', function (DB) {
-    var self = this;
-    
-    self.all = function() {
-        return DB.query('SELECT * FROM documents')
-        .then(function(result){
-            return DB.fetchAll(result);
+models.factory('ImageFactory', [function () {
+	function Image (URI) {
+		this.uri = URI;
+		this.base64Encoded;
+		this.width;
+		this.height;
+	}
+
+	Image.prototype.getBase64 = function() {
+		// body...
+	};
+
+	Image.prototype.mathHeigth = function(newWidth) {
+		return newWidth / (width / height);
+	};
+
+	Image.prototype.getThumbnail = function(expectedWidth) {
+		// body...
+	};
+
+	return Image;
+}])
+models.factory('StorageFactory', ['$window', function ($window) {
+	var storage = $window.localStorage;
+	var prefix = "hclDgtl";
+
+	this.setPrefix = function(newPrefix) {
+		prefix = newPrefix;
+	};
+
+	var save = function(newJson) {
+		return storage.setItem(prefix, angular.toJson(newJson, false));
+	};
+
+	var load = function() {
+		return angular.fromJson(storage.getItem(prefix));
+	};
+
+	var destroy = function() {
+		return storage.removeItem(prefix);
+	};
+
+	return {
+		save: function(newJson) {
+			return save(newJson);
+		},
+
+		load: function() {
+			return load();
+		},
+
+		destroy: function() {
+			return destroy();
+		},
+
+		init: function() {
+			if (!load()) {
+				return save({
+					key: 'value'
+				});
+			}
+
+			return load();
+		}
+	};
+}])
+services.service('CordovaCameraService', ['$window','$q','ImageFactory','MessageService','$ionicPopup', function ($window,$q,ImageFactory,MessageService,$ionicPopup) {
+    var cam = $window.navigator.camera,
+        cameraOptions = {
+            quality : 100,
+            destinationType : Camera.DestinationType.FILE_URI,
+            sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
+            /*allowEdit : true,
+            encodingType: Camera.EncodingType.JPEG,
+            targetWidth: 100,
+            targetHeight: 100,
+            popoverOptions: CameraPopoverOptions,
+            saveToPhotoAlbum: false*/
+        };
+
+    this.getPhonePic = function() {
+        var q = $q.defer();
+        cam.getPicture(function(result) {
+            q.resolve(result);
+        }, function(result) {
+            q.reject(result);
+        }, cameraOptions);
+
+        return q.promise;
+    };
+}])
+services.service('InstagramService', ['$http','$window','$ionicPopup','MessageService', function ($http, $window, $ionicPopup, MessageService) {
+    var self = this,
+        info,
+        user,
+        accessToken,
+        config = {
+            clientId:'70a2ae9262fc4805a5571e8036695a4d',
+            redirectUri:'http://www.wikipedia.org/',
+            apiUrl: 'https://api.instagram.com/v1/',
+            oauthUrl: 'https://instagram.com/oauth/authorize/?',
+            scope: 'basic'
+        };
+
+    var fetch = function(url, callback, params, method) {
+        var prms = {
+                client_id: config.clientId,
+                callback: 'JSON_CALLBACK'
+            },
+            cnfg = {
+                url: config.apiUrl+url,
+                method: method||'jsonp',
+                responseType: 'json',
+                params: angular.extend(prms, params)
+            };
+
+        $http(cnfg)
+            .success(function(data){
+                callback(data);
+            }).error(function(data){
+                callback({});
+            });
+    };
+
+    var bindAuthEvents = function(authTab) {
+        // This function bind the evens to the instagram autentication screen
+        // If every thing goes good then load the user information
+        // Also handle how the app respond to an authentication error
+        alert(authTab);
+        authTab.addEventListener('loadstop', function(e) {
+            if (e.url.search('access_token') !== -1) { // access granted
+                accessToken = e.url.substr(e.url.search('access_token')+13);
+            }
+            if (e.url.search('error') !== -1) { // The user denied access
+                var popupConfig = MessageService.search("user-denied-access");
+                $ionicPopup.show(popupConfig);
+            }
+            authTab.close();
         });
     };
-    
-    self.getById = function(id) {
-        return DB.query('SELECT * FROM documents WHERE id = ?', [id])
-        .then(function(result){
-            return DB.fetch(result);
+
+    this.getToken=function(){
+        return $window.sessionStorage.getItem('tkn');
+    };
+
+    this.auth = function() {
+        var options = {
+            client_id : config.clientId,
+            redirect_uri : config.redirectUri,
+            scope : config.scope,
+            response_type: 'token'
+        };
+
+        var authParams='';
+
+        angular.forEach(options, function(value, key) {
+            return authParams += key + '=' + value + '&';
+        });
+
+        var authUri = config.oauthUrl + authParams;
+
+        bindAuthEvents($window.open(authUri, '_blank', 'location=yes'));
+    };
+
+    this.getMedia = function(callback, params) {
+        fetch('users/self/media/recent', callback, angular.extend({
+            access_token: accessToken
+        }, params));
+    };
+
+    this.currentUser = function(callback) {
+        fetch('users/self', function(data) {
+            user = data.data;
+        }, {
+            access_token: accessToken
         });
     };
-    
-    return self;
 }]);
+services.service('LocationPrvdr', ['$http', function ($http) {
+	var costaRica;
+
+	var init = function() {
+		$http.get('js/common/costa-rica.json').
+			success(function(data, status, headers, config) {
+				costaRica = angular.fromJson(data);
+			}).
+			error(function(data, status, headers, config) {
+				console.log("Costa Rica JSON not found");
+			});
+	};
+
+	var iterate = function(obj) {
+		result = [];
+		angular.forEach(obj, function(value, key, obj) {
+			result.push({
+				id: key,
+				name: value.title
+			});
+		});
+		return result;
+	};
+
+	this.getProvinces = function() {
+		return iterate(costaRica.provincias);
+	};
+
+	this.getCantons = function(provinceID) {
+		return iterate(costaRica.provincias[provinceID].cantones);
+	};
+
+	this.getDistricts = function(provinceID, cantonID) {
+		return iterate(costaRica.provincias[provinceID].cantones[cantonID].distritos);
+	};
+
+	init();
+}])
 services.service('MessageService', ['$http', function ($http) {
     // Private stuff
     var messages =          null,
@@ -665,8 +871,8 @@ services.service('MessageService', ['$http', function ($http) {
     initMessages();
 }]);
 services.service('Nacion_Service',['$ionicLoading',function($ionicLoading){
-	this.username = '';
-	this.instagram_pics = [];
+  this.username = '';
+  this.instagram_pics = [];
   this.instagram_pics_on_queue = [];
   this.loadMore = '';
 
@@ -680,13 +886,13 @@ services.service('Nacion_Service',['$ionicLoading',function($ionicLoading){
   };
 
 
-	this.alert = function(){
-		alert('test');
-	};
+  this.alert = function(){
+    alert('test');
+  };
 
-	this.set_username = function(data){
-		this.username = data;
-	};
+  this.set_username = function(data){
+    this.username = data;
+  };
 
   this.setNextUrl = function(url){
     this.loadMore = url;
@@ -696,7 +902,7 @@ services.service('Nacion_Service',['$ionicLoading',function($ionicLoading){
     return this.loadMore;
   };
 
-	this.createEvent = function(text,data){
+  this.createEvent = function(text,data){
         var event;
           if(data !=undefined){
             event = new CustomEvent(text,{'detail':data});
@@ -706,11 +912,11 @@ services.service('Nacion_Service',['$ionicLoading',function($ionicLoading){
           document.dispatchEvent(event);
     };
     this.set_entire_ins_pics = function(data){
-    	this.instagram_pics = data;
+      this.instagram_pics = data;
     };
 
     this.get_entire_ins_pics = function(){
-    	return this.instagram_pics;
+      return this.instagram_pics;
     };
 
     this.set_instagram_pics_on_queue = function(data){
@@ -720,60 +926,4 @@ services.service('Nacion_Service',['$ionicLoading',function($ionicLoading){
     this.get_instagram_pics_on_queue = function(){
       return this.instagram_pics_on_queue;
     };
-}]);
-/*
- * Code pulled from https://gist.github.com/jgoux/10738978
- */
-services.factory('DB', ['$q', 'DB_CONFIG', '$window', '$log', function ($q, DB_CONFIG, $window, $log) {
-    // DB wrapper
-    var self = this;
-    self.db = null;
- 
-    self.init = function() {
-        // Use self.db = window.sqlitePlugin.openDatabase({name: DB_CONFIG.name}); in production
-        self.db = $window.openDatabase(DB_CONFIG.name, '1.0', DB_CONFIG.displayName, -1);
- 
-        angular.forEach(DB_CONFIG.tables, function(table) {
-            var columns = [];
- 
-            angular.forEach(table.columns, function(column) {
-                columns.push(column.name + ' ' + column.type);
-            });
- 
-            var query = 'CREATE TABLE IF NOT EXISTS ' + table.name + ' (' + columns.join(',') + ')';
-            self.query(query);
-            $log('Table ' + table.name + ' initialized');
-        });
-    };
- 
-    self.query = function(query, bindings) {
-        bindings = typeof bindings !== 'undefined' ? bindings : [];
-        var deferred = $q.defer();
- 
-        self.db.transaction(function(transaction) {
-            transaction.executeSql(query, bindings, function(transaction, result) {
-                deferred.resolve(result);
-            }, function(transaction, error) {
-                deferred.reject(error);
-            });
-        });
- 
-        return deferred.promise;
-    };
- 
-    self.fetchAll = function(result) {
-        var output = [];
- 
-        for (var i = 0; i < result.rows.length; i++) {
-            output.push(result.rows.item(i));
-        }
-        
-        return output;
-    };
- 
-    self.fetch = function(result) {
-        return result.rows.item(0);
-    };
- 
-    return self;
 }]);

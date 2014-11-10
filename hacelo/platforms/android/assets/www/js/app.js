@@ -1,6 +1,5 @@
 angular.module('hacelo', [
     'ionic',
-    'hacelo.config',
     'hacelo.models',
     'hacelo.controllers',
     'hacelo.providers',
@@ -51,7 +50,8 @@ angular.module('hacelo', [
         url: "/info",
         views: {
             'haceloContent': {
-                templateUrl: "templates/info.html"
+                templateUrl: "templates/info.html",
+                controller: "infoCtrl"
             }
         }
     })
@@ -85,8 +85,7 @@ angular.module('hacelo', [
         url: "/confirm",
         views: {
             'haceloContent': {
-                templateUrl: "templates/confirm.html",
-                controller: 'confirmCtrl'
+                templateUrl: "templates/confirm.html"
             }
         }
     })
