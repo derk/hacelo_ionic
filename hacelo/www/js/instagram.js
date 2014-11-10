@@ -45,17 +45,15 @@
 
         bind_events: function() {
             var self = this;
-            this.tab.addEventListener('loadstop', function(e) {
+            this.tab.addEventListener('loadstart', function(e) {
                 var el = e.url.split("code=");
                 var error = e.url.split('error=');
                 console.log(el);
                 console.log(error);
                 if (typeof error[1] != "undefined") {
-                    console.log('aca');
                     self.error_callback();
                 } else {
                     if (typeof el[1] != "undefined") {
-                        console.log('allaa');
                         self.code = el[1];
                         self.found_access_code(el);
                     }
@@ -75,6 +73,26 @@
                 dataType: 'jsonp',
                 jsonpCallback: 'callback',
                 success: function(e) {
+                    console.log(e);
+                    callback(e, self);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.debug(jqXHR);
+                    console.debug(errorThrown);
+                }
+            });
+        },
+
+        fetch_new_page: function(url,callback) {
+            var self = this;
+            $.ajax({
+                url: url,
+                type: 'GET',
+                crossDomain: true,
+                dataType: 'jsonp',
+                jsonpCallback: 'callback',
+                success: function(e) {
+                    console.log(e);
                     callback(e, self);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
@@ -85,6 +103,7 @@
         },
 
         insert_images: function(response, self) {
+            var pag = null;
             console.debug(response);
             $('.images-hidden *').remove();
             setTimeout(function() {
@@ -100,33 +119,39 @@
                         img_encode = null;
 
                     for (var els = 0; els < response.data.length; els++) {
-                        obj = {
-                            "url": response.data[els].images.standard_resolution
-                        };
-                        array.push(obj);
-                        img += "<img class='img_test' src='" + response.data[els].images.standard_resolution.url + "' id='image_id_" + counter + "'/>"
+                        //obj = {
+                            //"url": response.data[els].images.standard_resolution
+                        //};
+                        array.push(response.data[els].images.standard_resolution);
+                        //img += "<img class='img_test' src='" + response.data[els].images.standard_resolution.url + "' id='image_id_" + counter + "'/>"
                         counter++;
                     }
-                    self.img_template["images"] = array;
-                    $(img).appendTo(".images-hidden");
 
-                    setTimeout(function() {
-                        count = $(".img_test").length;
-                        img_encode = $(".img_test");
-                        for (var x = 0; x < count; x++) {
-                            console.debug(img_encode[x].id);
-                            console.log(self.convert_img_to_encode(img_encode[x].id));
-                            self.array_angular.push(self.convert_img_to_encode(img_encode[x].id));
-                        }
-                        self.createEvent('finish', self.array_angular);
-                    }, 400);
+
+                    self.img_template["images"] = array;
+
+                    if(response.pagination){
+                       self.createEvent('pagination', response.pagination.next_url)
+                    }
+
+                    self.createEvent('finish', array);
+
+                    
+                    // setTimeout(function() {
+                    //     count = $(".img_test").length;
+                    //     img_encode = $(".img_test");
+                    //     for (var x = 0; x < count; x++) {
+                    //         console.debug(img_encode[x].id);
+                    //         console.log(self.convert_img_to_encode(img_encode[x].id));
+                    //         self.array_angular.push(self.convert_img_to_encode(img_encode[x].id));
+                    //     }
+                    //     self.createEvent('finish', self.array_angular);
+                    // }, 400);
                 }
             }, 100);
         },
 
         get_user_id: function(data, scope) {
-            console.log('----------------');
-            console.log(data);
             if (data.data <= 0) {
                 hacelo.alert(messages['NO_EXIST']);
             } else {
@@ -136,6 +161,10 @@
                 self.fetch("https://api.instagram.com/v1/users/" + self.user_id + "/media/recent", 'access_token=' + self.access_token, self.insert_images);
             }
 
+        },
+
+        loadMore: function(url){
+            this.fetch_new_page(url, this.insert_images);
         },
 
         found_access_code: function(data) {

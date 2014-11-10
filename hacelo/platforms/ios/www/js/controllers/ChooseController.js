@@ -35,7 +35,10 @@ controllers.controller('chooseCtrl', function($scope, Nacion_Service) {
         $scope.username = e.detail;
         $scope.init_instagram($scope.username);
     });
-
+    document.addEventListener('pagination', function(e) {
+        Nacion_Service.setNextUrl(e.detail);
+        console.log(Nacion_Service.getNextUrl());
+    });
     //Listener when the page just got the code and the images as well.
     document.addEventListener('finish', function(e) {
         //Open the loading popup

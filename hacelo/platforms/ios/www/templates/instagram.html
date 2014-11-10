@@ -10,8 +10,9 @@
 			<div class="instagram-pics">
 				<div class="imagen {{item.picked}}" ng-animate="'animate'" ng-repeat="item in instagram_pics track by $index">
 					<button ng-click="pick_song($index, item.img)" class="pick-img"></button>
-				    <img width="" src="{{ item.img }}" class="{{item.picked}}" id="img_{{ $index }}"/>
+				    <img width="" src="{{ item.img.url }}" class="{{item.picked}}" id="img_{{ $index }}"/>
 				 </div>
+				 <button ng-show="load_more != '' " ng-click="loadMore()">Cargar Mas</button>
 			</div>
 		</div>
   	</ion-content>

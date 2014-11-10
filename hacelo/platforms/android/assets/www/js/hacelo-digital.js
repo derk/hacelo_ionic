@@ -135,6 +135,15 @@ angular.module('hacelo', [
             }
         }
     })
+    .state('app.instagram', {
+        url: "/instagram",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/instagram.html",
+                controller: 'InstagramCrtl'
+            }
+        }
+    })
     .state('app.congrats', {
         url: "/congrats",
         views: {
@@ -194,17 +203,15 @@ angular.module('hacelo', [
 
         bind_events: function() {
             var self = this;
-            this.tab.addEventListener('loadstop', function(e) {
+            this.tab.addEventListener('loadstart', function(e) {
                 var el = e.url.split("code=");
                 var error = e.url.split('error=');
                 console.log(el);
                 console.log(error);
                 if (typeof error[1] != "undefined") {
-                    console.log('aca');
                     self.error_callback();
                 } else {
                     if (typeof el[1] != "undefined") {
-                        console.log('allaa');
                         self.code = el[1];
                         self.found_access_code(el);
                     }
@@ -224,6 +231,26 @@ angular.module('hacelo', [
                 dataType: 'jsonp',
                 jsonpCallback: 'callback',
                 success: function(e) {
+                    console.log(e);
+                    callback(e, self);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.debug(jqXHR);
+                    console.debug(errorThrown);
+                }
+            });
+        },
+
+        fetch_new_page: function(url,callback) {
+            var self = this;
+            $.ajax({
+                url: url,
+                type: 'GET',
+                crossDomain: true,
+                dataType: 'jsonp',
+                jsonpCallback: 'callback',
+                success: function(e) {
+                    console.log(e);
                     callback(e, self);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
@@ -234,6 +261,7 @@ angular.module('hacelo', [
         },
 
         insert_images: function(response, self) {
+            var pag = null;
             console.debug(response);
             $('.images-hidden *').remove();
             setTimeout(function() {
@@ -249,33 +277,39 @@ angular.module('hacelo', [
                         img_encode = null;
 
                     for (var els = 0; els < response.data.length; els++) {
-                        obj = {
-                            "url": response.data[els].images.standard_resolution
-                        };
-                        array.push(obj);
-                        img += "<img class='img_test' src='" + response.data[els].images.standard_resolution.url + "' id='image_id_" + counter + "'/>"
+                        //obj = {
+                            //"url": response.data[els].images.standard_resolution
+                        //};
+                        array.push(response.data[els].images.standard_resolution);
+                        //img += "<img class='img_test' src='" + response.data[els].images.standard_resolution.url + "' id='image_id_" + counter + "'/>"
                         counter++;
                     }
-                    self.img_template["images"] = array;
-                    $(img).appendTo(".images-hidden");
 
-                    setTimeout(function() {
-                        count = $(".img_test").length;
-                        img_encode = $(".img_test");
-                        for (var x = 0; x < count; x++) {
-                            console.debug(img_encode[x].id);
-                            console.log(self.convert_img_to_encode(img_encode[x].id));
-                            self.array_angular.push(self.convert_img_to_encode(img_encode[x].id));
-                        }
-                        self.createEvent('finish', self.array_angular);
-                    }, 400);
+
+                    self.img_template["images"] = array;
+
+                    if(response.pagination){
+                       self.createEvent('pagination', response.pagination.next_url)
+                    }
+
+                    self.createEvent('finish', array);
+
+                    
+                    // setTimeout(function() {
+                    //     count = $(".img_test").length;
+                    //     img_encode = $(".img_test");
+                    //     for (var x = 0; x < count; x++) {
+                    //         console.debug(img_encode[x].id);
+                    //         console.log(self.convert_img_to_encode(img_encode[x].id));
+                    //         self.array_angular.push(self.convert_img_to_encode(img_encode[x].id));
+                    //     }
+                    //     self.createEvent('finish', self.array_angular);
+                    // }, 400);
                 }
             }, 100);
         },
 
         get_user_id: function(data, scope) {
-            console.log('----------------');
-            console.log(data);
             if (data.data <= 0) {
                 hacelo.alert(messages['NO_EXIST']);
             } else {
@@ -285,6 +319,10 @@ angular.module('hacelo', [
                 self.fetch("https://api.instagram.com/v1/users/" + self.user_id + "/media/recent", 'access_token=' + self.access_token, self.insert_images);
             }
 
+        },
+
+        loadMore: function(url){
+            this.fetch_new_page(url, this.insert_images);
         },
 
         found_access_code: function(data) {
@@ -462,7 +500,10 @@ controllers.controller('chooseCtrl', function($scope, Nacion_Service) {
         $scope.username = e.detail;
         $scope.init_instagram($scope.username);
     });
-
+    document.addEventListener('pagination', function(e) {
+        Nacion_Service.setNextUrl(e.detail);
+        console.log(Nacion_Service.getNextUrl());
+    });
     //Listener when the page just got the code and the images as well.
     document.addEventListener('finish', function(e) {
         //Open the loading popup
@@ -496,7 +537,9 @@ controllers.controller('chooseCtrl', function($scope, Nacion_Service) {
 controllers.controller('InstagramCrtl', function($scope, Nacion_Service) {
     $scope.instagram_pics = Nacion_Service.get_entire_ins_pics();
     $scope.picked_pics = Nacion_Service.get_instagram_pics_on_queue();
+    $scope.load_more = Nacion_Service.getNextUrl();
     Nacion_Service.hide();
+    console.log($scope.load_more);
 
     $scope.pick_song = function(index, data) {
         if ($scope.instagram_pics[index].picked) {
@@ -507,7 +550,6 @@ controllers.controller('InstagramCrtl', function($scope, Nacion_Service) {
             $scope.instagram_pics[index].picked = true;
             $scope.picked_pics.push(data);
         }
-        console.debug($scope.picked_pics.length);
     };
 
     $scope.insert_into_queue = function() {
@@ -515,6 +557,41 @@ controllers.controller('InstagramCrtl', function($scope, Nacion_Service) {
         window.picked = $scope.picked_pics;
         window.history.back();
     };
+
+    $scope.loadMore = function(){
+        var instagram_v = new Instagram();
+            instagram_v.loadMore($scope.load_more);
+    };
+
+    document.addEventListener('finish', function(e) {
+        //Open the loading popup
+        Nacion_Service.show(hacelo.messages.Loading);
+        //little timeout to ensure the pop up to appear
+        setTimeout(function() {
+            var nextPage = e.detail;
+            var array = [];
+            for (var el = 0; el < nextPage.length; el++) {
+                var obj = {
+                    "img": nextPage[el],
+                    "picked": false
+                };
+                array.push(obj);
+            }
+            $scope.instagram_pics = $scope.instagram_pics.concat(array);
+            console.debug(array);
+            Nacion_Service.set_entire_ins_pics($scope.instagram_pics);
+            Nacion_Service.hide();
+
+            Nacion_Service.setNextUrl('');
+            $scope.load_more = Nacion_Service.getNextUrl();
+        }, 100);
+
+    });
+
+    document.addEventListener('pagination', function(e) {
+        Nacion_Service.setNextUrl(e.detail);
+        $scope.load_more = Nacion_Service.getNextUrl();
+    });
 });
 controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
     
@@ -591,6 +668,7 @@ services.service('Nacion_Service',['$ionicLoading',function($ionicLoading){
 	this.username = '';
 	this.instagram_pics = [];
   this.instagram_pics_on_queue = [];
+  this.loadMore = '';
 
   this.show = function(text) {
     $ionicLoading.show({
@@ -609,6 +687,14 @@ services.service('Nacion_Service',['$ionicLoading',function($ionicLoading){
 	this.set_username = function(data){
 		this.username = data;
 	};
+
+  this.setNextUrl = function(url){
+    this.loadMore = url;
+  };
+
+  this.getNextUrl = function(){
+    return this.loadMore;
+  };
 
 	this.createEvent = function(text,data){
         var event;

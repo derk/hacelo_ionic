@@ -2,6 +2,7 @@ services.service('Nacion_Service',['$ionicLoading',function($ionicLoading){
 	this.username = '';
 	this.instagram_pics = [];
   this.instagram_pics_on_queue = [];
+  this.loadMore = '';
 
   this.show = function(text) {
     $ionicLoading.show({
@@ -20,6 +21,14 @@ services.service('Nacion_Service',['$ionicLoading',function($ionicLoading){
 	this.set_username = function(data){
 		this.username = data;
 	};
+
+  this.setNextUrl = function(url){
+    this.loadMore = url;
+  };
+
+  this.getNextUrl = function(){
+    return this.loadMore;
+  };
 
 	this.createEvent = function(text,data){
         var event;

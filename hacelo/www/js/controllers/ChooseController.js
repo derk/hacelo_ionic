@@ -7,7 +7,6 @@ controllers.controller('chooseCtrl', function($scope, Nacion_Service) {
     $scope.username = '';
     $scope.instagram_pics = Nacion_Service.get_entire_ins_pics();
     $scope.all_pics_for_print = Nacion_Service.get_instagram_pics_on_queue();
-    console.debug($scope.all_pics_for_print);
 
     //Function for init the isntagram
     $scope.init_instagram = function(username) {
@@ -35,7 +34,9 @@ controllers.controller('chooseCtrl', function($scope, Nacion_Service) {
         $scope.username = e.detail;
         $scope.init_instagram($scope.username);
     });
-
+    document.addEventListener('pagination', function(e) {
+        Nacion_Service.setNextUrl(e.detail);
+    });
     //Listener when the page just got the code and the images as well.
     document.addEventListener('finish', function(e) {
         //Open the loading popup
@@ -52,7 +53,6 @@ controllers.controller('chooseCtrl', function($scope, Nacion_Service) {
                 array.push(obj);
             }
             $scope.instagram_pics = array;
-            console.debug(array);
             Nacion_Service.set_entire_ins_pics($scope.instagram_pics);
             $scope.$apply();
             if ($scope.instagram_pics.length > 0) {
