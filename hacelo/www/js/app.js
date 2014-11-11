@@ -1,5 +1,6 @@
 angular.module('hacelo', [
     'ionic',
+    'hacelo.config',
     'hacelo.models',
     'hacelo.controllers',
     'hacelo.providers',
