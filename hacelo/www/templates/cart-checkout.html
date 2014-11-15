@@ -9,33 +9,54 @@
     		<a class="info" href="#">ver información completa de envío</a>
 			
 			<div class="list list-inset">
-				<select>
-			      <option selected>Costa Rica</option>
-			      <option>Guatemala</option>
-			      <option>Panamá</option>
-			    </select>
+				
 			    <div class="maininfo">
 			    	<label class="item item-input name">
-					<input class="" type="text" placeholder="NOMBRE">
+					<input class="" type="text" name="name" placeholder="NOMBRE">
 					</label>
 					<label class="item item-input lastname">
-						<input class="" type="text" placeholder="APELLIDO">
+						<input class="" type="text" name="lastname" placeholder="APELLIDO">
 					</label>
 			    </div>
-				<label class="item item-input">
-					<input class="address1" type="text" placeholder="DIRECCIÓN 1">
+				<label class="item item-input no-mg-bottom">
+					<input name="email" type="email" placeholder="CORREO">
 				</label>
-				<label class="item item-input">
-					<input class="address2" type="text" placeholder="DIRECCIÓN 2">
+				<span class="advise">(Para enviarte la factura)</span>
+				<label class="item item-input no-mg-bottom">
+					<input name="tel" type="text" placeholder="TELÉFONO">
 				</label>
+				<span class="advise">(Para llamarte por si algo sucedió durante la entrega)</span>
+
+				<h3>Te enviamos tus fotos a: </h3>
+				<label class="item btn sucursales">
+			      <button ng-click="" class="button button-block button-positive" type="submit">Sucursales (gratis)</button>
+			    </label>
+			    <label class="item btn casa">
+			      <button ng-click="" class="button button-block" type="submit">Casa</button>
+			    </label>
 				<label class="item item-input">
-					<input class="city" type="text" placeholder="CIUDAD">
+					<textarea name="comment" ng-model="address" rows="7" cols="5" placeholder="DIRECCIÓN">
+					</textarea>
 				</label>
-				<label class="item item-input">
-					<input class="city2" type="text" placeholder="PROVINCIA">
-				</label>
-				<label class="item item-input">
-					<input class="apt" type="text" placeholder="APARTADO POSTAL">
+				<select>
+			      <option selected>San José</option>
+			      <option>Heredia</option>
+			      <option>Cartago</option>
+			    </select>
+			    <span class="advise">(Ej: San José)</span>
+			    <select>
+			      <option selected>Tibás</option>
+			      <option>Guadalupe</option>
+			    </select>
+			    <span class="advise">(Ej. Tibás)</span>
+			    <select>
+			      <option selected>Llorente</option>
+			      <option>Otro</option>
+			    </select>
+			    <span class="advise">(Ej. Llorente)</span>
+			    <label class="item input-checkbox">
+					<input type="checkbox">
+					<span>Recordar para la próxima compra</span>
 				</label>
 			</div>
     		
