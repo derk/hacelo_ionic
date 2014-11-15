@@ -692,6 +692,43 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
     }
 }
 /* 
+   =============  payment page  ============= 
+*/
+
+.payment-page{
+    background: $lightGrey;
+    .payment-container{
+        label{
+            border-color: $borderColor;
+            margin: 4%;
+            input{
+                height: 23px;
+                color: $text-grey;
+            }
+            &.card{
+                padding-left: 2%;
+                select{
+                    border: 0;
+                    width: 100%;
+                    color: $text-grey;
+                    text-transform: uppercase;
+                }
+            }
+            &.date{
+                span{
+                    font-size: 0.8em;
+                    padding: 0 10px 0 0;
+                }
+                input{
+                    margin-top: 0;
+                    padding-top: 0;
+                }
+            }
+        }
+    }
+}
+
+/* 
    =============  congrats page  ============= 
 */
  .congrats-page {
