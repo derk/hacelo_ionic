@@ -78,7 +78,7 @@ angular.module('hacelo', [
         views: {
             'haceloContent': {
                 templateUrl: "templates/check-photo.html",
-                controller: 'checkCrtl'
+                controller: 'checkCtrl'
             }
         }
     })

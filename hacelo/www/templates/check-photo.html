@@ -6,7 +6,9 @@
 
   	<ion-content class="has-header">
     	<div class="check-container">
-			<h1>REVISAR Y CORTAR</h1>
+    		<div ng-repeat="image in images track by $index">
+    			<img data-ng-src="{{image}}" ng-click="crop($index)">
+    		</div>
 		</div>
   	</ion-content>
 </ion-view>

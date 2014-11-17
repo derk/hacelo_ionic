@@ -56,6 +56,7 @@
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/cordova.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/cordova_plugins.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/css \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/darkroom \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/img \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/index.html \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js \
@@ -64,6 +65,15 @@
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/templates \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/css/ionic.app.css \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/css/ionic.app.min.css \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/darkroom/css \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/darkroom/fonts \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/darkroom/js \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/darkroom/css/darkroom.min.css \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/darkroom/css/darkroom.min.css.map \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/darkroom/fonts/darkroom-db4f83343dc5c97207f9cbd2254ca682.eot \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/darkroom/fonts/darkroom-db4f83343dc5c97207f9cbd2254ca682.svg \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/darkroom/js/darkroom.min.js \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/darkroom/js/darkroom.min.js.map \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/img/arrow-buttons-small.png \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/img/arrow-buttons.png \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/img/arrow-green-buttons-small.png \
@@ -100,6 +110,7 @@
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/common/PhotoPrintConfig.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/common/posible-cart-v1.json \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/AppController.js \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/CheckController.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/ChooseController.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/InfoController.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/InstagramController.js \
@@ -116,8 +127,10 @@
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/services/MessageService.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/services/module.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/services/NacionService.js \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/lib/fabric \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/lib/ionic \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/lib/jquery \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/lib/fabric/fabric.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/lib/ionic/css \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/lib/ionic/fonts \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/lib/ionic/js \
