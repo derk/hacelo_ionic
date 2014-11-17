@@ -1,5 +1,6 @@
 angular.module('hacelo', [
     'ionic',
+    'hacelo.config',
     'hacelo.models',
     'hacelo.controllers',
     'hacelo.providers',
@@ -120,8 +121,55 @@ angular.module('hacelo', [
         url: "/cart-empty",
         views: {
             'haceloContent': {
-                templateUrl: "templates/cart-empty.html",
-                controller: 'cartEmptyCtrl'
+                templateUrl: "templates/cart-empty.html"
+            }
+        }
+    })
+    .state('app.payment', {
+        url: "/payment",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/payment.html"
+            }
+        }
+    })
+    .state('app.confirm-order', {
+        url: "/confirm-order",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/confirm-order.html"
+            }
+        }
+    })
+    .state('app.processing-order', {
+        url: "/processing-order",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/processing-order.html"
+            }
+        }
+    })
+    .state('app.order-sent', {
+        url: "/order-sent",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/order-sent.html"
+            }
+        }
+    })
+    .state('app.show-love', {
+        url: "/show-love",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/show-love.html"
+            }
+        }
+    })
+    .state('app.photobook', {
+        url: "/photobook",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/photobook.html"
             }
         }
     })

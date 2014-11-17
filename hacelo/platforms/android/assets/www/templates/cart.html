@@ -1,9 +1,19 @@
-<ion-view title="CARRITO(1)" class="cart-page" >
+<ion-view title="CARRITO1" class="cart-page" >
 	
   	<ion-content class="has-header">
     	<div class="cart-container">
-    		<p>Subtotal<br />
-    		1 item <span>= 4900.00</span></p>
+    		<div class="image-placeholder"></div>
+    		<p class="subtotal">Subtotal</h3>
+    		<p>1 item <span>= 4900.00</span></p>
+    		<span class="input-label">Cupón de Descuento</span>
+    		<label class="item item-input">
+    			<input type="text" ng-model="">
+                <span ng-class="" class="img valid"></span><!-- Add valid or invalid class -->
+    		</label>
+		    <label class="item validate">
+		      <button ng-click="" class="button button-block button-positive" type="submit">Validar Descuento</button>
+		    </label>
+            <p class="subtotal">Subtotal<span>= 4900.00</span></p>
     		<a class="button button-balanced" href="#/app/cart-checkout">Pagar Ahora</a>
 		</div>
   	</ion-content>

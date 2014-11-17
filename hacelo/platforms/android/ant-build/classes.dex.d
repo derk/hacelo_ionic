@@ -16,6 +16,9 @@
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/ant-build/classes/nl/xservices/plugins/SocialSharing$2.class \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/ant-build/classes/nl/xservices/plugins/SocialSharing$SocialSharingRunnable.class \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/ant-build/classes/nl/xservices/plugins/SocialSharing.class \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/ant-build/classes/org/apache/cordova/camera/CameraLauncher.class \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/ant-build/classes/org/apache/cordova/camera/ExifHelper.class \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/ant-build/classes/org/apache/cordova/camera/FileHelper.class \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/ant-build/classes/org/apache/cordova/device/Device.class \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/ant-build/classes/org/apache/cordova/inappbrowser/InAppBrowser$1.class \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/ant-build/classes/org/apache/cordova/inappbrowser/InAppBrowser$2.class \
