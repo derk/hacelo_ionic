@@ -836,3 +836,14 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
         font-size: 20px;
     }
 }
+
+
+
+.popup {
+    width: 98% !important;
+    height: 65% !important;
+  }
+
+  .popup-body {
+    overflow: visible;
+  }
