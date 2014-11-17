@@ -729,6 +729,85 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 }
 
 /* 
+   =============  confirm-order page  ============= 
+*/
+
+.confirm-order-page{
+    background: $lightGrey;
+    .confirm-order-container{
+        margin: 0 3%;
+        .order{
+            border: 1px solid $borderColor;
+            background: #FFF;
+            padding: 2%;
+            margin: 1.5% 0 1% 0;
+            div{
+                overflow: hidden;
+                span.sendto, span.contact{
+                    font-size: 0.8em;
+                    color: $text-grey;
+                    float: left;
+                    width: 25%;
+                }
+                p{
+                    width: 72%;
+                    float: left;
+                    font-size: 1em;
+                    span{
+                        display: block;
+                    }
+                    a.edit{
+                        width: 28%;
+                        background: $red;
+                        display: block;
+                        text-decoration: none;
+                        margin-top: 8%;
+                        color: white;
+                        text-align: center;
+                        font-weight: bold;
+                        font-size: 0.8em;
+                        text-transform: uppercase;
+                    }
+                }
+            }
+        }
+        label{
+            &.input-checkbox{
+                margin: 0;
+                padding: 2%;
+                border: 1px solid $borderColor;
+                span{
+                    text-transform: uppercase;
+                    font-size: 0.6em;
+                    color: $text-grey;
+                }
+            }
+        }
+        h3.photos{
+            width: 55%;
+            background: #FFF;
+            padding: 2% 6%;
+            color: $green;
+            font-weight: bold;
+        }
+        h4.total{
+            background: $red;
+            width: 40%;
+            padding: 2.2%;
+            font-size: 1.1em;
+            margin-bottom: 16%;
+            font-weight: bold;
+        }
+        a.button{
+            min-height: 40px;
+            width: 100%;
+            text-transform: uppercase;
+            padding: 0;
+        }
+    }
+}
+
+/* 
    =============  congrats page  ============= 
 */
  .congrats-page {
