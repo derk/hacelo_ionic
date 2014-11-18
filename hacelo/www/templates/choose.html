@@ -1,28 +1,22 @@
 <ion-view title="SELECCIONAR" class="photo-pick-page" >
 	<ion-nav-buttons side="right">
-	    <a style="color: black;" class="button button-icon icon ion-forward available-{{all_pics_for_print.length<=0}}" href="#/app/check"></a> 
+		<a class="button button-icon icon ion-forward" href="#/app/check"></a>
 	</ion-nav-buttons>
-  	<ion-content class="has-header">
-    	<div class="photo-pick-container">
-			<a class="button-picker" ng-click="call_popup()">Instagram</a>
-			<div class="images-hidden" style="display:none;"></div>
-			<!--div class="instagram-pics">
-				<div class="imagen" ng-animate="'animate'" ng-repeat="item in instagram_pics track by $index">
-					<button class="pick-img"></button>
-				    <img width="" src="{{ item.img }}" class="{{item.picked}}" id="img_{{ $index }}"/>
-				 </div>
-			</div-->
-			<a class="button-picker">Albums</a>
-			<div class="normal-pics"></div>
+	<ion-content class="has-header">
+		<div class="photo-pick-container">
+			<a class="button-picker" ng-click="instagramImageLoad()">Instagram</a>
+			<a class="button-picker" ng-click="phoneImageLoad()">Albums</a>
 		</div>
-  	</ion-content>
+		<div class="photos">
+			<div class="images-container">
+				<div class="image" ng-repeat="image in imageStack" ng-init="thumbnail = image.images.thumbnail">
+					<div class="image-inner" ng-class="{'positive-bg': image.toPrint}">
+						<a href="javascript:void(0);" ng-click="image.toPrint = !image.toPrint">
+							<img ng-src="{{thumbnail.url}}" width="{{thumbnail.width}}" height="{{thumbnail.height}}" alt="Photo">
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</ion-content>
 </ion-view>
-
-
-
-
-
-<div class="photo-page-picker">
-
-	
-</div> 
