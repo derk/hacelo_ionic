@@ -3,32 +3,31 @@ services.service('MessageService', ['$http', function ($http) {
     var messages =          null,
         messageDBlocation = "js/common/messagesDB.json",
         self =              this,
-        callbackResult =    function(json) {
-            self.messages = json ? angular.fromJson(json) : {};
+        callbackResult =    function(data, status, headers, config) {
+            messages = data ? angular.fromJson(data) : {};
         },
         initMessages =      function() {
-            $http.get(messageDBlocation).
-              success(callbackResult).
-              error(callbackResult);
-        },
-        keyToValue =   function(searchCriteria, obj) {
-            var value;
-            for(var key in obj) {
-                if (angular.isDefined(obj[searchCriteria])) {
-                    value = obj[searchCriteria];
-                }
-                if( angular.isObject(obj[searchCriteria]) || angular.isArray(obj[searchCriteria])){
-                    value = keyToValue(obj[searchCriteria]);
-                }
-            }
-            if (angular.isUndefined(value)) {
-                value = "not found";
-            }
-            return value;
+            $http.get(messageDBlocation)
+                .success(callbackResult)
+                .error(callbackResult);
         };
+    this.keyToValue =   function(searchCriteria, obj) {
+        var resul;
+        if (angular.isDefined(obj[searchCriteria])) {
+            return obj[searchCriteria];
+        }
+        for(var key in obj) {
+            if( angular.isObject(obj[key]) ){
+                var resul = this.keyToValue(searchCriteria, obj[key]);
+            }
+            if (angular.isDefined(resul)) break;
+        }
+        return resul;
+    };
     // Public stuff
     this.search = function(msjKey) {
-        return keyToValue(msjKey);
+        var resul = this.keyToValue(msjKey, messages);
+        return resul;
     };
     // Load the messages from JSON file
     initMessages();

@@ -22,7 +22,7 @@ angular.module('hacelo', [
     });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $compileProvider) {
     $stateProvider
 
     .state('app', {
@@ -69,7 +69,7 @@ angular.module('hacelo', [
         views: {
             'haceloContent': {
                 templateUrl: "templates/choose.html",
-                controller: 'chooseCtrl'
+                controller: 'PhotoSourceCtrl'
             }
         }
     })
@@ -202,4 +202,7 @@ angular.module('hacelo', [
     });
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/app/landing');
+    // Here we tel to angular that images with `content://` protocol are safe to load
+    // more info at: http://goo.gl/8PfN8I
+    $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob|content):|data:image\//);    
 });

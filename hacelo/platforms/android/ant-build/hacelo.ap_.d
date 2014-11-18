@@ -119,6 +119,7 @@
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/ShareController.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/models/ImageFactory.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/models/module.js \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/models/SelectedImagesFactory.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/models/StorageFactory.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/providers/module.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/services/CordovaCameraService.js \

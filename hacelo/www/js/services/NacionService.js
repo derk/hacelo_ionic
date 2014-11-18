@@ -51,7 +51,26 @@ services.service('Nacion_Service',['$ionicLoading',function($ionicLoading){
       this.instagram_pics_on_queue = data;
     };
 
+    this.addImageQueue = function (data) {
+      var promise = same(this.instagram_pics_on_queue, data);
+        if(promise == -1){
+          this.instagram_pics_on_queue.push(data);
+        } else {
+          this.instagram_pics_on_queue.splice(promise, 1);
+        }
+    };
+
     this.get_instagram_pics_on_queue = function(){
       return this.instagram_pics_on_queue;
     };
+
+    function same(parent, data) {
+        var object = -1;
+        for(var el in parent){
+             if( JSON.stringify(parent[el]) == JSON.stringify(data) ){
+                object = el;
+            }
+        }
+        return object;
+    }
 }]);

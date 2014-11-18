@@ -6,8 +6,10 @@
 
   	<ion-content class="has-header">
     	<div class="check-container">
-    		<div ng-repeat="image in images track by $index">
-    			<img data-ng-src="{{image}}" ng-click="crop($index)">
+        <h1>Revisar y Cortar</h1>
+        <p>Tocar cualquier foto para ajusar.</p>
+    		<div ng-repeat="image in images track by $index" class="singeImage">
+    			<img src="{{image.images.low_resolution.url}}" width="{{image.images.low_resolution.width}}" ng-click="crop($index)">
     		</div>
 		</div>
   	</ion-content>

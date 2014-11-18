@@ -22,7 +22,7 @@ angular.module('hacelo', [
     });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $compileProvider) {
     $stateProvider
 
     .state('app', {
@@ -69,7 +69,7 @@ angular.module('hacelo', [
         views: {
             'haceloContent': {
                 templateUrl: "templates/choose.html",
-                controller: 'chooseCtrl'
+                controller: 'PhotoSourceCtrl'
             }
         }
     })
@@ -202,6 +202,9 @@ angular.module('hacelo', [
     });
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/app/landing');
+    // Here we tel to angular that images with `content://` protocol are safe to load
+    // more info at: http://goo.gl/8PfN8I
+    $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob|content):|data:image\//);    
 });
     /*
      * Instagram class for getting entire things
@@ -445,6 +448,377 @@ var controllers = angular.module('hacelo.controllers', []);
 var models = angular.module('hacelo.models', []);
 var providers = angular.module('hacelo.providers', []);
 var services = angular.module('hacelo.services', []);
+controllers.controller('AppCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
+    // Form data for the login modal
+    $scope.loginData = {};
+    $scope.user = {
+        "instagra_username": "Raiam"
+    };
+    $scope.validate = false;
+
+    // Create the login modal that we will use later
+    $ionicModal.fromTemplateUrl('templates/login.html', {
+        scope: $scope
+    }).then(function(modal) {
+        $scope.modal = modal;
+    });
+
+    // Triggered in the login modal to close it
+    $scope.closeLogin = function() {
+        $scope.modal.hide();
+    };
+
+    // Open the login modal
+    $scope.login = function() {
+        $scope.modal.show();
+    };
+
+    $scope.insert_url = function() {
+        if ($scope.validate == false) {
+            $scope.validate = true;
+            Nacion_Service.set_username($scope.user.instagra_username);
+            $timeout(function() {
+                $scope.closeLogin();
+                Nacion_Service.createEvent('update-username', $scope.user.instagra_username);
+            }, 1000);
+        }
+
+    };
+    // Perform the login action when the user submits the login form
+    $scope.doLogin = function() {
+        console.log('Doing login', $scope.loginData);
+
+        // Simulate a login delay. Remove this and replace with your login
+        // code if using a login system
+        $timeout(function() {
+            $scope.closeLogin();
+        }, 1000);
+    };
+});
+/* ChooseCrtl para controlar la pantalla de escoger
+ * $scope - Scope de la pantalla
+ * Nacion_Service - Servicio de datos de nacion, service.js
+ */
+controllers.controller('checkCtrl', function($scope,$ionicPopup, $timeout, Nacion_Service) {
+    //Variables for using on the app
+    //$scope.images = ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp_xyq9C4GVc79lShg4Uo5gTZoBPdimQEHQKHn6cjibxe69Im-A','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp_xyq9C4GVc79lShg4Uo5gTZoBPdimQEHQKHn6cjibxe69Im-A'];
+    $scope.images = Nacion_Service.get_instagram_pics_on_queue();
+    $scope.dkrm;
+
+    $scope.crop = function ($index) {
+        $scope.showPopup($index);
+    };
+
+    $scope.showPopup = function($index) {
+      $scope.data = {}
+      $scope.img = $scope.images[$index].images.low_resolution;
+
+      // An elaborate, custom popup
+      var myPopup = $ionicPopup.show({
+        template: ' <img id="cropArea" src="{{img.url}}" width="{{img.width}}" alt="$index">',
+        title: 'Cortar la Fotografía',
+        subTitle: 'Selecciona el area a cortar',
+        scope: $scope,
+        buttons: [
+          { 
+            text: 'Cancelar'
+          },
+          {
+            text: '<b>Save</b>',
+            type: 'button-positive',
+            onTap: function(e) {
+                console.log($scope.images[$index].images.low_resolution.url);
+                $scope.images[$index].images.low_resolution.url = $scope.dkrm.snapshotImage();
+                console.log($scope.images[$index].images.low_resolution.url);
+                myPopup.close();
+            }
+          },
+        ]
+      });
+
+      myPopup.then(function(res) {
+        console.log('Tapped!', res);
+      });
+
+      $timeout(function(){
+        $scope.executeCrop();
+      },100);
+     };
+
+
+
+     $scope.executeCrop = function () {
+        $scope.dkrm = new Darkroom('#cropArea', {
+          minWidth: 100,
+          minHeight: 100,
+          maxWidth: 650,
+          maxHeight: 500,
+
+          plugins: {
+            crop: {
+              quickCropKey: 67
+            }
+          },
+
+          init: function() {
+            var cropPlugin = this.getPlugin('crop');
+            cropPlugin.selectZone(170, 25, 300, 300);
+          }
+        });
+     };
+
+
+});
+/* ChooseCrtl para controlar la pantalla de escoger
+ * $scope - Scope de la pantalla
+ * Nacion_Service - Servicio de datos de nacion, service.js
+ */
+controllers.controller('chooseCtrl', function($scope, Nacion_Service) {
+    //Variables for using on the app
+    $scope.username = '';
+    $scope.instagram_pics = Nacion_Service.get_entire_ins_pics();
+    $scope.all_pics_for_print = Nacion_Service.get_instagram_pics_on_queue();
+
+    //Function for init the isntagram
+    $scope.init_instagram = function(username) {
+        var instagram_v = new Instagram(username);
+        instagram_v.init();
+    };
+
+    //Open the new window with the correct url for using
+    $scope.call_popup = function() {
+        if (Nacion_Service.get_entire_ins_pics().length <= 0) {
+            var instagram_v = new Instagram();
+            instagram_v.init();
+            //$scope.modal.show();
+        } else {
+            Nacion_Service.show(hacelo.messages.Loading);
+            setTimeout(function() {
+                window.location.href = '#/app/instagram';
+            }, 500);
+
+        }
+    };
+
+    //Document listener for when updating username
+    document.addEventListener('update-username', function(e) {
+        $scope.username = e.detail;
+        $scope.init_instagram($scope.username);
+    });
+    document.addEventListener('pagination', function(e) {
+        Nacion_Service.setNextUrl(e.detail);
+    });
+    //Listener when the page just got the code and the images as well.
+    document.addEventListener('finish', function(e) {
+        //Open the loading popup
+        Nacion_Service.show(hacelo.messages.Loading);
+        //little timeout to ensure the pop up to appear
+        setTimeout(function() {
+            $scope.instagram_pics = e.detail;
+            var array = [];
+            for (var el = 0; el < $scope.instagram_pics.length; el++) {
+                var obj = {
+                    "img": $scope.instagram_pics[el],
+                    "picked": false
+                };
+                array.push(obj);
+            }
+            $scope.instagram_pics = array;
+            Nacion_Service.set_entire_ins_pics($scope.instagram_pics);
+            $scope.$apply();
+            if ($scope.instagram_pics.length > 0) {
+                window.location.hash = "#/app/instagram";
+            };
+        }, 100);
+
+    });
+});
+/* InfoCtrl Accordion List
+ * $scope - Scope de la pantalla
+ */
+
+controllers.controller('infoCtrl', function($scope) {
+
+	$scope.toggleGroup = function(group){
+		if($scope.isGroupShown(group)){
+			$scope.shownGroup = null;
+		}else{ 
+			$scope.shownGroup = group;	
+		}
+	};
+
+	$scope.isGroupShown = function(group){
+		return $scope.shownGroup === group;
+	};
+
+});
+/* Instagram para controlar la pantalla de isntagram
+ * $scope - Scope de la pantalla
+ * Nacion_Service - Servicio de datos de nacion, service.js
+ */
+controllers.controller('InstagramCrtl', function($scope, Nacion_Service) {
+    $scope.instagram_pics = Nacion_Service.get_entire_ins_pics();
+    $scope.picked_pics = Nacion_Service.get_instagram_pics_on_queue();
+    $scope.load_more = Nacion_Service.getNextUrl();
+    Nacion_Service.hide();
+    console.log($scope.load_more);
+
+    $scope.pick_song = function(index, data) {
+        if ($scope.instagram_pics[index].picked) {
+            $scope.instagram_pics[index].picked = false;
+            var index = $scope.picked_pics.indexOf(data);
+            $scope.picked_pics.splice(index, 1);
+        } else {
+            $scope.instagram_pics[index].picked = true;
+            $scope.picked_pics.push(data);
+        }
+    };
+
+    $scope.insert_into_queue = function() {
+        Nacion_Service.set_instagram_pics_on_queue($scope.picked_pics);
+        window.picked = $scope.picked_pics;
+        window.history.back();
+    };
+
+    $scope.loadMore = function(){
+        var instagram_v = new Instagram();
+            instagram_v.loadMore($scope.load_more);
+    };
+
+    document.addEventListener('finish', function(e) {
+        //Open the loading popup
+        Nacion_Service.show(hacelo.messages.Loading);
+        //little timeout to ensure the pop up to appear
+        setTimeout(function() {
+            var nextPage = e.detail;
+            var array = [];
+            for (var el = 0; el < nextPage.length; el++) {
+                var obj = {
+                    "img": nextPage[el],
+                    "picked": false
+                };
+                array.push(obj);
+            }
+            $scope.instagram_pics = $scope.instagram_pics.concat(array);
+            console.debug(array);
+            Nacion_Service.set_entire_ins_pics($scope.instagram_pics);
+            Nacion_Service.hide();
+
+            Nacion_Service.setNextUrl('');
+            $scope.load_more = Nacion_Service.getNextUrl();
+        }, 100);
+
+    });
+
+    document.addEventListener('pagination', function(e) {
+        Nacion_Service.setNextUrl(e.detail);
+        $scope.load_more = Nacion_Service.getNextUrl();
+    });
+});
+controllers.controller('PhotoSourceCtrl', ['$scope', '$filter', '$ionicPopup', '$ionicLoading', 'SelectedImagesFactory', 'MessageService', 'InstagramService', 'CordovaCameraService', 'ImageFactory','Nacion_Service', function ($scope, $filter, $ionicPopup, $ionicLoading, SelectedImagesFactory, MessageService, InstagramService, CordovaCameraService, ImageFactory, Nacion_Service) {
+    var lastInstagramLoad;
+
+    $scope.loading = false;
+    $scope.imageStack = [];
+    $scope.$watch('loading', function(newVal, oldVal) {// for showing and hiding load spinner
+        var cache = angular.isDefined(cache)? cache: MessageService.search("loading");
+        if (newVal !== oldVal) {
+            if (newVal === true) {
+                $ionicLoading.show(cache);
+            } else {
+                $ionicLoading.hide();
+            }
+        }
+    });
+    $scope.$watch('imageStack', function(newVal, oldVal) {// to keep updated the Service
+        SelectedImagesFactory.setSelectedImages($scope.imageStack);
+    }, true);
+
+    $scope.addImg = function($index){
+        console.log($scope.imageStack[$index]);
+        Nacion_Service.addImageQueue($scope.imageStack[$index]);
+        console.log(Nacion_Service.get_instagram_pics_on_queue());
+    };
+
+    function extractInstagramImages (apiResponse) {
+        lastInstagramLoad = apiResponse;
+        var filteredResponse = $filter('filter')(apiResponse.data, {type:"image"}),
+            j = filteredResponse.length;
+
+        if (j === 0) {
+            $ionicPopup.alert(MessageService.search("no-images-found"));
+        } else {
+            for (var i = 0; i < j; i++) {
+                $scope.imageStack.push(new ImageFactory(filteredResponse[i].images));
+            }
+        }
+    }
+
+
+    function getRecentMedia (){
+        $scope.loading = true;
+        InstagramService.getRecentMedia()
+            .then(function(response) {
+                $scope.loading = false;
+                if (response.data.meta.code === 400) { // check if token is expired
+                    authenticateInstagramUser();
+                } else {
+                    extractInstagramImages(response.data);
+                }
+            }, function(err) {
+                $scope.loading = false;
+                $ionicPopup.alert(MessageService.search("cannot-load-media"));
+            });
+    }
+
+    function authenticateInstagramUser (){
+        InstagramService.auth()
+            .then(function(result) {
+                getRecentMedia();
+            }, function(err) {
+                $ionicPopup.alert(MessageService.search("user-denied-access"));
+            });
+    }
+
+    $scope.instagramImageLoad = function() {
+        if (InstagramService.isAuthenticated()){
+            getRecentMedia();
+        } else {
+            authenticateInstagramUser();
+        }
+    };
+
+    $scope.phoneImageLoad = function() {
+        CordovaCameraService.getImage()
+            .then(function(result) {
+                $scope.imageStack.push(new ImageFactory(result));
+            }, function(result) {
+                // $ionicPopup.alert(MessageService.search("cordova-load-failed"));
+            });
+    };
+
+    $scope.logArray = function(){
+        console.log($scope.imageStack);
+    };
+
+    InstagramService.getRecientTagMedia().then(function(response){
+        extractInstagramImages(response.data);
+    },function(err){});
+}]);
+controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
+    
+    $scope.shareFb = function(){
+        window.plugins.socialsharing.shareViaFacebook('http://www.hacelodigital.com/')
+    };
+
+    $scope.shareTwitter = function(){
+        window.plugins.socialsharing.shareViaTwitter('http://www.hacelodigital.com/')
+    };
+
+    $scope.shareEmail = function(){
+        window.plugins.socialsharing.shareViaEmail('Hacelo','Hacelo');
+    };
+});
 commons.constant('PhotoPrintConfig', {
 	"products": {
 		// here we hold the information related to every single product
@@ -679,321 +1053,73 @@ commons.constant('PhotoPrintConfig', {
 		},
 	}
 });
-controllers.controller('AppCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
-    // Form data for the login modal
-    $scope.loginData = {};
-    $scope.user = {
-        "instagra_username": "Raiam"
-    };
-    $scope.validate = false;
-
-    // Create the login modal that we will use later
-    $ionicModal.fromTemplateUrl('templates/login.html', {
-        scope: $scope
-    }).then(function(modal) {
-        $scope.modal = modal;
-    });
-
-    // Triggered in the login modal to close it
-    $scope.closeLogin = function() {
-        $scope.modal.hide();
-    };
-
-    // Open the login modal
-    $scope.login = function() {
-        $scope.modal.show();
-    };
-
-    $scope.insert_url = function() {
-        if ($scope.validate == false) {
-            $scope.validate = true;
-            Nacion_Service.set_username($scope.user.instagra_username);
-            $timeout(function() {
-                $scope.closeLogin();
-                Nacion_Service.createEvent('update-username', $scope.user.instagra_username);
-            }, 1000);
-        }
-
-    };
-    // Perform the login action when the user submits the login form
-    $scope.doLogin = function() {
-        console.log('Doing login', $scope.loginData);
-
-        // Simulate a login delay. Remove this and replace with your login
-        // code if using a login system
-        $timeout(function() {
-            $scope.closeLogin();
-        }, 1000);
-    };
-});
-/* ChooseCrtl para controlar la pantalla de escoger
- * $scope - Scope de la pantalla
- * Nacion_Service - Servicio de datos de nacion, service.js
- */
-controllers.controller('checkCtrl', function($scope,$ionicPopup, Nacion_Service) {
-    //Variables for using on the app
-    $scope.images = ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp_xyq9C4GVc79lShg4Uo5gTZoBPdimQEHQKHn6cjibxe69Im-A','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp_xyq9C4GVc79lShg4Uo5gTZoBPdimQEHQKHn6cjibxe69Im-A'];
-    $scope.image = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp_xyq9C4GVc79lShg4Uo5gTZoBPdimQEHQKHn6cjibxe69Im-A';
-
-    $scope.crop = function ($index) {
-        $scope.showPopup($index);
-    };
-
-    $scope.showPopup = function($index) {
-      $scope.data = {}
-      console.log($index);
-      $scope.img = $scope.images[$index];
-
-      // An elaborate, custom popup
-      var myPopup = $ionicPopup.show({
-        template: ' <img id="cropArea" src="{{img}}" alt="$index">',
-        title: 'Cortar la Fotografía',
-        subTitle: 'Selecciona el area a cortar',
-        scope: $scope,
-        buttons: [
-          { text: 'Cancelar'
-          },
-          {
-            text: '<b>Save</b>',
-            type: 'button-positive',
-            onTap: function(e) {
-             myPopup.close();
-            }
-          },
-        ]
-      });
-      myPopup.then(function(res) {
-        console.log('Tapped!', res);
-      });
-
-      setTimeout(function(){
-        $scope.executeCrop();
-      },1000);
-     };
-
-     $scope.executeCrop = function () {
-        var dkrm = new Darkroom('#cropArea', {
-          // Size options
-          minWidth: 100,
-          minHeight: 100,
-          maxWidth: 650,
-          maxHeight: 500,
-
-          plugins: {
-            //save: false,
-            crop: {
-              quickCropKey: 67, //key "c"
-              //minHeight: 50,
-              //minWidth: 50,
-              //ratio: 1
-            }
-          },
-          init: function() {
-            var cropPlugin = this.getPlugin('crop');
-            cropPlugin.selectZone(170, 25, 300, 300);
-            //cropPlugin.requireFocus();
-          }
-        });
-     }
-});
-/* ChooseCrtl para controlar la pantalla de escoger
- * $scope - Scope de la pantalla
- * Nacion_Service - Servicio de datos de nacion, service.js
- */
-controllers.controller('chooseCtrl', function($scope, Nacion_Service) {
-    //Variables for using on the app
-    $scope.username = '';
-    $scope.instagram_pics = Nacion_Service.get_entire_ins_pics();
-    $scope.all_pics_for_print = Nacion_Service.get_instagram_pics_on_queue();
-
-    //Function for init the isntagram
-    $scope.init_instagram = function(username) {
-        var instagram_v = new Instagram(username);
-        instagram_v.init();
-    };
-
-    //Open the new window with the correct url for using
-    $scope.call_popup = function() {
-        if (Nacion_Service.get_entire_ins_pics().length <= 0) {
-            var instagram_v = new Instagram();
-            instagram_v.init();
-            //$scope.modal.show();
-        } else {
-            Nacion_Service.show(hacelo.messages.Loading);
-            setTimeout(function() {
-                window.location.href = '#/app/instagram';
-            }, 500);
-
-        }
-    };
-
-    //Document listener for when updating username
-    document.addEventListener('update-username', function(e) {
-        $scope.username = e.detail;
-        $scope.init_instagram($scope.username);
-    });
-    document.addEventListener('pagination', function(e) {
-        Nacion_Service.setNextUrl(e.detail);
-    });
-    //Listener when the page just got the code and the images as well.
-    document.addEventListener('finish', function(e) {
-        //Open the loading popup
-        Nacion_Service.show(hacelo.messages.Loading);
-        //little timeout to ensure the pop up to appear
-        setTimeout(function() {
-            $scope.instagram_pics = e.detail;
-            var array = [];
-            for (var el = 0; el < $scope.instagram_pics.length; el++) {
-                var obj = {
-                    "img": $scope.instagram_pics[el],
-                    "picked": false
-                };
-                array.push(obj);
-            }
-            $scope.instagram_pics = array;
-            Nacion_Service.set_entire_ins_pics($scope.instagram_pics);
-            $scope.$apply();
-            if ($scope.instagram_pics.length > 0) {
-                window.location.hash = "#/app/instagram";
-            };
-        }, 100);
-
-    });
-});
-/* InfoCtrl Accordion List
- * $scope - Scope de la pantalla
- */
-
-controllers.controller('infoCtrl', function($scope) {
-
-	$scope.toggleGroup = function(group){
-		if($scope.isGroupShown(group)){
-			$scope.shownGroup = null;
-		}else{ 
-			$scope.shownGroup = group;	
-		}
-	};
-
-	$scope.isGroupShown = function(group){
-		return $scope.shownGroup === group;
-	};
-
-});
-/* Instagram para controlar la pantalla de isntagram
- * $scope - Scope de la pantalla
- * Nacion_Service - Servicio de datos de nacion, service.js
- */
-controllers.controller('InstagramCrtl', function($scope, Nacion_Service) {
-    $scope.instagram_pics = Nacion_Service.get_entire_ins_pics();
-    $scope.picked_pics = Nacion_Service.get_instagram_pics_on_queue();
-    $scope.load_more = Nacion_Service.getNextUrl();
-    Nacion_Service.hide();
-    console.log($scope.load_more);
-
-    $scope.pick_song = function(index, data) {
-        if ($scope.instagram_pics[index].picked) {
-            $scope.instagram_pics[index].picked = false;
-            var index = $scope.picked_pics.indexOf(data);
-            $scope.picked_pics.splice(index, 1);
-        } else {
-            $scope.instagram_pics[index].picked = true;
-            $scope.picked_pics.push(data);
-        }
-    };
-
-    $scope.insert_into_queue = function() {
-        Nacion_Service.set_instagram_pics_on_queue($scope.picked_pics);
-        window.picked = $scope.picked_pics;
-        window.history.back();
-    };
-
-    $scope.loadMore = function(){
-        var instagram_v = new Instagram();
-            instagram_v.loadMore($scope.load_more);
-    };
-
-    document.addEventListener('finish', function(e) {
-        //Open the loading popup
-        Nacion_Service.show(hacelo.messages.Loading);
-        //little timeout to ensure the pop up to appear
-        setTimeout(function() {
-            var nextPage = e.detail;
-            var array = [];
-            for (var el = 0; el < nextPage.length; el++) {
-                var obj = {
-                    "img": nextPage[el],
-                    "picked": false
-                };
-                array.push(obj);
-            }
-            $scope.instagram_pics = $scope.instagram_pics.concat(array);
-            console.debug(array);
-            Nacion_Service.set_entire_ins_pics($scope.instagram_pics);
-            Nacion_Service.hide();
-
-            Nacion_Service.setNextUrl('');
-            $scope.load_more = Nacion_Service.getNextUrl();
-        }, 100);
-
-    });
-
-    document.addEventListener('pagination', function(e) {
-        Nacion_Service.setNextUrl(e.detail);
-        $scope.load_more = Nacion_Service.getNextUrl();
-    });
-});
-controllers.controller('PhotoSourceCtrl', ['$scope', '$ionicPopup', 'MessageService', 'InstagramService', 'CordovaCameraService', 'ImageFactory', function ($scope, $ionicPopup, MessageService, InstagramService, CordovaCameraService, ImageFactory) {
-    $scope.pickedImages = [];
-
-    $scope.instagramPick = function() {
-        InstagramService.auth();
-    };
-    $scope.phonePick = function() {
-        CordovaCameraService.getPhonePic()
-        .then(function(result) {
-            alert(result);
-            $scope.pickedImages.push(result);
-        }, function(result) {
-            $ionicPopup.alert(MessageService.search("cordova-load-failed"));
-        });
-    };
-}]);
-controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
-    
-    $scope.shareFb = function(){
-        window.plugins.socialsharing.shareViaFacebook('http://www.hacelodigital.com/')
-    };
-
-    $scope.shareTwitter = function(){
-        window.plugins.socialsharing.shareViaTwitter('http://www.hacelodigital.com/')
-    };
-
-    $scope.shareEmail = function(){
-        window.plugins.socialsharing.shareViaEmail('Hacelo','Hacelo');
-    };
-});
 models.factory('ImageFactory', [function () {
-	function Image (URI) {
-		this.uri = URI;
-		this.base64Encoded;
-		this.width;
-		this.height;
-	}
+    function ImageWrapper (source) {
+        var self = this;
+        this.origin = "phone";
+        this.images;
+        this.toPrint = false;
 
-	Image.prototype.getBase64 = function() {
-		// body...
-	};
+        if (angular.isObject(source)) {
+            this.origin = "instagram";
+            this.images = source;
+        } else if (angular.isString(source)) {
+            this.images = {
+                "low_resolution": {
+                    "url": source,
+                    "width": 306,
+                    "height": 306
+                },
+                "thumbnail": {
+                    "url": source,
+                    "width": 150,
+                    "height": 150
+                },
+                "standard_resolution": {
+                    "url": source,
+                    "width": 640,
+                    "height": 640
+                }
+            }
+        }
+    }
 
-	Image.prototype.mathHeigth = function(newWidth) {
-		return newWidth / (width / height);
-	};
-
-	Image.prototype.getThumbnail = function(expectedWidth) {
-		// body...
-	};
-
-	return Image;
+    return ImageWrapper;
 }])
+models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
+	/**
+	 * A simple service that returns the array of selected images.
+	 */
+	var selectedImages = [];
+
+	return {
+		setSelectedImages: function(pSelectedImages) {
+			if (angular.isArray(pSelectedImages)) {
+				selectedImages = pSelectedImages;
+			}
+		},
+        addItem: function(pItem) {
+			if (angular.isObject(pItem)) {
+				selectedImages.push(pItem);
+			}
+		},
+		getInstagramOnes: function() {
+			return $filter('filter')(selectedImages, {origin:"instagram"});
+		},
+		getPhoneOnes: function() {
+            return $filter('filter')(selectedImages, {origin:"phone"});
+        },
+        getToPrintOnes: function() {
+            return $filter('filter')(selectedImages, {toPrint:true});
+        },
+        getAll: function() {
+            return selectedImages;
+        },
+        getOne: function(id){
+            return selectedImages[id];
+        }
+	};
+}]);
 models.factory('StorageFactory', ['$window', function ($window) {
 	var storage = $window.localStorage;
 	var prefix = "hclDgtl";
@@ -1039,20 +1165,24 @@ models.factory('StorageFactory', ['$window', function ($window) {
 	};
 }])
 services.service('CordovaCameraService', ['$window','$q','ImageFactory','MessageService','$ionicPopup', function ($window,$q,ImageFactory,MessageService,$ionicPopup) {
-    var cam = $window.navigator.camera,
-        cameraOptions = {
-            quality : 100,
-            destinationType : Camera.DestinationType.FILE_URI,
-            sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
-            /*allowEdit : true,
-            encodingType: Camera.EncodingType.JPEG,
-            targetWidth: 100,
-            targetHeight: 100,
-            popoverOptions: CameraPopoverOptions,
-            saveToPhotoAlbum: false*/
+    var cam,
+        cameraOptions,
+        init = function() {
+            cam = $window.navigator.camera;
+            cameraOptions = {
+                quality : 100,
+                destinationType : cam.DestinationType.FILE_URI,
+                sourceType : cam.PictureSourceType.PHOTOLIBRARY,
+                /*allowEdit : true,
+                encodingType: Camera.EncodingType.JPEG,
+                targetWidth: 100,
+                targetHeight: 100,
+                popoverOptions: CameraPopoverOptions,
+                saveToPhotoAlbum: false*/
+            };
         };
 
-    this.getPhonePic = function() {
+    this.getImage = function() {
         var q = $q.defer();
         cam.getPicture(function(result) {
             q.resolve(result);
@@ -1062,92 +1192,121 @@ services.service('CordovaCameraService', ['$window','$q','ImageFactory','Message
 
         return q.promise;
     };
+
+    // wait until the device is ready to setup everything
+    ionic.Platform.ready(init);
 }])
-services.service('InstagramService', ['$http','$window','$ionicPopup','MessageService', function ($http, $window, $ionicPopup, MessageService) {
+services.service('InstagramService', ['$http', '$window', '$q', function ($http, $window, $q) {
     var self = this,
-        info,
         user,
         accessToken,
         config = {
-            clientId:'70a2ae9262fc4805a5571e8036695a4d',
-            redirectUri:'http://www.wikipedia.org/',
+            clientId: '70a2ae9262fc4805a5571e8036695a4d',
+            redirectUri: 'http://www.wikipedia.org/',
             apiUrl: 'https://api.instagram.com/v1/',
             oauthUrl: 'https://instagram.com/oauth/authorize/?',
             scope: 'basic'
         };
 
-    var fetch = function(url, callback, params, method) {
+    this.isAuthenticated = function () {
+        return angular.isDefined(accessToken);
+    };
+
+    var fetch = function (url, params) {
         var prms = {
                 client_id: config.clientId,
                 callback: 'JSON_CALLBACK'
-            },
-            cnfg = {
-                url: config.apiUrl+url,
-                method: method||'jsonp',
+            };
+        if (self.isAuthenticated()) {
+            prms.access_token = accessToken;
+        }
+        var cnfg = {
+                url: config.apiUrl + url,
+                method: 'jsonp',
                 responseType: 'json',
                 params: angular.extend(prms, params)
             };
 
-        $http(cnfg)
-            .success(function(data){
-                callback(data);
-            }).error(function(data){
-                callback({});
-            });
+        return $http(cnfg);
+    };
+
+    var getUrlParameters = function (parameter, staticURL, decode) {
+        /*
+        Function: getUrlParameters
+        Description: Get the value of URL parameters either from 
+                     current URL or static URL
+        Author: Tirumal
+        URL: www.code-tricks.com
+       */
+       var currLocation = (staticURL.length)? staticURL : window.location.search,
+           parArr = currLocation.split('?')[1].split('&'),
+           returnBool = true,
+           parr;
+       
+       for (var i = 0; i < parArr.length; i++){
+            parr = parArr[i].split('=');
+            if(parr[0] == parameter){
+                return (decode) ? decodeURIComponent(parr[1]) : parr[1];
+                returnBool = true;
+            }else{
+                returnBool = false;            
+            }
+       }
+       
+       if(!returnBool) return false;
     };
 
     var bindAuthEvents = function(authTab) {
         // This function bind the evens to the instagram autentication screen
         // If every thing goes good then load the user information
         // Also handle how the app respond to an authentication error
-        alert(authTab);
-        authTab.addEventListener('loadstop', function(e) {
+        var deferred = $q.defer();
+        authTab.addEventListener('loadstart', function(e) {
             if (e.url.search('access_token') !== -1) { // access granted
-                accessToken = e.url.substr(e.url.search('access_token')+13);
+                accessToken = e.url.substr(e.url.search('access_token')+'access_token='.length);
+                authTab.close();
+                deferred.resolve({
+                    authorized: true
+                });
+            } else if (e.url.search('error') !== -1) { // The user denied access
+                authTab.close();
+                deferred.reject({
+                    error: getUrlParameters('error',e.url,true),
+                    errorReason: getUrlParameters('error_reason',e.url,true),
+                    errorDescription: getUrlParameters('error_description',e.url,true)
+                });
             }
-            if (e.url.search('error') !== -1) { // The user denied access
-                var popupConfig = MessageService.search("user-denied-access");
-                $ionicPopup.show(popupConfig);
-            }
-            authTab.close();
         });
-    };
-
-    this.getToken=function(){
-        return $window.sessionStorage.getItem('tkn');
+        return deferred.promise;
     };
 
     this.auth = function() {
         var options = {
-            client_id : config.clientId,
-            redirect_uri : config.redirectUri,
-            scope : config.scope,
-            response_type: 'token'
-        };
-
-        var authParams='';
+                client_id:      config.clientId,
+                redirect_uri:   config.redirectUri,
+                scope:          config.scope,
+                response_type:  'token'
+            },
+            authParams = '';
 
         angular.forEach(options, function(value, key) {
             return authParams += key + '=' + value + '&';
         });
+        var authUrl = config.oauthUrl + authParams;
 
-        var authUri = config.oauthUrl + authParams;
-
-        bindAuthEvents($window.open(authUri, '_blank', 'location=yes'));
+        return bindAuthEvents($window.open(authUrl, '_blank', 'location=yes'));
     };
 
-    this.getMedia = function(callback, params) {
-        fetch('users/self/media/recent', callback, angular.extend({
-            access_token: accessToken
-        }, params));
+    this.getRecentMedia = function(params) {
+        return fetch('users/self/media/recent', params);
     };
 
-    this.currentUser = function(callback) {
-        fetch('users/self', function(data) {
-            user = data.data;
-        }, {
-            access_token: accessToken
-        });
+    this.getCurrentUser = function() {
+        return fetch('users/self');
+    };
+
+    this.getRecientTagMedia = function() {
+        return fetch('tags/angularjs/media/recent');
     };
 }]);
 services.service('LocationPrvdr', ['$http', function ($http) {
@@ -1193,32 +1352,31 @@ services.service('MessageService', ['$http', function ($http) {
     var messages =          null,
         messageDBlocation = "js/common/messagesDB.json",
         self =              this,
-        callbackResult =    function(json) {
-            self.messages = json ? angular.fromJson(json) : {};
+        callbackResult =    function(data, status, headers, config) {
+            messages = data ? angular.fromJson(data) : {};
         },
         initMessages =      function() {
-            $http.get(messageDBlocation).
-              success(callbackResult).
-              error(callbackResult);
-        },
-        keyToValue =   function(searchCriteria, obj) {
-            var value;
-            for(var key in obj) {
-                if (angular.isDefined(obj[searchCriteria])) {
-                    value = obj[searchCriteria];
-                }
-                if( angular.isObject(obj[searchCriteria]) || angular.isArray(obj[searchCriteria])){
-                    value = keyToValue(obj[searchCriteria]);
-                }
-            }
-            if (angular.isUndefined(value)) {
-                value = "not found";
-            }
-            return value;
+            $http.get(messageDBlocation)
+                .success(callbackResult)
+                .error(callbackResult);
         };
+    this.keyToValue =   function(searchCriteria, obj) {
+        var resul;
+        if (angular.isDefined(obj[searchCriteria])) {
+            return obj[searchCriteria];
+        }
+        for(var key in obj) {
+            if( angular.isObject(obj[key]) ){
+                var resul = this.keyToValue(searchCriteria, obj[key]);
+            }
+            if (angular.isDefined(resul)) break;
+        }
+        return resul;
+    };
     // Public stuff
     this.search = function(msjKey) {
-        return keyToValue(msjKey);
+        var resul = this.keyToValue(msjKey, messages);
+        return resul;
     };
     // Load the messages from JSON file
     initMessages();
@@ -1276,7 +1434,26 @@ services.service('Nacion_Service',['$ionicLoading',function($ionicLoading){
       this.instagram_pics_on_queue = data;
     };
 
+    this.addImageQueue = function (data) {
+      var promise = same(this.instagram_pics_on_queue, data);
+        if(promise == -1){
+          this.instagram_pics_on_queue.push(data);
+        } else {
+          this.instagram_pics_on_queue.splice(promise, 1);
+        }
+    };
+
     this.get_instagram_pics_on_queue = function(){
       return this.instagram_pics_on_queue;
     };
+
+    function same(parent, data) {
+        var object = -1;
+        for(var el in parent){
+             if( JSON.stringify(parent[el]) == JSON.stringify(data) ){
+                object = el;
+            }
+        }
+        return object;
+    }
 }]);

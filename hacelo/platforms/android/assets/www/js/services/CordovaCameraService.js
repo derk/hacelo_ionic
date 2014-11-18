@@ -1,18 +1,22 @@
 services.service('CordovaCameraService', ['$window','$q','ImageFactory','MessageService','$ionicPopup', function ($window,$q,ImageFactory,MessageService,$ionicPopup) {
-    var cam = $window.navigator.camera,
-        cameraOptions = {
-            quality : 100,
-            destinationType : Camera.DestinationType.FILE_URI,
-            sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
-            /*allowEdit : true,
-            encodingType: Camera.EncodingType.JPEG,
-            targetWidth: 100,
-            targetHeight: 100,
-            popoverOptions: CameraPopoverOptions,
-            saveToPhotoAlbum: false*/
+    var cam,
+        cameraOptions,
+        init = function() {
+            cam = $window.navigator.camera;
+            cameraOptions = {
+                quality : 100,
+                destinationType : cam.DestinationType.FILE_URI,
+                sourceType : cam.PictureSourceType.PHOTOLIBRARY,
+                /*allowEdit : true,
+                encodingType: Camera.EncodingType.JPEG,
+                targetWidth: 100,
+                targetHeight: 100,
+                popoverOptions: CameraPopoverOptions,
+                saveToPhotoAlbum: false*/
+            };
         };
 
-    this.getPhonePic = function() {
+    this.getImage = function() {
         var q = $q.defer();
         cam.getPicture(function(result) {
             q.resolve(result);
@@ -22,4 +26,7 @@ services.service('CordovaCameraService', ['$window','$q','ImageFactory','Message
 
         return q.promise;
     };
+
+    // wait until the device is ready to setup everything
+    ionic.Platform.ready(init);
 }])

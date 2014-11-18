@@ -838,10 +838,35 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 }
 
 
+/*
+   ============ check page ================
+*/
+.check-page {
+    .scroll-content {
+        background: #343232;
+    }
+    .check-container {
+        text-align: center;
+        color: white;
+
+        h1 {
+            color: white;
+            font-weight: bold;
+        }
+        .singeImage {
+            text-align: center;
+            width: 90%;
+            margin: 0 auto;
+            box-sizing: border-box;
+            border: 9px solid #fff;
+            margin-bottom: 30px;
+        }
+    }
+}
+
 
 .popup {
     width: 98% !important;
-    height: 65% !important;
   }
 
   .popup-body {
