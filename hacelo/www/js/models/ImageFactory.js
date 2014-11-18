@@ -1,22 +1,33 @@
 models.factory('ImageFactory', [function () {
-	function Image (URI) {
-		this.uri = URI;
-		this.base64Encoded;
-		this.width;
-		this.height;
-	}
+    function ImageWrapper (source) {
+        var self = this;
+        this.origin = "phone";
+        this.images;
+        this.toPrint = false;
 
-	Image.prototype.getBase64 = function() {
-		// body...
-	};
+        if (angular.isObject(source)) {
+            this.origin = "instagram";
+            this.images = source;
+        } else if (angular.isString(source)) {
+            this.images = {
+                "low_resolution": {
+                    "url": source,
+                    "width": 306,
+                    "height": 306
+                },
+                "thumbnail": {
+                    "url": source,
+                    "width": 150,
+                    "height": 150
+                },
+                "standard_resolution": {
+                    "url": source,
+                    "width": 640,
+                    "height": 640
+                }
+            }
+        }
+    }
 
-	Image.prototype.mathHeigth = function(newWidth) {
-		return newWidth / (width / height);
-	};
-
-	Image.prototype.getThumbnail = function(expectedWidth) {
-		// body...
-	};
-
-	return Image;
+    return ImageWrapper;
 }])
