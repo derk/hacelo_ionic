@@ -469,191 +469,200 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 /* 
    =============  Cart page  ============= 
 */
- .cart-container {
-    text-align: center;
-    text-transform: uppercase;
-    .image-placeholder{
-        width: 100%;
-        min-height: 140px;
-        background: #ccc;
-        margin-bottom: 8%;
-    }
-    p {
-        text-align: left;
-        margin-left: 5%;
-        color: $text-grey;
-        overflow: hidden;
-        &.subtotal{
-            margin-bottom: 0;
-            font-weight: bold;
-            color: $text-grey;
+.cart-page{
+   background: $lightGrey;
+   .cart-container {
+        text-align: center;
+        text-transform: uppercase;
+        .image-placeholder{
+            width: 100%;
+            min-height: 140px;
+            background: #ccc;
+            margin-bottom: 8%;
         }
-        span{
-            float: right;
-            margin-right: 4%;
-            font-size: 1.6em;
+        p {
+            text-align: left;
+            margin-left: 5%;
             color: $text-grey;
-            font-weight: bold;
+            overflow: hidden;
+            &.subtotal{
+                margin-bottom: 0;
+                font-weight: bold;
+                color: $text-grey;
+            }
+            span{
+                float: right;
+                margin-right: 4%;
+                font-size: 1.6em;
+                color: $text-grey;
+                font-weight: bold;
 
-        }
-    }
-    span.input-label{
-        text-transform: none;
-        font-size: 0.9em;
-        max-width: 300px;
-        padding-bottom: 0;
-        width: 55%;
-        color: $grey;
-    }
-    label{
-        &.item-input{
-            width: 94%;
-            margin: auto;
-            font-size: 1em;
-            border-color: $borderColor;
-            input{
-                height: 25px;
-            }
-            .img{
-                background-repeat: no-repeat;
-                height: 23px;
-                margin-right: 7px;
-                &.valid{
-                    background: url('../img/small-arrows-sprite.png') -28px 0;
-                    background-size: 120px 23px;
-                    width: 30px;
-                }
-                &.invalid{
-                    background: url('../img/small-arrows-sprite.png') -57px 0;
-                    background-size: 120px 23px;
-                    width: 24px;
-                }
             }
         }
-        &.validate{
-            border: none;
-            margin: 0;
-            button{
-                line-height: 15px;
-                min-height: 32px;
-                width: 60%;
-                background: $blue;
-                text-transform: uppercase;
-                font-size: 0.8em;
+        span.input-label{
+            text-transform: none;
+            font-size: 0.9em;
+            max-width: 300px;
+            padding-bottom: 0;
+            width: 55%;
+            color: $grey;
+        }
+        label{
+            &.item-input{
+                width: 94%;
                 margin: auto;
+                font-size: 1em;
+                border-color: $borderColor;
+                input{
+                    height: 25px;
+                }
+                .img{
+                    background-repeat: no-repeat;
+                    height: 23px;
+                    margin-right: 7px;
+                    &.valid{
+                        background: url('../img/small-arrows-sprite.png') -28px 0;
+                        background-size: 120px 23px;
+                        width: 30px;
+                    }
+                    &.invalid{
+                        background: url('../img/small-arrows-sprite.png') -57px 0;
+                        background-size: 120px 23px;
+                        width: 24px;
+                    }
+                }
+            }
+            &.validate{
+                border: none;
+                background: $lightGrey;
+                margin: 0;
+                button{
+                    line-height: 15px;
+                    min-height: 32px;
+                    width: 60%;
+                    background: $blue;
+                    text-transform: uppercase;
+                    font-size: 0.8em;
+                    margin: auto;
+                }
             }
         }
-    }
-    .button-balanced {
-        display: block;
-        width: 92%;
-        margin: 7% auto 0;
-    }
+        .button-balanced {
+            display: block;
+            width: 92%;
+            margin: 7% auto 0;
+        }
+    } 
 }
 /* 
    =============  cart-checkout page  ============= 
 */
- .cart-checkout-container {
-    margin: 3% 0;
-    color: $text-grey;
-    text-transform: uppercase;
-    ul {
-        margin: 0 3%;
-        li {
-            &:first-child{
-                margin-top: 0;
-                margin-bottom: 0;
-            }
-            list-style-type: disc;
-            list-style-position: inside;
-            font-style: italic;
-            font-size: 0.7em;
-        }
-    }
-    a.info {
-        margin: 0 auto 3%;
-        color: red;
-        text-decoration: underline;
-        font-size: 0.7em;
-        text-align: center;
-        display: block;
-        width: 65%;
-    }
-    .list {
-        select {
-            width: 99%;
-            margin: auto;
-            display: block;
-            font-size: 1.3em;
-        }
-        .maininfo {
-            overflow: hidden;
-            margin-bottom: 10%;
-        }
-        .advise{
-            font-size: 0.7em;
-            text-transform: none;
-            display: block;
-            margin: 0;
-            text-align: center;
-            color: $darkerBlue;
-        }
-        label {
-            margin: 5% 0;
-            border-color: $borderColor;
-            input{
-                height: 23px;
-                color: $text-grey;
-            }
-            &.btn{
-                padding: 0;
-                border: none;
-                button{
-                    margin-bottom: 0;
-                    text-transform: uppercase;
+.cart-checkout-page{
+    background: $lightGrey;
+    .cart-checkout-container {
+        margin: 3% 0;
+        color: $text-grey;
+        text-transform: uppercase;
+        ul {
+            margin: 0 3%;
+            li {
+                &:first-child{
                     margin-top: 0;
-                    font-weight: bold;
-                }   
-            }
-            &.casa{
-                button{
-                   background: $darkerGrey;
-                    color: #FFF; 
+                    margin-bottom: 0;
                 }
+                list-style-type: disc;
+                list-style-position: inside;
+                font-style: italic;
+                font-size: 0.7em;
             }
-            &.no-mg-bottom{
-                margin-bottom: 0;
-            }
-            &.name, &.lastname {
-                width: 48%;
-                float: left;
-                margin: 5% 0 0 0;
-            }
-            &.name {
-                margin-right: 4%;
-            }
-            &.input-checkbox{
-                padding: 10px;
-                input{
-                    height: 25px;
-                    float: left;
-                    width: 25px;
-                }
-                span{
-                    font-size: 0.7em;
-                    margin-top: 4px;
-                    float: left;
-                }
-            }
-            
-        }// end label
-        h3{
-            font-size: 1.5em;
-            color: $darkerBlue;
         }
+        a.info {
+            margin: 0 auto 3%;
+            color: red;
+            text-decoration: underline;
+            font-size: 0.7em;
+            text-align: center;
+            display: block;
+            width: 65%;
+        }
+        .list {
+            background: none;
+            select {
+                width: 99%;
+                margin: auto;
+                display: block;
+                font-size: 1.3em;
+            }
+            .maininfo {
+                overflow: hidden;
+                margin-bottom: 10%;
+            }
+            .advise{
+                font-size: 0.7em;
+                text-transform: none;
+                display: block;
+                margin: 0;
+                text-align: center;
+                color: $darkerBlue;
+            }
+            label {
+                margin: 5% 0;
+                border-color: $borderColor;
+                input{
+                    height: 23px;
+                    color: $text-grey;
+                }
+                &.btn{
+                    padding: 0;
+                    border: none;
+                    button{
+                        margin-bottom: 0;
+                        text-transform: uppercase;
+                        margin-top: 0;
+                        font-weight: bold;
+                    }   
+                }
+                &.casa{
+                    button{
+                       background: $darkerGrey;
+                        color: #FFF; 
+                    }
+                }
+                &.no-mg-bottom{
+                    margin-bottom: 0;
+                }
+                &.name, &.lastname {
+                    width: 48%;
+                    float: left;
+                    margin: 5% 0 0 0;
+                }
+                &.name {
+                    margin-right: 4%;
+                }
+                &.input-checkbox{
+                    padding: 10px;
+                    input{
+                        height: 25px;
+                        float: left;
+                        width: 25px;
+                    }
+                    span{
+                        font-size: 0.7em;
+                        margin-top: 4px;
+                        float: left;
+                    }
+                }
+                
+            }// end label
+            h3{
+                font-size: 1.5em;
+                color: $darkerBlue;
+            }
 
-    }// end list
+        }// end list
+    }
 }
+
 /* 
    =============  cart-empty page  ============= 
 */
@@ -804,6 +813,86 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
             text-transform: uppercase;
             padding: 0;
         }
+    }
+}
+
+/* 
+   =============  processing-order page  ============= 
+*/
+
+.processing-order-container{
+    text-transform: uppercase;
+    font-family: verdana;
+    .loading{
+        background: $red;
+        border-radius: 50%;
+        width: 65px;
+        height: 65px;
+        margin: 12% auto 16%;
+    }
+    .loading-counter{
+        p{
+            &.photos-counter{
+                font-size: 3.2em;
+                color: $red;
+                text-align: center;
+                font-weight: bold;
+            }
+            &.uploaded-copy{
+                color: $red;
+                text-align: center;
+                margin-top: 12%;
+                font-size: 1.2em;
+                font-weight: bold;
+            }
+        }
+    }
+    p.disclaimer{
+        color: $text-grey;
+        width: 80%;
+        text-align: center;
+        margin: 20% auto 0;
+    }
+}
+
+/* 
+   =============  congrats page  ============= 
+*/
+
+.order-sent-container{
+    text-transform: uppercase;
+    font-family: verdana;
+    h2{ 
+        color: $green;
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.5em;
+        span{
+            display: block;
+            font-size: 2.1em;
+            margin-top: 3%;
+        }
+    }
+    p.message{
+        color: $text-grey;
+        letter-spacing: -1px;
+        font-style: italic;
+        width: 90%;
+        font-size: 1em;
+        margin: 10% auto;
+        text-align: center;
+    }
+    div.image{
+        background: #ccc;
+        width: 94%;
+        height: 150px;
+        margin: 0 auto 10%;
+    }
+    a.button{
+        width: 98%;
+        margin: auto;
+        display: block;
+        min-height: 42px;
     }
 }
 
