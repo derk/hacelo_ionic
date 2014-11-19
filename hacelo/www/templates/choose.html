@@ -9,7 +9,7 @@
 		</div>
 		<div class="photos">
 			<div class="images-container">
-				<div class="image" ng-repeat="image in imageStack track by $index" ng-init="thumbnail = image.images.thumbnail" ng-click="addImg($index)">
+				<div class="image" ng-repeat="image in imageStack track by $index" ng-init="thumbnail = image.images.thumbnail">
 					<div class="image-inner" ng-class="{'positive-bg': image.toPrint}">
 						<a href="javascript:void(0);" ng-click="image.toPrint = !image.toPrint">
 							<img ng-src="{{thumbnail.url}}" width="{{thumbnail.width}}" height="{{thumbnail.height}}" alt="Photo">

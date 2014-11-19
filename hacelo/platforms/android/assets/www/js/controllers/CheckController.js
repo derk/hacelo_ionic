@@ -2,11 +2,15 @@
  * $scope - Scope de la pantalla
  * Nacion_Service - Servicio de datos de nacion, service.js
  */
-controllers.controller('checkCtrl', function($scope,$ionicPopup, $timeout, Nacion_Service) {
+controllers.controller('checkCtrl', function($scope,$ionicPopup, $timeout, SelectedImagesFactory, Nacion_Service, Market) {
     //Variables for using on the app
     //$scope.images = ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp_xyq9C4GVc79lShg4Uo5gTZoBPdimQEHQKHn6cjibxe69Im-A','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp_xyq9C4GVc79lShg4Uo5gTZoBPdimQEHQKHn6cjibxe69Im-A'];
-    $scope.images = Nacion_Service.get_instagram_pics_on_queue();
+    $scope.images = SelectedImagesFactory.getToPrintOnes();
     $scope.dkrm;
+
+    angular.forEach($scope.images, function(value) {
+      value.quantity = 1;
+    });
 
     $scope.crop = function ($index) {
         $scope.showPopup($index);
@@ -30,17 +34,11 @@ controllers.controller('checkCtrl', function($scope,$ionicPopup, $timeout, Nacio
             text: '<b>Save</b>',
             type: 'button-positive',
             onTap: function(e) {
-                console.log($scope.images[$index].images.low_resolution.url);
                 $scope.images[$index].images.low_resolution.url = $scope.dkrm.snapshotImage();
-                console.log($scope.images[$index].images.low_resolution.url);
                 myPopup.close();
             }
           },
         ]
-      });
-
-      myPopup.then(function(res) {
-        console.log('Tapped!', res);
       });
 
       $timeout(function(){
@@ -68,6 +66,10 @@ controllers.controller('checkCtrl', function($scope,$ionicPopup, $timeout, Nacio
             cropPlugin.selectZone(170, 25, 300, 300);
           }
         });
+     };
+
+     $scope.addToCart = function () {
+        Market.insertMarket($scope.images);
      };
 
 

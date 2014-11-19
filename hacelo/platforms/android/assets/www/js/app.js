@@ -43,7 +43,17 @@ angular.module('hacelo', [
         url: "/products",
         views: {
             'haceloContent': {
-                templateUrl: "templates/product.html"
+                templateUrl: "templates/product.html",
+                controller: "productCrtl"
+            }
+        }
+    })
+    .state('app.category', {
+        url: "/category",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/category.html",
+                controller: "categoryCrtl"
             }
         }
     })
@@ -60,7 +70,8 @@ angular.module('hacelo', [
         url: "/photo",
         views: {
             'haceloContent': {
-                templateUrl: "templates/photo.html"
+                templateUrl: "templates/photo.html",
+                controller: "photoCrtl"
             }
         }
     })

@@ -17,11 +17,6 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$filter', '$ionicPopup', '
         SelectedImagesFactory.setSelectedImages($scope.imageStack);
     }, true);
 
-    $scope.addImg = function($index){
-        console.log($scope.imageStack[$index]);
-        Nacion_Service.addImageQueue($scope.imageStack[$index]);
-        console.log(Nacion_Service.get_instagram_pics_on_queue());
-    };
 
     function extractInstagramImages (apiResponse) {
         lastInstagramLoad = apiResponse;

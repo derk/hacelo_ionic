@@ -1,6 +1,6 @@
 <ion-view title="REVISAR" class="check-page" >
 	<ion-nav-buttons side="right">
-	    <a ng-click="insert_into_queue()" style="color: black;" class="button button-icon icon ion-checkmark"></a> 
+	    <a ng-click="addToCart()" style="color: black;" class="button button-icon icon ion-checkmark"></a> 
 	</ion-nav-buttons>
 
 
@@ -10,6 +10,7 @@
         <p>Tocar cualquier foto para ajusar.</p>
     		<div ng-repeat="image in images track by $index" class="singeImage">
     			<img src="{{image.images.low_resolution.url}}" width="{{image.images.low_resolution.width}}" ng-click="crop($index)">
+          <div class="quantity-container"><button ng-disabled="image.quantity == 1" ng-click="image.quantity = image.quantity -1" class="minus">-</button>x{{image.quantity}}<button class="add" ng-click="image.quantity = image.quantity +1">+</button></div>
     		</div>
 		</div>
   	</ion-content>

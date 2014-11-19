@@ -89,6 +89,8 @@
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/img/ionic.png \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/img/logo-hacelo-small.png \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/img/logo-hacelo.png \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/img/minusButton.jpg \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/img/plusButton.jpg \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/img/share-sprite-smaller.png \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/img/share-sprite.png \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/img/small-arrows-sprite.png \
@@ -116,8 +118,10 @@
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/InstagramController.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/module.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/PhotoSourceController.js \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/ProductController.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/ShareController.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/models/ImageFactory.js \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/models/MarketFactory.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/models/module.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/models/SelectedImagesFactory.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/models/StorageFactory.js \
@@ -222,6 +226,7 @@
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/templates/cart-checkout.html \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/templates/cart-empty.html \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/templates/cart.html \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/templates/category.html \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/templates/check-photo.html \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/templates/choose.html \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/templates/confirm-order.html \

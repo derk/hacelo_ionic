@@ -43,7 +43,17 @@ angular.module('hacelo', [
         url: "/products",
         views: {
             'haceloContent': {
-                templateUrl: "templates/product.html"
+                templateUrl: "templates/product.html",
+                controller: "productCrtl"
+            }
+        }
+    })
+    .state('app.category', {
+        url: "/category",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/category.html",
+                controller: "categoryCrtl"
             }
         }
     })
@@ -60,7 +70,8 @@ angular.module('hacelo', [
         url: "/photo",
         views: {
             'haceloContent': {
-                templateUrl: "templates/photo.html"
+                templateUrl: "templates/photo.html",
+                controller: "photoCrtl"
             }
         }
     })
@@ -448,6 +459,714 @@ var controllers = angular.module('hacelo.controllers', []);
 var models = angular.module('hacelo.models', []);
 var providers = angular.module('hacelo.providers', []);
 var services = angular.module('hacelo.services', []);
+commons.constant('PhotoPrintConfig', {
+	"products": {
+		// here we hold the information related to every single product
+		// `photo`, `photo_album` and `poster` will have similar structure
+		"Fotografias": {
+			"printing_sizes": [
+				{	"name" : "4x6",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 4,
+						"height": 6
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 500,
+							"height": 700,
+						},
+						"minimum": {
+							"width": 300,
+							"height": 450,		
+							"aspect": 0.5
+						},
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 21,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 4999
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				},
+				{	"name" : "5x7",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 5,
+						"height": 7
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 500,
+							"height": 700,
+						},
+						"minimum": {
+							"width": 375,
+							"height": 525,	
+							"aspect": 0.5		
+						},
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 16,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 5499
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				},
+				{	"name" : "8x10",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 8,
+						"height": 10
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 500,
+							"height": 700,
+						},
+						"minimum": {
+							"width": 600,
+							"height": 750,		
+							"aspect": 0.5	
+						},
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 6,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 6499
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				}
+			],
+			"coupons": [
+				{
+					// showed in the UI for visual feedback
+					"name": "My discount code",
+					// will match what the user entered
+					"code": "1234_5678_9012_3456"
+				},
+			]
+		},
+
+		"Cuadradas": {
+			"printing_sizes": [
+				{	
+					"name":"4x4",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 4,
+						"height": 4
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 300,
+							"height": 500,
+						},
+						"minimum": {
+							"width": 300,
+							"height": 300,	
+							"aspect": 1		
+						},
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 35,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 4999
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				},
+				{
+					"name":"8x8",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 8,
+						"height": 8
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 600,
+							"height": 600,
+						},
+						"minimum": {
+							"width": 600,
+							"height": 600,		
+							"aspect": 1	
+						},
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 6,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 5999
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				},
+				{
+					"name":"10x10",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 10,
+						"height": 190
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 600,
+							"height": 600,
+						},
+						"minimum": {
+							"width": 750,
+							"height": 750,	
+							"aspect": 1		
+						},
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 4,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 6999
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				}
+			],
+			"coupons": [
+				{
+					// showed in the UI for visual feedback
+					"name": "My discount code",
+					// will match what the user entered
+					"code": "1234_5678_9012_3456"
+				},
+			]
+		},
+
+		"Photobook": {
+			"printing_sizes": [
+				{	
+					"name":"8.5x11",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 8.5,
+						"height": 11
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 300,
+							"height": 500,
+						},
+						"minimum": {
+							"width": 637,
+							"height": 825,	
+							"aspect": 0.5
+
+						},
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 38,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 17499
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				},
+				{
+					"name":"12x9",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 12,
+						"height": 9
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 600,
+							"height": 600,
+						},
+						"minimum": {
+							"width": 900,
+							"height": 675,	
+							"aspect": 1.5		
+						},
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 38,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 19999
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				},
+			],
+			"coupons": [
+				{
+					// showed in the UI for visual feedback
+					"name": "My discount code",
+					// will match what the user entered
+					"code": "1234_5678_9012_3456"
+				},
+			]
+		},
+
+		"Marco de Madera": {
+			"printing_sizes": [
+				{	
+					"name":"4x4",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 4,
+						"height": 4
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 300,
+							"height": 500,
+						},
+						"minimum": {
+							"width": 300,
+							"height": 300,	
+							"aspect": 1		
+						},
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 1,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 14999
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				},
+				{
+					"name":"8x8",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 8,
+						"height": 8
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 600,
+							"height": 600,
+						},
+						"minimum": {
+							"width": 600,
+							"height": 600,
+							"aspect": 1			
+						},
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 1,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 19999
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				},
+				{
+					"name":"11x17",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 11,
+						"height": 17
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 600,
+							"height": 600,
+						},
+						"minimum": {
+							"width": 825,
+							"height": 1275,
+							"aspect": 0.5		
+						},
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 1,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 31999
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				},
+				{
+					"name":"14x20",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 14,
+						"height": 20
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 600,
+							"height": 600,
+						},
+						"minimum": {
+							"width": 1050,
+							"height": 1500,
+							"aspect": 0.5		
+						},
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 1,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 38999
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				},
+				{
+					"name":"20x29",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 20,
+						"height": 29
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 600,
+							"height": 600,
+						},
+						"minimum": {
+							"width": 1500,
+							"height": 2175,
+							"aspect": 0.5		
+						},
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 1,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 58999
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				},
+			],
+			"coupons": [
+				{
+					// showed in the UI for visual feedback
+					"name": "My discount code",
+					// will match what the user entered
+					"code": "1234_5678_9012_3456"
+				},
+			]
+		},
+
+		"Photostrips": {
+			"printing_sizes": [
+				{	
+					"name":"4.25x17.78",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 4.25,
+						"height": 17.78
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 300,
+							"height": 500,
+						},
+						"minimum": {
+							"width": 333,
+							"height": 1333,	
+							"aspect": 0.5		
+						}
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 12,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 4999
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				}
+			],
+			"coupons": [
+				{
+					// showed in the UI for visual feedback
+					"name": "My discount code",
+					// will match what the user entered
+					"code": "1234_5678_9012_3456"
+				},
+			]
+		},
+		
+		"Poster": {
+			"printing_sizes": [
+				{
+					"name":"20.1x29.1",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 20.1,
+						"height": 29.1
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 1800,
+							"height": 1100,
+						},
+						"minimum": {
+							"width": 1507,
+							"height": 2182,	
+							"aspect": 0.5			
+						}
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 1,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 12999
+						},
+						"additional": {
+							"price": 1575
+						}
+					}
+				},
+				
+			],
+			"coupons": [
+				{
+					// showed in the UI for visual feedback
+					"name": "My discount code",
+					// will match what the user entered
+					"code": "1234_5678_9012_3456"
+				},
+			]
+		},
+
+		"Gran Formato": {
+			"printing_sizes": [
+				{
+					"name":"11x17",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 11,
+						"height": 17
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 1800,
+							"height": 1100,
+						},
+						"minimum": {
+							"width": 825,
+							"height": 1275,	
+							"aspect": 0.5			
+						}
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 2,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 12999
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				},
+				{
+					"name":"14x20",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 14,
+						"height": 20
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 1050,
+							"height": 1500,
+						},
+						"minimum": {
+							"width": 1050,
+							"height": 1500,	
+							"aspect": 0.5		
+						}
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 2,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 13999
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				},
+				{
+					"name":"20.1 x 29.1",
+					"real_size": {
+						// this measures NEEDS to be in inches.
+						// Use dot for decimals like 9.5 X 12
+						"width": 20.1,
+						"height": 29.1
+					},
+					"pixel_size": {
+						// any measure inside here should to be in pixels
+						"optimal": {
+							"width": 1050,
+							"height": 1500,
+						},
+						"minimum": {
+							"width": 1507,
+							"height": 2181,	
+							"aspect": 0.5		
+						}
+					},
+					"prices": {
+						"first_items": {
+							"quantity": 1,
+							// use `.` for decimals 
+							// for example one dollar with fifty cents = 1.50
+							// do not separate big numbers like 20,000.50
+							// just use 20000.50
+							"price": 14999
+						},
+						"additional": {
+							"price": 1000
+						}
+					}
+				}
+				
+			],
+			"coupons": [
+				{
+					// showed in the UI for visual feedback
+					"name": "My discount code",
+					// will match what the user entered
+					"code": "1234_5678_9012_3456"
+				},
+			]
+		}
+	}
+});
 controllers.controller('AppCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
     // Form data for the login modal
     $scope.loginData = {};
@@ -499,11 +1218,15 @@ controllers.controller('AppCtrl', function($scope, $ionicModal, $timeout, $ionic
  * $scope - Scope de la pantalla
  * Nacion_Service - Servicio de datos de nacion, service.js
  */
-controllers.controller('checkCtrl', function($scope,$ionicPopup, $timeout, Nacion_Service) {
+controllers.controller('checkCtrl', function($scope,$ionicPopup, $timeout, SelectedImagesFactory, Nacion_Service, Market) {
     //Variables for using on the app
     //$scope.images = ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp_xyq9C4GVc79lShg4Uo5gTZoBPdimQEHQKHn6cjibxe69Im-A','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp_xyq9C4GVc79lShg4Uo5gTZoBPdimQEHQKHn6cjibxe69Im-A'];
-    $scope.images = Nacion_Service.get_instagram_pics_on_queue();
+    $scope.images = SelectedImagesFactory.getToPrintOnes();
     $scope.dkrm;
+
+    angular.forEach($scope.images, function(value) {
+      value.quantity = 1;
+    });
 
     $scope.crop = function ($index) {
         $scope.showPopup($index);
@@ -527,17 +1250,11 @@ controllers.controller('checkCtrl', function($scope,$ionicPopup, $timeout, Nacio
             text: '<b>Save</b>',
             type: 'button-positive',
             onTap: function(e) {
-                console.log($scope.images[$index].images.low_resolution.url);
                 $scope.images[$index].images.low_resolution.url = $scope.dkrm.snapshotImage();
-                console.log($scope.images[$index].images.low_resolution.url);
                 myPopup.close();
             }
           },
         ]
-      });
-
-      myPopup.then(function(res) {
-        console.log('Tapped!', res);
       });
 
       $timeout(function(){
@@ -565,6 +1282,10 @@ controllers.controller('checkCtrl', function($scope,$ionicPopup, $timeout, Nacio
             cropPlugin.selectZone(170, 25, 300, 300);
           }
         });
+     };
+
+     $scope.addToCart = function () {
+        Market.insertMarket($scope.images);
      };
 
 
@@ -734,11 +1455,6 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$filter', '$ionicPopup', '
         SelectedImagesFactory.setSelectedImages($scope.imageStack);
     }, true);
 
-    $scope.addImg = function($index){
-        console.log($scope.imageStack[$index]);
-        Nacion_Service.addImageQueue($scope.imageStack[$index]);
-        console.log(Nacion_Service.get_instagram_pics_on_queue());
-    };
 
     function extractInstagramImages (apiResponse) {
         lastInstagramLoad = apiResponse;
@@ -805,6 +1521,30 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$filter', '$ionicPopup', '
         extractInstagramImages(response.data);
     },function(err){});
 }]);
+/* InfoCtrl Accordion List
+ * $scope - Scope de la pantalla
+ */
+
+controllers.controller('productCrtl', function($scope, SelectedImagesFactory, PhotoPrintConfig) {
+
+	$scope.saveOption = function(option) {
+		if(PhotoPrintConfig.products.hasOwnProperty(option)){
+			SelectedImagesFactory.setCategory(PhotoPrintConfig.products[option]);
+		}
+	};
+});
+
+controllers.controller('categoryCrtl', function($scope, SelectedImagesFactory, PhotoPrintConfig) {
+	$scope.options = SelectedImagesFactory.getCategory();
+
+	$scope.pickCategory = function(model) {
+		SelectedImagesFactory.setSettings(model);
+	};
+});
+
+controllers.controller('photoCrtl', function($scope, SelectedImagesFactory, PhotoPrintConfig) {
+	$scope.settings = SelectedImagesFactory.getSettings();
+});
 controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
     
     $scope.shareFb = function(){
@@ -818,240 +1558,6 @@ controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ion
     $scope.shareEmail = function(){
         window.plugins.socialsharing.shareViaEmail('Hacelo','Hacelo');
     };
-});
-commons.constant('PhotoPrintConfig', {
-	"products": {
-		// here we hold the information related to every single product
-		// `photo`, `photo-album` and `poster` will have similar structure
-		"photo": {
-			"printing-sizes": [
-				{
-					"real-size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 5,
-						"height": 7
-					},
-					"pixel-size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 500,
-							"height": 700,
-						},
-						"minimum": {
-							"width": 375,
-							"height": 525,			
-						},
-					},
-					"prices": {
-						"first-items": {
-							"quantity": 24,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 800
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				},
-				{
-					"real-size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 8.5,
-						"height": 11
-					},
-					"pixel-size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 850,
-							"height": 1100,
-						},
-						"minimum": {
-							"width": 637,
-							"height": 825,			
-						},
-					},
-					"prices": {
-						"first-items": {
-							"quantity": 24,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 900
-						},
-						"additional": {
-							"price": 1100
-						}
-					}
-				},
-			],
-			"coupons": [
-				{
-					// showed in the UI for visual feedback
-					"name": "My discount code",
-					// will match what the user entered
-					"code": "1234-5678-9012-3456"
-				},
-			]
-		},
-		"photo-album": {
-			"printing-sizes": [
-				{
-					"real-size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 3,
-						"height": 5
-					},
-					"pixel-size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 300,
-							"height": 500,
-						},
-						"minimum": {
-							"width": 225,
-							"height": 375,			
-						},
-					},
-					"prices": {
-						"first-items": {
-							"quantity": 12,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 600
-						},
-						"additional": {
-							"price": 800
-						}
-					}
-				},
-				{
-					"real-size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 4,
-						"height": 6
-					},
-					"pixel-size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 400,
-							"height": 600,
-						},
-						"minimum": {
-							"width": 300,
-							"height": 450,			
-						},
-					},
-					"prices": {
-						"first-items": {
-							"quantity": 18,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 650.25
-						},
-						"additional": {
-							"price": 850.25
-						}
-					}
-				},
-			],
-			"coupons": [
-				{
-					// showed in the UI for visual feedback
-					"name": "My discount code",
-					// will match what the user entered
-					"code": "1234-5678-9012-3456"
-				},
-			]
-		},
-		"poster": {
-			"printing-sizes": [
-				{
-					"real-size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 18,
-						"height": 11
-					},
-					"pixel-size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 1800,
-							"height": 1100,
-						},
-						"minimum": {
-							"width": 1350,
-							"height": 825,			
-						},
-					},
-					"prices": {
-						"first-items": {
-							"quantity": 5,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 1250
-						},
-						"additional": {
-							"price": 1575
-						}
-					}
-				},
-				{
-					"real-size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 11,
-						"height": 17
-					},
-					"pixel-size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 1100,
-							"height": 1700,
-						},
-						"minimum": {
-							"width": 825,
-							"height": 1275,
-						},
-					},
-					"prices": {
-						"first-items": {
-							"quantity": 2,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 1450
-						},
-						"additional": {
-							"price": 1550
-						}
-					}
-				},
-			],
-			"coupons": [
-				{
-					// showed in the UI for visual feedback
-					"name": "My discount code",
-					// will match what the user entered
-					"code": "1234-5678-9012-3456"
-				},
-			]
-		},
-	}
 });
 models.factory('ImageFactory', [function () {
     function ImageWrapper (source) {
@@ -1086,11 +1592,31 @@ models.factory('ImageFactory', [function () {
 
     return ImageWrapper;
 }])
+models.factory('Market', ['$filter', function ($filter) {
+	/**
+	 * A simple service that returns the array of selected images.
+	 */
+     var model = {
+        "shop_item":{
+
+        }
+     };
+
+	return {
+		
+        insertMarket : function(model) {
+            console.log(model);
+        }
+
+	};
+}]);
 models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
 	/**
 	 * A simple service that returns the array of selected images.
 	 */
 	var selectedImages = [];
+	var category = [];
+	var settings = [];
 
 	return {
 		setSelectedImages: function(pSelectedImages) {
@@ -1117,6 +1643,18 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         },
         getOne: function(id){
             return selectedImages[id];
+        },
+        setCategory: function(id){
+        	category = id;
+        },
+        getCategory: function(){
+        	return category;
+        },
+        setSettings: function(id){
+        	settings = id;
+        },
+        getSettings: function(){
+        	return settings;
         }
 	};
 }]);

@@ -3,6 +3,8 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
 	 * A simple service that returns the array of selected images.
 	 */
 	var selectedImages = [];
+	var category = [];
+	var settings = [];
 
 	return {
 		setSelectedImages: function(pSelectedImages) {
@@ -29,6 +31,18 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         },
         getOne: function(id){
             return selectedImages[id];
+        },
+        setCategory: function(id){
+        	category = id;
+        },
+        getCategory: function(){
+        	return category;
+        },
+        setSettings: function(id){
+        	settings = id;
+        },
+        getSettings: function(){
+        	return settings;
         }
 	};
 }]);
