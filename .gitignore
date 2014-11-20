@@ -227,3 +227,9 @@ node_modules
 *.css.map
 *.sublime-project
 *.sublime-workspace
+
+#############
+## Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
+#############
+## Directory-based project format:
+.idea/
