@@ -3,6 +3,7 @@ commons.constant('PhotoPrintConfig', {
 		// here we hold the information related to every single product
 		// `photo`, `photo_album` and `poster` will have similar structure
 		"Fotografias": {
+			"name":"Fotografias",
 			"printing_sizes": [
 				{	"name" : "4x6",
 					"real_size": {
@@ -115,6 +116,7 @@ commons.constant('PhotoPrintConfig', {
 		},
 
 		"Cuadradas": {
+			"name":"Cuadradas",
 			"printing_sizes": [
 				{	
 					"name":"4x4",
@@ -230,6 +232,7 @@ commons.constant('PhotoPrintConfig', {
 		},
 
 		"Photobook": {
+			"name":"Photobook",
 			"printing_sizes": [
 				{	
 					"name":"8.5x11",
@@ -312,6 +315,7 @@ commons.constant('PhotoPrintConfig', {
 		},
 
 		"Marco de Madera": {
+			"name":"Marco de Madera",
 			"printing_sizes": [
 				{	
 					"name":"4x4",
@@ -495,6 +499,7 @@ commons.constant('PhotoPrintConfig', {
 		},
 
 		"Photostrips": {
+			"name":"Photostrips",
 			"printing_sizes": [
 				{	
 					"name":"4.25x17.78",
@@ -542,6 +547,7 @@ commons.constant('PhotoPrintConfig', {
 		},
 		
 		"Poster": {
+			"name":"Poster",
 			"printing_sizes": [
 				{
 					"name":"20.1x29.1",
@@ -590,6 +596,7 @@ commons.constant('PhotoPrintConfig', {
 		},
 
 		"Gran Formato": {
+			"name":"Gran Formato",
 			"printing_sizes": [
 				{
 					"name":"11x17",

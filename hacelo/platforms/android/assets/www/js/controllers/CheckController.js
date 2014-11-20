@@ -69,7 +69,24 @@ controllers.controller('checkCtrl', function($scope,$ionicPopup, $timeout, Selec
      };
 
      $scope.addToCart = function () {
-        Market.insertMarket($scope.images);
+
+        var confirmPopup = $ionicPopup.confirm({
+         title: 'Confirmar',
+         template: 'Estas seguro de utilizar estas fotos?',
+         cancelText: 'Cancelar',
+         okText: 'Aceptar'
+        });
+
+       confirmPopup.then(function(res) {
+         if(res) {
+           Market.insertMarket($scope.images);
+           window.location.href = '#/app/confirm';
+         } else {
+           console.log('You are not sure');
+         }
+       });
+
+
      };
 
 

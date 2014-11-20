@@ -35,7 +35,8 @@ angular.module('hacelo', [
         url: "/landing",
         views: {
             'haceloContent': {
-                templateUrl: "templates/landing.html"
+                templateUrl: "templates/landing.html",
+                controller: "landingCtrl"
             }
         }
     })
@@ -97,7 +98,8 @@ angular.module('hacelo', [
         url: "/confirm",
         views: {
             'haceloContent': {
-                templateUrl: "templates/confirm.html"
+                templateUrl: "templates/confirm.html",
+                controller: "confirmCtrl"
             }
         }
     })
@@ -105,8 +107,7 @@ angular.module('hacelo', [
         url: "/added",
         views: {
             'haceloContent': {
-                templateUrl: "templates/added-cart.html",
-                controller: 'addedCartCtrl'
+                templateUrl: "templates/added-cart.html"
             }
         }
     })
@@ -123,8 +124,8 @@ angular.module('hacelo', [
         url: "/cart-checkout",
         views: {
             'haceloContent': {
-                templateUrl: "templates/cart-checkout.html",
-                controller: 'cartCheckoutCtrl'
+                templateUrl: "templates/cart-checkout.html"
+                //controller: 'cartCheckoutCtrl'
             }
         }
     })

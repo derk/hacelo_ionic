@@ -35,7 +35,8 @@ angular.module('hacelo', [
         url: "/landing",
         views: {
             'haceloContent': {
-                templateUrl: "templates/landing.html"
+                templateUrl: "templates/landing.html",
+                controller: "landingCtrl"
             }
         }
     })
@@ -97,7 +98,8 @@ angular.module('hacelo', [
         url: "/confirm",
         views: {
             'haceloContent': {
-                templateUrl: "templates/confirm.html"
+                templateUrl: "templates/confirm.html",
+                controller: "confirmCtrl"
             }
         }
     })
@@ -105,8 +107,7 @@ angular.module('hacelo', [
         url: "/added",
         views: {
             'haceloContent': {
-                templateUrl: "templates/added-cart.html",
-                controller: 'addedCartCtrl'
+                templateUrl: "templates/added-cart.html"
             }
         }
     })
@@ -123,8 +124,8 @@ angular.module('hacelo', [
         url: "/cart-checkout",
         views: {
             'haceloContent': {
-                templateUrl: "templates/cart-checkout.html",
-                controller: 'cartCheckoutCtrl'
+                templateUrl: "templates/cart-checkout.html"
+                //controller: 'cartCheckoutCtrl'
             }
         }
     })
@@ -464,6 +465,7 @@ commons.constant('PhotoPrintConfig', {
 		// here we hold the information related to every single product
 		// `photo`, `photo_album` and `poster` will have similar structure
 		"Fotografias": {
+			"name":"Fotografias",
 			"printing_sizes": [
 				{	"name" : "4x6",
 					"real_size": {
@@ -576,6 +578,7 @@ commons.constant('PhotoPrintConfig', {
 		},
 
 		"Cuadradas": {
+			"name":"Cuadradas",
 			"printing_sizes": [
 				{	
 					"name":"4x4",
@@ -691,6 +694,7 @@ commons.constant('PhotoPrintConfig', {
 		},
 
 		"Photobook": {
+			"name":"Photobook",
 			"printing_sizes": [
 				{	
 					"name":"8.5x11",
@@ -773,6 +777,7 @@ commons.constant('PhotoPrintConfig', {
 		},
 
 		"Marco de Madera": {
+			"name":"Marco de Madera",
 			"printing_sizes": [
 				{	
 					"name":"4x4",
@@ -956,6 +961,7 @@ commons.constant('PhotoPrintConfig', {
 		},
 
 		"Photostrips": {
+			"name":"Photostrips",
 			"printing_sizes": [
 				{	
 					"name":"4.25x17.78",
@@ -1003,6 +1009,7 @@ commons.constant('PhotoPrintConfig', {
 		},
 		
 		"Poster": {
+			"name":"Poster",
 			"printing_sizes": [
 				{
 					"name":"20.1x29.1",
@@ -1051,6 +1058,7 @@ commons.constant('PhotoPrintConfig', {
 		},
 
 		"Gran Formato": {
+			"name":"Gran Formato",
 			"printing_sizes": [
 				{
 					"name":"11x17",
@@ -1285,7 +1293,24 @@ controllers.controller('checkCtrl', function($scope,$ionicPopup, $timeout, Selec
      };
 
      $scope.addToCart = function () {
-        Market.insertMarket($scope.images);
+
+        var confirmPopup = $ionicPopup.confirm({
+         title: 'Confirmar',
+         template: 'Estas seguro de utilizar estas fotos?',
+         cancelText: 'Cancelar',
+         okText: 'Aceptar'
+        });
+
+       confirmPopup.then(function(res) {
+         if(res) {
+           Market.insertMarket($scope.images);
+           window.location.href = '#/app/confirm';
+         } else {
+           console.log('You are not sure');
+         }
+       });
+
+
      };
 
 
@@ -1545,6 +1570,28 @@ controllers.controller('categoryCrtl', function($scope, SelectedImagesFactory, P
 controllers.controller('photoCrtl', function($scope, SelectedImagesFactory, PhotoPrintConfig) {
 	$scope.settings = SelectedImagesFactory.getSettings();
 });
+
+controllers.controller('confirmCtrl', function($scope, StorageFactory, Market) {
+	$scope.order = Market.getCurrentModel();
+	$scope.addToCart = function(){
+		StorageFactory.save($scope.order);
+	};
+});
+
+controllers.controller('cartCtrl', function($scope, StorageFactory, Market) {
+	$scope.items = StorageFactory.init();
+	$scope.subtotal = 0;
+
+	angular.forEach($scope.items.market, function(value){
+		$scope.subtotal = $scope.subtotal + value.price;
+	});
+});
+
+controllers.controller('landingCtrl', function($scope, StorageFactory) {
+	$scope.market = StorageFactory.init();
+});
+
+
 controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
     
     $scope.shareFb = function(){
@@ -1592,20 +1639,52 @@ models.factory('ImageFactory', [function () {
 
     return ImageWrapper;
 }])
-models.factory('Market', ['$filter', function ($filter) {
+models.factory('Market', ['$filter','SelectedImagesFactory', function ($filter,SelectedImagesFactory) {
 	/**
 	 * A simple service that returns the array of selected images.
 	 */
-     var model = {
-        "shop_item":{
+     var model;
 
-        }
-     };
+     function insertInfo(obj, categoryName, subCategoryName, size, quantity, price){
+        model = {
+            'order_id': Math.floor((Math.random() * 100) + 1),
+            'category':categoryName,
+            'subCategory':subCategoryName,
+            'size':size.width+'x'+size.height,
+            'items':obj,
+            'quantity':quantity,
+            'price':price
+        };
+     }
 
 	return {
 		
         insertMarket : function(model) {
-            console.log(model);
+            var category = SelectedImagesFactory.getCategory(),
+                setting = SelectedImagesFactory.getSettings(),
+                promise = false,
+                price = 0,
+                quantity = 0,
+                totalPrice = 0;
+
+            angular.forEach(model, function(value){
+                quantity = quantity + value.quantity;
+            });
+
+            if(quantity <= setting.prices.first_items.quantity){
+                price = price = setting.prices.first_items.price;;
+            } else {
+                var d = quantity - setting.prices.first_items.quantity;
+                price = setting.prices.first_items.price + (d * setting.prices.additional.price);
+            }
+
+            insertInfo(model, category.name, setting.name, setting.real_size, quantity, price);
+
+            return true;
+        },
+
+        getCurrentModel: function() {
+            return model;
         }
 
 	};
@@ -1660,14 +1739,33 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
 }]);
 models.factory('StorageFactory', ['$window', function ($window) {
 	var storage = $window.localStorage;
-	var prefix = "hclDgtl";
+	var prefix = "hacelo";
+
+	var addStructure = function() {
+		if(!storage.getItem(prefix)){
+			saveMarket({"market":[]});
+		}
+	};
 
 	this.setPrefix = function(newPrefix) {
 		prefix = newPrefix;
 	};
 
-	var save = function(newJson) {
-		return storage.setItem(prefix, angular.toJson(newJson, false));
+	var save = function(newObj) {
+		var model = load(),
+			json = null;
+	
+		if(model.hasOwnProperty('market')){
+			model.market.push(newObj);
+			storage.setItem(prefix, angular.toJson(model));
+			return true;
+		} else {
+			return false;
+		}
+	};
+
+	var saveMarket = function(newJson) {
+		return storage.setItem(prefix, angular.toJson(newJson));
 	};
 
 	var load = function() {
@@ -1677,6 +1775,9 @@ models.factory('StorageFactory', ['$window', function ($window) {
 	var destroy = function() {
 		return storage.removeItem(prefix);
 	};
+
+	addStructure();
+
 
 	return {
 		save: function(newJson) {

@@ -949,6 +949,38 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
             box-sizing: border-box;
             border: 9px solid #fff;
             margin-bottom: 30px;
+            position: relative;
+        }
+
+        .quantity-container {
+            position: absolute;
+            bottom: 12px;
+            width: 80%;
+            padding: 5% 0;
+            background: #d73833;
+            left: 0;
+            right: 0;
+            margin: auto;
+
+            button {
+                height: 100%;
+                position: absolute;
+                top: 0;
+                width: 48px;
+                text-indent: -999px;
+                outline: none;
+                border: 0;
+                
+            }
+            button.add {
+                right: 0;
+                background: url(../img/plusButton.jpg) no-repeat center center;
+            }
+
+            button.minus {
+                left: 0;
+                background: url(../img/minusButton.jpg) no-repeat center center;
+            }
         }
     }
 }

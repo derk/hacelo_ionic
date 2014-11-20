@@ -5,8 +5,8 @@
     		<div class="image"></div><!-- REPLACE FOR THE IMAGE -->
 			<h2>fotos</h2>
 			<p>Quieres ordenar</p>
-			<p>16 fotos <span>= 4900.00</span></p>
-			<a class="button button-balanced" href="#/app/added">Añadir a Carrito</a>
+			<p>{{order.quantity}} fotos <span>= &#8353;{{order.price}}.00</span></p>
+			<a class="button button-balanced" ng-click="addToCart()" href="#/app/added">Añadir a Carrito</a>
 		</div>
   	</ion-content>
 </ion-view>

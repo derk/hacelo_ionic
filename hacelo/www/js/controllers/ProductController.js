@@ -22,3 +22,24 @@ controllers.controller('categoryCrtl', function($scope, SelectedImagesFactory, P
 controllers.controller('photoCrtl', function($scope, SelectedImagesFactory, PhotoPrintConfig) {
 	$scope.settings = SelectedImagesFactory.getSettings();
 });
+
+controllers.controller('confirmCtrl', function($scope, StorageFactory, Market) {
+	$scope.order = Market.getCurrentModel();
+	$scope.addToCart = function(){
+		StorageFactory.save($scope.order);
+	};
+});
+
+controllers.controller('cartCtrl', function($scope, StorageFactory, Market) {
+	$scope.items = StorageFactory.init();
+	$scope.subtotal = 0;
+
+	angular.forEach($scope.items.market, function(value){
+		$scope.subtotal = $scope.subtotal + value.price;
+	});
+});
+
+controllers.controller('landingCtrl', function($scope, StorageFactory) {
+	$scope.market = StorageFactory.init();
+});
+
