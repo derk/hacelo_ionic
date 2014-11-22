@@ -49,6 +49,10 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
    =============  General Styles  ============= 
 */
 
+body{
+    font-family: verdana;
+}
+
 .button.button-balanced{
     border: none;
     background-color: $green;
@@ -82,7 +86,17 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
     letter-spacing: 2px;
 }
 
-// Index page
+.popup {
+    width: 98% !important;
+}
+
+.popup-body {
+    overflow: visible;
+}
+
+/* 
+   =============  Index Page Styles  ============= 
+*/
 
 .options-index {
     position: absolute;
@@ -129,6 +143,11 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
         }
     }
 }
+
+/* 
+   =============  Products Page  ============= 
+*/
+
 .products-container {
     height: 100%;
     width: 100%;
@@ -856,43 +875,116 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 }
 
 /* 
-   =============  congrats page  ============= 
+   =============  order-sent page  ============= 
 */
-
-.order-sent-container{
-    text-transform: uppercase;
-    font-family: verdana;
-    h2{ 
-        color: $green;
-        text-align: center;
-        font-weight: bold;
-        font-size: 1.5em;
-        span{
-            display: block;
-            font-size: 2.1em;
-            margin-top: 3%;
+.order-sent-page{
+    .order-sent-container{
+        text-transform: uppercase;
+        font-family: verdana;
+        h2{ 
+            color: $green;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.5em;
+            span{
+                display: block;
+                font-size: 2.1em;
+                margin-top: 3%;
+            }
+        }
+        p.message{
+            color: $text-grey;
+            letter-spacing: -1px;
+            font-style: italic;
+            width: 90%;
+            font-size: 1em;
+            margin: 10% auto;
+            text-align: center;
+        }
+        div.image{
+            background: #ccc;
+            width: 94%;
+            height: 150px;
+            margin: 0 auto 10%;
         }
     }
-    p.message{
+
+    .bar-footer{
+        margin-bottom: 10%;
+        a.button{
+            width: 98%;
+            margin: auto;
+            display: block;
+            min-height: 42px;
+            text-transform: uppercase;
+            font-family: verdana;
+            font-size: 1.2em;
+            padding: 5px;
+        }
+    }
+}
+
+/* 
+   =============  show-love page  ============= 
+*/
+
+.show-love-page{
+    p{
         color: $text-grey;
-        letter-spacing: -1px;
+        font-size: 0.9em;
         font-style: italic;
-        width: 90%;
-        font-size: 1em;
-        margin: 10% auto;
-        text-align: center;
+        width: 92%;
+        margin: 0 auto 6%;
+        &.thanks{
+            margin-bottom: 0;
+        }
     }
-    div.image{
-        background: #ccc;
-        width: 94%;
-        height: 150px;
-        margin: 0 auto 10%;
-    }
-    a.button{
-        width: 98%;
-        margin: auto;
+    .bar-footer{
+        margin-bottom: 6%;
         display: block;
-        min-height: 42px;
+        min-height: 140px;
+        a.instagram{
+            width: 100%;
+            display: block;
+            float: none;
+            margin-bottom: 1px;
+            text-transform: uppercase;
+            padding: 5px;
+            font-size: 1.15em;
+        }
+        div.buttons{
+            a{
+                text-transform: uppercase;
+                padding: 5px;
+            }
+            &.socialbtns{
+                width: 100%;
+                overflow: hidden;
+                margin-bottom: 1px;
+                .twitter{
+                    width: 49.5%;
+                    float: left;
+                    margin-right: 0.5%;
+                }
+                .fb{
+                    float: left;
+                    width: 49.9%;
+                }
+            }
+            &.btns{
+                width: 100%;
+                overflow: hidden;
+                .comment{
+                    width: 49.5%;
+                    float: left;
+                    margin-right: 0.5%;
+                }
+                .return{
+                    float: left;
+                    width: 49.9%;
+                }
+            }
+        }
     }
 }
 
@@ -985,11 +1077,42 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
     }
 }
 
+/*
+   ============ Photobook page ================
+*/
 
-.popup {
-    width: 98% !important;
-  }
+.photobook-page{
+    background: $green;
+    text-transform: uppercase;
+    color: #FFF;
+    h3{
+        color: #FFF;
+        font-size: 1.3em;
+        width: 50%;
+        font-family: verdana;
+        text-align: center;
+        font-weight: bold;
+        margin: 20% auto 25%;
+        letter-spacing: 1px;
+    }
 
-  .popup-body {
-    overflow: visible;
-  }
+    p{
+        text-align: center;
+        width: 90%;
+        margin: auto;
+        line-height: 27px;
+    }
+
+    .bar-footer{
+        background: $green;
+        margin-bottom: 6%;
+        a.button{
+            width: 90%;
+            margin: auto;
+            display: block;
+            font-size: 1.2em;
+            padding: 6px;
+        }
+    }
+
+}
