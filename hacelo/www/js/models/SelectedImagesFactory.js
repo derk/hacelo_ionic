@@ -1,26 +1,31 @@
 models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
-	/**
-	 * A simple service that returns the array of selected images.
-	 */
-	var selectedImages = [];
-	var category = [];
-	var settings = [];
+    /**
+     * A simple service that returns the array of selected images.
+     */
+    var selectedImages = [];
+    var category = [];
+    var settings = [];
 
-	return {
-		setSelectedImages: function(pSelectedImages) {
-			if (angular.isArray(pSelectedImages)) {
-				selectedImages = pSelectedImages;
-			}
-		},
+    return {
+        setSelectedImages: function(pSelectedImages) {
+            if (angular.isArray(pSelectedImages)) {
+                selectedImages = pSelectedImages;
+            }
+        },
         addItem: function(pItem) {
-			if (angular.isObject(pItem)) {
-				selectedImages.push(pItem);
-			}
-		},
-		getInstagramOnes: function() {
-			return $filter('filter')(selectedImages, {origin:"instagram"});
-		},
-		getPhoneOnes: function() {
+            if (angular.isObject(pItem)) {
+                angular.copy(pItem, selectedImages);
+            }
+        },
+        addItems: function(pItems) {
+            if (angular.isArray(pItems)) {
+                angular.copy(pItems, selectedImages);
+            }
+        },
+        getInstagramOnes: function() {
+            return $filter('filter')(selectedImages, {origin:"instagram"});
+        },
+        getPhoneOnes: function() {
             return $filter('filter')(selectedImages, {origin:"phone"});
         },
         getToPrintOnes: function() {
@@ -33,16 +38,16 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
             return selectedImages[id];
         },
         setCategory: function(id){
-        	category = id;
+            category = id;
         },
         getCategory: function(){
-        	return category;
+            return category;
         },
         setSettings: function(id){
-        	settings = id;
+            settings = id;
         },
         getSettings: function(){
-        	return settings;
+            return settings;
         }
-	};
+    };
 }]);

@@ -1,63 +1,105 @@
-/* Instagram para controlar la pantalla de isntagram
- * $scope - Scope de la pantalla
- * Nacion_Service - Servicio de datos de nacion, service.js
- */
-controllers.controller('InstagramCrtl', function($scope, Nacion_Service) {
-    $scope.instagram_pics = Nacion_Service.get_entire_ins_pics();
-    $scope.picked_pics = Nacion_Service.get_instagram_pics_on_queue();
-    $scope.load_more = Nacion_Service.getNextUrl();
-    Nacion_Service.hide();
-    console.log($scope.load_more);
+controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$ionicLoading', 'SelectedImagesFactory', 'MessageService', 'InstagramService', 'ImageFactory', function ($scope, $filter, $ionicPopup, $ionicLoading, SelectedImagesFactory, MessageService, InstagramService, ImageFactory) {
+    $scope.loading = false;
+    $scope.imageStack = SelectedImagesFactory.getAll();
+    $scope.canLoadMore = false;
 
-    $scope.pick_song = function(index, data) {
-        if ($scope.instagram_pics[index].picked) {
-            $scope.instagram_pics[index].picked = false;
-            var index = $scope.picked_pics.indexOf(data);
-            $scope.picked_pics.splice(index, 1);
+    $scope.$watch('loading', function(newVal, oldVal) {// for showing and hiding load spinner
+        var cache = angular.isDefined(cache)? cache: MessageService.search("loading");
+        if (newVal !== oldVal) {
+            if (newVal === true) {
+                $ionicLoading.show(cache);
+            } else {
+                $ionicLoading.hide();
+            }
+        }
+    });
+
+    var extractInstagramImages = function(apiResponse) {
+        /*
+         *   Aquí reviso la respuesta que me devolvió Instagram, le quito los videos y
+         *   luego reviso si luego de filtrar lo quedaron  imágenes en caso de que no
+         *   quedaran muestro un mensaje al usuario diciéndole que no tiene imágenes
+         *   que su cuenta de Instagram y lo envió a la pantalla anterior.
+         *   Si hay imágenes las meto al scope para que el usuario decida cuales
+         *   imágenes va a imprimir.
+         * */
+        var filteredResponse = $filter('filter')(apiResponse.data, {type:"image"}),
+            j = filteredResponse.length;
+
+        if (j === 0) {
+            $ionicPopup.alert(MessageService.search("no-images-found")).then(function(){
+                sendUserBackToChoose();
+            });
         } else {
-            $scope.instagram_pics[index].picked = true;
-            $scope.picked_pics.push(data);
+            for (var i = 0; i < j; i++) {
+                $scope.imageStack.push(new ImageFactory(filteredResponse[i].images));
+            }
         }
     };
 
-    $scope.insert_into_queue = function() {
-        Nacion_Service.set_instagram_pics_on_queue($scope.picked_pics);
-        window.picked = $scope.picked_pics;
-        window.history.back();
+    var getRecentMedia = function(){
+        /*  Se conecta con la API de Instagram por medio del servicio y trae las
+         *  ultimas imágenes.En caso de que la respuesta de Instagram venga con
+         *  un error (token vencido o alguno otro) Fuerzo al servicio a que haga
+         *  un nuevo log in para refrescar el token.
+         * */
+        $scope.loading = true;
+        InstagramService.getRecentMedia()
+            .then(function(response) {
+                $scope.loading = false;
+                if (response.data.meta.code === 400) { // check if token is expired
+                    authenticateInstagramUser();
+                } else {
+                    extractInstagramImages(response.data);
+                    canLoadMoreImages();
+                }
+            }, function(err) {
+                $scope.loading = false;
+                $ionicPopup.alert(MessageService.search("cannot-load-media"));
+            });
     };
 
-    $scope.loadMore = function(){
-        var instagram_v = new Instagram();
-            instagram_v.loadMore($scope.load_more);
+    var sendUserBackToChoose = function(){
+        $state.go('app.choose');
     };
 
-    document.addEventListener('finish', function(e) {
-        //Open the loading popup
-        Nacion_Service.show(hacelo.messages.Loading);
-        //little timeout to ensure the pop up to appear
-        setTimeout(function() {
-            var nextPage = e.detail;
-            var array = [];
-            for (var el = 0; el < nextPage.length; el++) {
-                var obj = {
-                    "img": nextPage[el],
-                    "picked": false
-                };
-                array.push(obj);
+    var havePreviousImages = function(){
+        return (SelectedImagesFactory.getInstagramOnes().length>0)?true:false;
+    };
+
+    var authenticateInstagramUser = function (){
+        /*
+        * Muestra la ventana en la que el usuario inicia sesión con su cuenta de Instagram.
+        * si el usario no otorga aceso a la cuenta muestra un mensaje de error y redirecciona
+        * al usuario a la ventana anterior.
+        * */
+        InstagramService.auth()
+            .then(function(result) {
+                getRecentMedia();
+            }, function(err) {
+                $ionicPopup.alert(MessageService.search("user-denied-access")).then(function(){
+                    sendUserBackToChoose();
+                });
+            });
+    };
+
+    $scope.loadMore = getRecentMedia;
+
+    var canLoadMoreImages = function(){
+        $scope.canLoadMore = InstagramService.canLoadMore();
+    };
+
+    var init = function(){
+        if (InstagramService.isAuthenticated()){
+            if(havePreviousImages()){
+                canLoadMoreImages();
+            } else {
+                getRecentMedia();
             }
-            $scope.instagram_pics = $scope.instagram_pics.concat(array);
-            console.debug(array);
-            Nacion_Service.set_entire_ins_pics($scope.instagram_pics);
-            Nacion_Service.hide();
+        } else {
+            authenticateInstagramUser();
+        }
+    };
 
-            Nacion_Service.setNextUrl('');
-            $scope.load_more = Nacion_Service.getNextUrl();
-        }, 100);
-
-    });
-
-    document.addEventListener('pagination', function(e) {
-        Nacion_Service.setNextUrl(e.detail);
-        $scope.load_more = Nacion_Service.getNextUrl();
-    });
-});
+    init();
+}]);
