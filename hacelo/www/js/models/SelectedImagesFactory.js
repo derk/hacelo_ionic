@@ -1,10 +1,11 @@
 models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
     /**
      * A simple service that returns the array of selected images.
+     * Also store the selected product with his parent product line
      */
     var selectedImages = [];
-    var category = [];
-    var settings = [];
+    var category = {};
+    var settings = {};
 
     return {
         setSelectedImages: function(pSelectedImages) {
@@ -37,16 +38,16 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         getOne: function(id){
             return selectedImages[id];
         },
-        setCategory: function(id){
+        setProductLine: function(id){
             category = id;
         },
-        getCategory: function(){
+        getProductLine: function(){
             return category;
         },
-        setSettings: function(id){
+        setProduct: function(id){
             settings = id;
         },
-        getSettings: function(){
+        getProduct: function(){
             return settings;
         }
     };

@@ -1,10 +1,13 @@
 commons.constant('PhotoPrintConfig', {
-	"products": {
-		// here we hold the information related to every single product
-		// `photo`, `photo_album` and `poster` will have similar structure
-		"Fotografias": {
+	"products": [
+		/*
+		* here we hold the information related to every product line product.
+		* And inside of it all the products for that line.
+		* */
+		{
+			id: "pictures",
 			"name":"Fotografias",
-			"printing_sizes": [
+			"products": [
 				{	"name" : "4x6",
 					"real_size": {
 						// this measures NEEDS to be in inches.
@@ -16,13 +19,13 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 500,
-							"height": 700,
+							"height": 700
 						},
 						"minimum": {
 							"width": 300,
 							"height": 450,		
 							"aspect": 0.5
-						},
+						}
 					},
 					"prices": {
 						"first_items": {
@@ -49,13 +52,13 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 500,
-							"height": 700,
+							"height": 700
 						},
 						"minimum": {
 							"width": 375,
 							"height": 525,	
 							"aspect": 0.5		
-						},
+						}
 					},
 					"prices": {
 						"first_items": {
@@ -82,13 +85,13 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 500,
-							"height": 700,
+							"height": 700
 						},
 						"minimum": {
 							"width": 600,
 							"height": 750,		
 							"aspect": 0.5	
-						},
+						}
 					},
 					"prices": {
 						"first_items": {
@@ -111,13 +114,14 @@ commons.constant('PhotoPrintConfig', {
 					"name": "My discount code",
 					// will match what the user entered
 					"code": "1234_5678_9012_3456"
-				},
+				}
 			]
 		},
 
-		"Cuadradas": {
+		{
+			id: "quadrate",
 			"name":"Cuadradas",
-			"printing_sizes": [
+			"products": [
 				{	
 					"name":"4x4",
 					"real_size": {
@@ -130,13 +134,13 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 300,
-							"height": 500,
+							"height": 500
 						},
 						"minimum": {
 							"width": 300,
 							"height": 300,	
 							"aspect": 1		
-						},
+						}
 					},
 					"prices": {
 						"first_items": {
@@ -164,13 +168,13 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 600,
-							"height": 600,
+							"height": 600
 						},
 						"minimum": {
 							"width": 600,
 							"height": 600,		
 							"aspect": 1	
-						},
+						}
 					},
 					"prices": {
 						"first_items": {
@@ -198,13 +202,13 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 600,
-							"height": 600,
+							"height": 600
 						},
 						"minimum": {
 							"width": 750,
 							"height": 750,	
 							"aspect": 1		
-						},
+						}
 					},
 					"prices": {
 						"first_items": {
@@ -227,13 +231,14 @@ commons.constant('PhotoPrintConfig', {
 					"name": "My discount code",
 					// will match what the user entered
 					"code": "1234_5678_9012_3456"
-				},
+				}
 			]
 		},
 
-		"Photobook": {
+		{
+			id: "photobook",
 			"name":"Photobook",
-			"printing_sizes": [
+			"products": [
 				{	
 					"name":"8.5x11",
 					"real_size": {
@@ -246,14 +251,14 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 300,
-							"height": 500,
+							"height": 500
 						},
 						"minimum": {
 							"width": 637,
 							"height": 825,	
 							"aspect": 0.5
 
-						},
+						}
 					},
 					"prices": {
 						"first_items": {
@@ -281,13 +286,13 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 600,
-							"height": 600,
+							"height": 600
 						},
 						"minimum": {
 							"width": 900,
 							"height": 675,	
 							"aspect": 1.5		
-						},
+						}
 					},
 					"prices": {
 						"first_items": {
@@ -302,7 +307,7 @@ commons.constant('PhotoPrintConfig', {
 							"price": 1000
 						}
 					}
-				},
+				}
 			],
 			"coupons": [
 				{
@@ -310,13 +315,14 @@ commons.constant('PhotoPrintConfig', {
 					"name": "My discount code",
 					// will match what the user entered
 					"code": "1234_5678_9012_3456"
-				},
+				}
 			]
 		},
 
-		"Marco de Madera": {
+		{
+			id: "woodFrame",
 			"name":"Marco de Madera",
-			"printing_sizes": [
+			"products": [
 				{	
 					"name":"4x4",
 					"real_size": {
@@ -329,13 +335,13 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 300,
-							"height": 500,
+							"height": 500
 						},
 						"minimum": {
 							"width": 300,
 							"height": 300,	
 							"aspect": 1		
-						},
+						}
 					},
 					"prices": {
 						"first_items": {
@@ -363,13 +369,13 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 600,
-							"height": 600,
+							"height": 600
 						},
 						"minimum": {
 							"width": 600,
 							"height": 600,
 							"aspect": 1			
-						},
+						}
 					},
 					"prices": {
 						"first_items": {
@@ -397,13 +403,13 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 600,
-							"height": 600,
+							"height": 600
 						},
 						"minimum": {
 							"width": 825,
 							"height": 1275,
 							"aspect": 0.5		
-						},
+						}
 					},
 					"prices": {
 						"first_items": {
@@ -431,13 +437,13 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 600,
-							"height": 600,
+							"height": 600
 						},
 						"minimum": {
 							"width": 1050,
 							"height": 1500,
 							"aspect": 0.5		
-						},
+						}
 					},
 					"prices": {
 						"first_items": {
@@ -465,13 +471,13 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 600,
-							"height": 600,
+							"height": 600
 						},
 						"minimum": {
 							"width": 1500,
 							"height": 2175,
 							"aspect": 0.5		
-						},
+						}
 					},
 					"prices": {
 						"first_items": {
@@ -486,7 +492,7 @@ commons.constant('PhotoPrintConfig', {
 							"price": 1000
 						}
 					}
-				},
+				}
 			],
 			"coupons": [
 				{
@@ -494,13 +500,14 @@ commons.constant('PhotoPrintConfig', {
 					"name": "My discount code",
 					// will match what the user entered
 					"code": "1234_5678_9012_3456"
-				},
+				}
 			]
 		},
 
-		"Photostrips": {
+		{
+			id: "photostrips",
 			"name":"Photostrips",
-			"printing_sizes": [
+			"products": [
 				{	
 					"name":"4.25x17.78",
 					"real_size": {
@@ -513,7 +520,7 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 300,
-							"height": 500,
+							"height": 500
 						},
 						"minimum": {
 							"width": 333,
@@ -542,13 +549,14 @@ commons.constant('PhotoPrintConfig', {
 					"name": "My discount code",
 					// will match what the user entered
 					"code": "1234_5678_9012_3456"
-				},
+				}
 			]
 		},
 		
-		"Poster": {
+		{
+			id: "poster",
 			"name":"Poster",
-			"printing_sizes": [
+			"products": [
 				{
 					"name":"20.1x29.1",
 					"real_size": {
@@ -561,7 +569,7 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 1800,
-							"height": 1100,
+							"height": 1100
 						},
 						"minimum": {
 							"width": 1507,
@@ -582,8 +590,7 @@ commons.constant('PhotoPrintConfig', {
 							"price": 1575
 						}
 					}
-				},
-				
+				}
 			],
 			"coupons": [
 				{
@@ -591,13 +598,14 @@ commons.constant('PhotoPrintConfig', {
 					"name": "My discount code",
 					// will match what the user entered
 					"code": "1234_5678_9012_3456"
-				},
+				}
 			]
 		},
 
-		"Gran Formato": {
+		{
+			id: "largeFormat",
 			"name":"Gran Formato",
-			"printing_sizes": [
+			"products": [
 				{
 					"name":"11x17",
 					"real_size": {
@@ -610,7 +618,7 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 1800,
-							"height": 1100,
+							"height": 1100
 						},
 						"minimum": {
 							"width": 825,
@@ -644,7 +652,7 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 1050,
-							"height": 1500,
+							"height": 1500
 						},
 						"minimum": {
 							"width": 1050,
@@ -678,7 +686,7 @@ commons.constant('PhotoPrintConfig', {
 						// any measure inside here should to be in pixels
 						"optimal": {
 							"width": 1050,
-							"height": 1500,
+							"height": 1500
 						},
 						"minimum": {
 							"width": 1507,
@@ -708,8 +716,8 @@ commons.constant('PhotoPrintConfig', {
 					"name": "My discount code",
 					// will match what the user entered
 					"code": "1234_5678_9012_3456"
-				},
+				}
 			]
 		}
-	}
+	]
 });
