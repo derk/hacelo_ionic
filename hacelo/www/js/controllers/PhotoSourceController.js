@@ -4,11 +4,14 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$filter', '$ionicPopup', '
     $scope.imageStack = SelectedImagesFactory.getAll();
 
     $scope.phoneImageLoad = function () {
-        CordovaCameraService.getImage()
-            .then(function (result) {
-                $scope.imageStack.push(new ImageFactory(result));
-            }, function (result) {
-                // $ionicPopup.alert(MessageService.search("cordova-load-failed"));
-            });
+        CordovaCameraService.getImage().then(
+            function (result) {
+                (new ImageFactory(result)).phoneImageInit().then(
+                    function(result){
+                        $scope.imageStack.push(result);
+                    }
+                );
+            }
+        );
     };
 }]);

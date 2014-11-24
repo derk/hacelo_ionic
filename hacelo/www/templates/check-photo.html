@@ -1,17 +1,24 @@
-<ion-view title="REVISAR" class="check-page" >
-	<ion-nav-buttons side="right">
-	    <a ng-click="addToCart()" style="color: black;" class="button button-icon icon ion-checkmark"></a> 
-	</ion-nav-buttons>
+<ion-view title="REVISAR" class="check-page">
+    <ion-nav-buttons side="right">
+        <a ng-click="addToCart()" class="button button-icon icon ion-checkmark"></a>
+    </ion-nav-buttons>
 
 
-  	<ion-content class="has-header">
-    	<div class="check-container">
-        <h1>Revisar y Cortar</h1>
-        <p>Tocar cualquier foto para ajusar.</p>
-    		<div ng-repeat="image in images track by $index" class="singeImage">
-    			<img src="{{image.images.low_resolution.url}}" width="{{image.images.low_resolution.width}}" ng-click="crop($index)">
-          <div class="quantity-container"><button ng-disabled="image.quantity == 1" ng-click="image.quantity = image.quantity -1" class="minus">-</button>x{{image.quantity}}<button class="add" ng-click="image.quantity = image.quantity +1">+</button></div>
-    		</div>
-		</div>
-  	</ion-content>
+    <ion-content class="has-header">
+        <div class="check-container">
+            <h1>Revisar y Cortar</h1>
+
+            <p>Tocar cualquier foto para ajusar.</p>
+
+            <div class="singeImage" ng-repeat="image in images track by $index" ng-init="sResolution = image.images.standard_resolution">
+                <img ng-src="{{sResolution.url}}" ng-click="crop($index)" style="max-width: 100%;height: auto;">
+
+                <div class="quantity-container" ng-init="quantity = image.quantity">
+                    <button ng-disabled="quantity==1" ng-click="quantity=quantity-1" class="minus">-</button>
+                    &times;{{quantity}}
+                    <button class="add" ng-click="quantity=quantity+1">+</button>
+                </div>
+            </div>
+        </div>
+    </ion-content>
 </ion-view>
