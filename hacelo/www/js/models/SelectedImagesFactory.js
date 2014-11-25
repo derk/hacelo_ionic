@@ -5,7 +5,7 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
      */
     var selectedImages = [];
     var category = {};
-    var settings = {};
+    var product = {};
 
     return {
         setSelectedImages: function(pSelectedImages) {
@@ -38,17 +38,17 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         getOne: function(id){
             return selectedImages[id];
         },
-        setProductLine: function(id){
-            category = id;
+        setProductLine: function(pCategory){
+            category = pCategory;
         },
         getProductLine: function(){
             return category;
         },
-        setProduct: function(id){
-            settings = id;
+        setProduct: function(pProduct){
+            product = pProduct;
         },
         getProduct: function(){
-            return settings;
+            return product;
         }
     };
 }]);

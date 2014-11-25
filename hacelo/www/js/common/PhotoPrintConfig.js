@@ -143,7 +143,7 @@ commons.constant('PhotoPrintConfig', {
                         "minimum": {
                             "width": 300,
                             "height": 300,
-                            "aspect": 1
+                            "aspect": "square"
                         }
                     },
                     "prices": {
@@ -177,7 +177,7 @@ commons.constant('PhotoPrintConfig', {
                         "minimum": {
                             "width": 600,
                             "height": 600,
-                            "aspect": 1
+                            "aspect": "square"
                         }
                     },
                     "prices": {
@@ -211,7 +211,7 @@ commons.constant('PhotoPrintConfig', {
                         "minimum": {
                             "width": 750,
                             "height": 750,
-                            "aspect": 1
+                            "aspect": "square"
                         }
                     },
                     "prices": {
@@ -344,7 +344,7 @@ commons.constant('PhotoPrintConfig', {
                         "minimum": {
                             "width": 300,
                             "height": 300,
-                            "aspect": 1
+                            "aspect": "square"
                         }
                     },
                     "prices": {
@@ -378,7 +378,7 @@ commons.constant('PhotoPrintConfig', {
                         "minimum": {
                             "width": 600,
                             "height": 600,
-                            "aspect": 1
+                            "aspect": "square"
                         }
                     },
                     "prices": {

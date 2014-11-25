@@ -1,4 +1,4 @@
-controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$ionicLoading', 'SelectedImagesFactory', 'MessageService', 'InstagramService', 'ImageFactory', function ($scope, $filter, $ionicPopup, $ionicLoading, SelectedImagesFactory, MessageService, InstagramService, ImageFactory) {
+controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$ionicLoading', 'SelectedImagesFactory', 'MessageService', 'InstagramService', 'ImageFactory', 'PhotoSizeChecker', function ($scope, $filter, $ionicPopup, $ionicLoading, SelectedImagesFactory, MessageService, InstagramService, ImageFactory, PhotoSizeChecker) {
     $scope.loading = false;
     $scope.imageStack = SelectedImagesFactory.getAll();
     $scope.canLoadMore = false;
@@ -83,8 +83,6 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
             });
     };
 
-    $scope.loadMore = getRecentMedia;
-
     var canLoadMoreImages = function(){
         $scope.canLoadMore = InstagramService.canLoadMore();
     };
@@ -98,6 +96,25 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
             }
         } else {
             authenticateInstagramUser();
+        }
+    };
+
+    $scope.loadMore = getRecentMedia;
+
+    $scope.checkRequirements = function(image){
+        if(image.toPrint === true) {
+            image.toPrint = false;
+        } else {
+            if(PhotoSizeChecker.meetsMinimumRequirements(image)) {
+                image.toPrint = true;
+            } else {
+                $ionicPopup.alert({
+                    title: 'La imagen es muy pequenna',
+                    template: 'Lo sentimos :( la foto tiene que ser'+
+                    'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
+                    'una impresión de la más alta calidad.'
+                });
+            }
         }
     };
 

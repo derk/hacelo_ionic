@@ -7,7 +7,7 @@
 			<div class="images-container">
 				<div class="image" ng-repeat="image in imageStack | filter:{origin:'instagram'} track by $index" ng-init="thumbnail = image.images.thumbnail">
 					<div class="image-inner" ng-class="{'positive-bg': image.toPrint}">
-						<a href="javascript:void(0);" ng-click="image.toPrint = !image.toPrint">
+						<a ng-click="checkRequirements(image)">
 							<img ng-src="{{thumbnail.url}}" width="{{thumbnail.width}}" height="{{thumbnail.height}}" alt="Photo">
 						</a>
 					</div>
