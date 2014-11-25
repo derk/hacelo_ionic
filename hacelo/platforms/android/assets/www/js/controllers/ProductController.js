@@ -1,26 +1,24 @@
-/* InfoCtrl Accordion List
- * $scope - Scope de la pantalla
- */
+controllers.controller('productCrtl', function($scope, $state, SelectedImagesFactory, PhotoPrintConfig) {
 
-controllers.controller('productCrtl', function($scope, SelectedImagesFactory, PhotoPrintConfig) {
+	$scope.productLines = PhotoPrintConfig.products;
 
-	$scope.saveOption = function(option) {
-		if(PhotoPrintConfig.products.hasOwnProperty(option)){
-			SelectedImagesFactory.setCategory(PhotoPrintConfig.products[option]);
-		}
+	$scope.saveProductLine = function(pProductLine) {
+		SelectedImagesFactory.setProductLine(pProductLine);
+		$state.go("app.category");
 	};
 });
 
-controllers.controller('categoryCrtl', function($scope, SelectedImagesFactory, PhotoPrintConfig) {
-	$scope.options = SelectedImagesFactory.getCategory();
+controllers.controller('categoryCrtl', function($scope, $state, SelectedImagesFactory) {
+	$scope.productLine = SelectedImagesFactory.getProductLine();
 
-	$scope.pickCategory = function(model) {
-		SelectedImagesFactory.setSettings(model);
+	$scope.saveProduct = function(pProduct) {
+		SelectedImagesFactory.setProduct(pProduct);
+		$state.go("app.photo");
 	};
 });
 
 controllers.controller('photoCrtl', function($scope, SelectedImagesFactory, PhotoPrintConfig) {
-	$scope.settings = SelectedImagesFactory.getSettings();
+	$scope.product = SelectedImagesFactory.getProduct();
 });
 
 controllers.controller('confirmCtrl', function($scope, StorageFactory, Market) {
@@ -37,9 +35,24 @@ controllers.controller('cartCtrl', function($scope, StorageFactory, Market) {
 	angular.forEach($scope.items.market, function(value){
 		$scope.subtotal = $scope.subtotal + value.price;
 	});
+
+	$scope.delete = function ($index) {
+		StorageFactory.deleteNode($index);
+		init();
+	};
+
+	var init = function(){
+		$scope.items = StorageFactory.init();
+		$scope.subtotal = 0;
+
+		angular.forEach($scope.items.market, function(value){
+			$scope.subtotal = $scope.subtotal + value.price;
+		});
+	};
+
+	init();
 });
 
 controllers.controller('landingCtrl', function($scope, StorageFactory) {
 	$scope.market = StorageFactory.init();
 });
-

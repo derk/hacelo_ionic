@@ -2,6 +2,7 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
     var self = this,
         user,
         accessToken,
+        lastInstagramLoad,
         config = {
             clientId: '70a2ae9262fc4805a5571e8036695a4d',
             redirectUri: 'http://www.wikipedia.org/',
@@ -18,7 +19,8 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
         var prms = {
                 client_id: config.clientId,
                 callback: 'JSON_CALLBACK'
-            };
+            }
+            deferred = $q.defer();
         if (self.isAuthenticated()) {
             prms.access_token = accessToken;
         }
@@ -29,7 +31,15 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
                 params: angular.extend(prms, params)
             };
 
-        return $http(cnfg);
+        $http(cnfg).then(function(response){
+            lastInstagramLoad = response.data;
+            console.log(lastInstagramLoad);
+            deferred.resolve(response);
+        },function(response){
+            deferred.reject(response);
+        });
+
+        return deferred.promise;
     };
 
     var getUrlParameters = function (parameter, staticURL, decode) {
@@ -60,7 +70,7 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
 
     var bindAuthEvents = function(authTab) {
         // This function bind the evens to the instagram autentication screen
-        // If every thing goes good then load the user information
+        // If every thing goes good then store the token
         // Also handle how the app respond to an authentication error
         var deferred = $q.defer();
         authTab.addEventListener('loadstart', function(e) {
@@ -99,8 +109,34 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
         return bindAuthEvents($window.open(authUrl, '_blank', 'location=yes'));
     };
 
-    this.getRecentMedia = function(params) {
-        return fetch('users/self/media/recent', params);
+    this.hasLastInstagramLoad = function(){
+        return angular.isDefined(lastInstagramLoad);
+    };
+
+    this.canLoadMore = function(){
+        var can;
+        console.log(lastInstagramLoad);
+        if(!self.hasLastInstagramLoad()){
+            can = true;
+        } else if (angular.isDefined(lastInstagramLoad.pagination)) {
+            if (angular.isDefined(lastInstagramLoad.pagination.next_url)){
+                can = true;
+            } else {
+                can = false;
+            }
+        } else {
+            can = false;
+        }
+        return can;
+    };
+
+    this.getRecentMedia = function() {
+        var prms = {};
+
+        if (self.hasLastInstagramLoad() && self.canLoadMore()) {
+            prms.max_tag_id = lastInstagramLoad.pagination.next_max_tag_id;
+        }
+        return fetch('users/self/media/recent', prms);
     };
 
     this.getCurrentUser = function() {
@@ -108,6 +144,11 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
     };
 
     this.getRecientTagMedia = function() {
-        return fetch('tags/angularjs/media/recent');
+        var prms = {};
+
+        if (self.hasLastInstagramLoad() && self.canLoadMore()) {
+            prms.max_tag_id = lastInstagramLoad.pagination.next_max_tag_id;
+        }
+        return fetch('tags/angularjs/media/recent',prms);
     };
 }]);

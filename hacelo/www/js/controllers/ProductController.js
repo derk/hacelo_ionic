@@ -35,6 +35,22 @@ controllers.controller('cartCtrl', function($scope, StorageFactory, Market) {
 	angular.forEach($scope.items.market, function(value){
 		$scope.subtotal = $scope.subtotal + value.price;
 	});
+
+	$scope.delete = function ($index) {
+		StorageFactory.deleteNode($index);
+		init();
+	};
+
+	var init = function(){
+		$scope.items = StorageFactory.init();
+		$scope.subtotal = 0;
+
+		angular.forEach($scope.items.market, function(value){
+			$scope.subtotal = $scope.subtotal + value.price;
+		});
+	};
+
+	init();
 });
 
 controllers.controller('landingCtrl', function($scope, StorageFactory) {

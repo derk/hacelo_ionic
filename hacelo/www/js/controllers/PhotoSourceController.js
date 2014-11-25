@@ -2,6 +2,9 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$filter', '$ionicPopup', '
 
     $scope.loading = false;
     $scope.imageStack = SelectedImagesFactory.getAll();
+    $scope.prepare = function () {
+        SelectedImagesFactory.prepareQuantity();
+    };
 
     $scope.phoneImageLoad = function () {
         CordovaCameraService.getImage().then(

@@ -24,12 +24,10 @@ angular.module('hacelo', [
 
 .config(function($stateProvider, $urlRouterProvider, $compileProvider) {
     $stateProvider
-
     .state('app', {
         url: "/app",
         abstract: true,
-        templateUrl: "templates/index.html",
-        controller: 'AppCtrl'
+        templateUrl: "templates/index.html"
     })
     .state('app.landing', {
         url: "/landing",
@@ -218,229 +216,6 @@ angular.module('hacelo', [
     // more info at: http://goo.gl/8PfN8I
     $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob|content):|data:image\//);    
 });
-    /*
-     * Instagram class for getting entire things
-     */
-    window.messages = {
-        "EMPTY": "No hay iamgenes la cuenta!",
-        "NO_EXIST": "El usuario no existe!",
-        "FILL": "Por favor, llenar los campos!"
-    }
-    /*
-     * Instagram constructor
-     */
-    var Instagram = function() {
-
-        this.user_url = "https://api.instagram.com/v1/users/";
-        this.client_id = "70a2ae9262fc4805a5571e8036695a4d";
-        this.redirect_uri = "http://www.wikipedia.org/";
-        this.scope = "likes+comments";
-        this.url = "https://api.instagram.com/oauth/authorize/?client_id=" + this.client_id + "&redirect_uri=" + this.redirect_uri + "&response_type=code&scope=" + this.scope;
-        this.access_token = "";
-        this.user_id = "";
-        this.img = "";
-        this.tab = {};
-        this.img_template = {
-            "images": []
-        };
-        this.canvas_width = $(window).width() - 20;
-        this.array_angular = [];
-        this.current_hosted_service = "http://www.luisrojascr.com/lab/test/nacion_instagram.php";
-        this.code = '';
-
-    };
-
-    /*
-     *
-     * Instagram prototypal inheritance.
-     *
-     */
-    Instagram.prototype = {
-
-        init: function() {
-            //this.tab = w.open(encodeURI(this.url), '_blank', 'location=yes,clearcache=no');
-            this.tab = window.open(encodeURI(this.url), '_blank', 'location=yes');
-            this.bind_events();
-        },
-
-        bind_events: function() {
-            var self = this;
-            this.tab.addEventListener('loadstart', function(e) {
-                var el = e.url.split("code=");
-                var error = e.url.split('error=');
-                console.log(el);
-                console.log(error);
-                if (typeof error[1] != "undefined") {
-                    self.error_callback();
-                } else {
-                    if (typeof el[1] != "undefined") {
-                        self.code = el[1];
-                        self.found_access_code(el);
-                    }
-
-                }
-
-            });
-        },
-
-        fetch: function(url, data, callback) {
-            var self = this;
-            $.ajax({
-                url: url,
-                type: 'GET',
-                data: data,
-                crossDomain: true,
-                dataType: 'jsonp',
-                jsonpCallback: 'callback',
-                success: function(e) {
-                    console.log(e);
-                    callback(e, self);
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.debug(jqXHR);
-                    console.debug(errorThrown);
-                }
-            });
-        },
-
-        fetch_new_page: function(url,callback) {
-            var self = this;
-            $.ajax({
-                url: url,
-                type: 'GET',
-                crossDomain: true,
-                dataType: 'jsonp',
-                jsonpCallback: 'callback',
-                success: function(e) {
-                    console.log(e);
-                    callback(e, self);
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.debug(jqXHR);
-                    console.debug(errorThrown);
-                }
-            });
-        },
-
-        insert_images: function(response, self) {
-            var pag = null;
-            console.debug(response);
-            $('.images-hidden *').remove();
-            setTimeout(function() {
-                if (response.data.length <= 0) {
-                    hacelo.alert(messages["EMPTY"]);
-                    createEvent('_EMPTY');
-                } else {
-                    var array = new Array(),
-                        obj = new Object(),
-                        img = '',
-                        counter = 0,
-                        count = '',
-                        img_encode = null;
-
-                    for (var els = 0; els < response.data.length; els++) {
-                        //obj = {
-                            //"url": response.data[els].images.standard_resolution
-                        //};
-                        array.push(response.data[els].images.standard_resolution);
-                        //img += "<img class='img_test' src='" + response.data[els].images.standard_resolution.url + "' id='image_id_" + counter + "'/>"
-                        counter++;
-                    }
-
-
-                    self.img_template["images"] = array;
-
-                    if(response.pagination){
-                       self.createEvent('pagination', response.pagination.next_url)
-                    }
-
-                    self.createEvent('finish', array);
-
-                    
-                    // setTimeout(function() {
-                    //     count = $(".img_test").length;
-                    //     img_encode = $(".img_test");
-                    //     for (var x = 0; x < count; x++) {
-                    //         console.debug(img_encode[x].id);
-                    //         console.log(self.convert_img_to_encode(img_encode[x].id));
-                    //         self.array_angular.push(self.convert_img_to_encode(img_encode[x].id));
-                    //     }
-                    //     self.createEvent('finish', self.array_angular);
-                    // }, 400);
-                }
-            }, 100);
-        },
-
-        get_user_id: function(data, scope) {
-            if (data.data <= 0) {
-                hacelo.alert(messages['NO_EXIST']);
-            } else {
-                var self = scope;
-                self.user_id = data.user.id;
-                self.access_token = data.access_token;
-                self.fetch("https://api.instagram.com/v1/users/" + self.user_id + "/media/recent", 'access_token=' + self.access_token, self.insert_images);
-            }
-
-        },
-
-        loadMore: function(url){
-            this.fetch_new_page(url, this.insert_images);
-        },
-
-        found_access_code: function(data) {
-            if (data.length == 2) {
-                this.tab.close();
-                this.fetch_post(this.current_hosted_service, this.code, this.get_user_id);
-                //this.fetch('https://api.instagram.com/v1/users/search',"q="+this.username+"&access_token="+this.access_token,this.get_user_id);
-            }
-        },
-
-        error_callback: function() {
-            this.tab.close();
-        },
-
-        fetch_post: function(url, data, callback) {
-            var self = this;
-            $.post(url, {
-                code: data
-            })
-                .done(function(data) {
-                    callback(data, self);
-                });
-        },
-
-
-        convert_img_to_encode: function(id) {
-            var img = document.getElementById(id);
-            var canvas = document.createElement("canvas");
-            var height, width, ratio;
-            width = img.width;
-            height = img.height;
-            ratio = width / height;
-            ratio = this.canvas_width / ratio;
-            canvas.width = this.canvas_width;
-            canvas.height = ratio;
-            var ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, this.canvas_width, ratio);
-            $(canvas).appendTo(".images-hidden");
-            window.dataURL = canvas.toDataURL("image/png");
-            $('<img src="' + window.dataURL + '"/>').appendTo(".images-hidden");
-            return window.dataURL;
-        },
-
-        createEvent: function(text, data) {
-            var event;
-            if (data != undefined) {
-                event = new CustomEvent(text, {
-                    'detail': data
-                });
-            } else {
-                event = new CustomEvent(text);
-            }
-            document.dispatchEvent(event);
-        }
-
-    };
  (function(){
 
  	window.hacelo = window.hacelo || {};
@@ -461,860 +236,818 @@ var models = angular.module('hacelo.models', []);
 var providers = angular.module('hacelo.providers', []);
 var services = angular.module('hacelo.services', []);
 commons.constant('PhotoPrintConfig', {
-	"products": {
-		// here we hold the information related to every single product
-		// `photo`, `photo_album` and `poster` will have similar structure
-		"Fotografias": {
-			"name":"Fotografias",
-			"printing_sizes": [
-				{	"name" : "4x6",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 4,
-						"height": 6
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 500,
-							"height": 700,
-						},
-						"minimum": {
-							"width": 300,
-							"height": 450,		
-							"aspect": 0.5
-						},
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 21,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 4999
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				},
-				{	"name" : "5x7",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 5,
-						"height": 7
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 500,
-							"height": 700,
-						},
-						"minimum": {
-							"width": 375,
-							"height": 525,	
-							"aspect": 0.5		
-						},
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 16,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 5499
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				},
-				{	"name" : "8x10",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 8,
-						"height": 10
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 500,
-							"height": 700,
-						},
-						"minimum": {
-							"width": 600,
-							"height": 750,		
-							"aspect": 0.5	
-						},
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 6,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 6499
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				}
-			],
-			"coupons": [
-				{
-					// showed in the UI for visual feedback
-					"name": "My discount code",
-					// will match what the user entered
-					"code": "1234_5678_9012_3456"
-				},
-			]
-		},
+    "products": [
+        /*
+         * here we hold the information related to every product line product.
+         * And inside of it all the products for that line.
+         * */
+        {
+            id: "pictures",
+            "name": "Fotografias",
+            "products": [
+                {
+                    "name": "4x6",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 4,
+                        "height": 6
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 500,
+                            "height": 700
+                        },
+                        "minimum": {
+                            "width": 300,
+                            "height": 450,
+                            // 1.5 = horizontal = marco = fut, 0.5 = vertical = puerta
+                            "aspect": "portrait"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 21,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 4999
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                },
+                {
+                    "name": "5x7",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 5,
+                        "height": 7
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 500,
+                            "height": 700
+                        },
+                        "minimum": {
+                            "width": 375,
+                            "height": 525,
+                            "aspect": "portrait"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 16,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 5499
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                },
+                {
+                    "name": "8x10",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 8,
+                        "height": 10
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 500,
+                            "height": 700
+                        },
+                        "minimum": {
+                            "width": 600,
+                            "height": 750,
+                            "aspect": "portrait"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 6,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 6499
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                }
+            ],
+            "coupons": [
+                {
+                    // showed in the UI for visual feedback
+                    "name": "My discount code",
+                    // will match what the user entered
+                    "code": "1234_5678_9012_3456"
+                }
+            ]
+        },
 
-		"Cuadradas": {
-			"name":"Cuadradas",
-			"printing_sizes": [
-				{	
-					"name":"4x4",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 4,
-						"height": 4
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 300,
-							"height": 500,
-						},
-						"minimum": {
-							"width": 300,
-							"height": 300,	
-							"aspect": 1		
-						},
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 35,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 4999
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				},
-				{
-					"name":"8x8",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 8,
-						"height": 8
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 600,
-							"height": 600,
-						},
-						"minimum": {
-							"width": 600,
-							"height": 600,		
-							"aspect": 1	
-						},
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 6,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 5999
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				},
-				{
-					"name":"10x10",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 10,
-						"height": 190
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 600,
-							"height": 600,
-						},
-						"minimum": {
-							"width": 750,
-							"height": 750,	
-							"aspect": 1		
-						},
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 4,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 6999
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				}
-			],
-			"coupons": [
-				{
-					// showed in the UI for visual feedback
-					"name": "My discount code",
-					// will match what the user entered
-					"code": "1234_5678_9012_3456"
-				},
-			]
-		},
+        {
+            id: "quadrate",
+            "name": "Cuadradas",
+            "products": [
+                {
+                    "name": "4x4",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 4,
+                        "height": 4
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 300,
+                            "height": 500
+                        },
+                        "minimum": {
+                            "width": 300,
+                            "height": 300,
+                            "aspect": "square"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 35,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 4999
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                },
+                {
+                    "name": "8x8",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 8,
+                        "height": 8
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 600,
+                            "height": 600
+                        },
+                        "minimum": {
+                            "width": 600,
+                            "height": 600,
+                            "aspect": "square"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 6,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 5999
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                },
+                {
+                    "name": "10x10",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 10,
+                        "height": 190
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 600,
+                            "height": 600
+                        },
+                        "minimum": {
+                            "width": 750,
+                            "height": 750,
+                            "aspect": "square"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 4,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 6999
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                }
+            ],
+            "coupons": [
+                {
+                    // showed in the UI for visual feedback
+                    "name": "My discount code",
+                    // will match what the user entered
+                    "code": "1234_5678_9012_3456"
+                }
+            ]
+        },
 
-		"Photobook": {
-			"name":"Photobook",
-			"printing_sizes": [
-				{	
-					"name":"8.5x11",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 8.5,
-						"height": 11
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 300,
-							"height": 500,
-						},
-						"minimum": {
-							"width": 637,
-							"height": 825,	
-							"aspect": 0.5
+        {
+            id: "photobook",
+            "name": "Photobook",
+            "products": [
+                {
+                    "name": "8.5x11",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 8.5,
+                        "height": 11
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 300,
+                            "height": 500
+                        },
+                        "minimum": {
+                            "width": 637,
+                            "height": 825,
+                            "aspect": "portrait"
 
-						},
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 38,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 17499
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				},
-				{
-					"name":"12x9",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 12,
-						"height": 9
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 600,
-							"height": 600,
-						},
-						"minimum": {
-							"width": 900,
-							"height": 675,	
-							"aspect": 1.5		
-						},
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 38,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 19999
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				},
-			],
-			"coupons": [
-				{
-					// showed in the UI for visual feedback
-					"name": "My discount code",
-					// will match what the user entered
-					"code": "1234_5678_9012_3456"
-				},
-			]
-		},
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 38,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 17499
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                },
+                {
+                    "name": "12x9",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 12,
+                        "height": 9
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 600,
+                            "height": 600
+                        },
+                        "minimum": {
+                            "width": 900,
+                            "height": 675,
+                            "aspect": "landscape"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 38,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 19999
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                }
+            ],
+            "coupons": [
+                {
+                    // showed in the UI for visual feedback
+                    "name": "My discount code",
+                    // will match what the user entered
+                    "code": "1234_5678_9012_3456"
+                }
+            ]
+        },
 
-		"Marco de Madera": {
-			"name":"Marco de Madera",
-			"printing_sizes": [
-				{	
-					"name":"4x4",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 4,
-						"height": 4
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 300,
-							"height": 500,
-						},
-						"minimum": {
-							"width": 300,
-							"height": 300,	
-							"aspect": 1		
-						},
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 1,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 14999
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				},
-				{
-					"name":"8x8",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 8,
-						"height": 8
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 600,
-							"height": 600,
-						},
-						"minimum": {
-							"width": 600,
-							"height": 600,
-							"aspect": 1			
-						},
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 1,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 19999
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				},
-				{
-					"name":"11x17",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 11,
-						"height": 17
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 600,
-							"height": 600,
-						},
-						"minimum": {
-							"width": 825,
-							"height": 1275,
-							"aspect": 0.5		
-						},
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 1,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 31999
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				},
-				{
-					"name":"14x20",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 14,
-						"height": 20
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 600,
-							"height": 600,
-						},
-						"minimum": {
-							"width": 1050,
-							"height": 1500,
-							"aspect": 0.5		
-						},
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 1,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 38999
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				},
-				{
-					"name":"20x29",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 20,
-						"height": 29
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 600,
-							"height": 600,
-						},
-						"minimum": {
-							"width": 1500,
-							"height": 2175,
-							"aspect": 0.5		
-						},
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 1,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 58999
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				},
-			],
-			"coupons": [
-				{
-					// showed in the UI for visual feedback
-					"name": "My discount code",
-					// will match what the user entered
-					"code": "1234_5678_9012_3456"
-				},
-			]
-		},
+        {
+            id: "woodFrame",
+            "name": "Marco de Madera",
+            "products": [
+                {
+                    "name": "4x4",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 4,
+                        "height": 4
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 300,
+                            "height": 500
+                        },
+                        "minimum": {
+                            "width": 300,
+                            "height": 300,
+                            "aspect": "square"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 1,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 14999
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                },
+                {
+                    "name": "8x8",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 8,
+                        "height": 8
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 600,
+                            "height": 600
+                        },
+                        "minimum": {
+                            "width": 600,
+                            "height": 600,
+                            "aspect": "square"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 1,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 19999
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                },
+                {
+                    "name": "11x17",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 11,
+                        "height": 17
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 600,
+                            "height": 600
+                        },
+                        "minimum": {
+                            "width": 825,
+                            "height": 1275,
+                            "aspect": "portrait"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 1,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 31999
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                },
+                {
+                    "name": "14x20",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 14,
+                        "height": 20
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 600,
+                            "height": 600
+                        },
+                        "minimum": {
+                            "width": 1050,
+                            "height": 1500,
+                            "aspect": "portrait"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 1,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 38999
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                },
+                {
+                    "name": "20x29",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 20,
+                        "height": 29
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 600,
+                            "height": 600
+                        },
+                        "minimum": {
+                            "width": 1500,
+                            "height": 2175,
+                            "aspect": "portrait"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 1,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 58999
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                }
+            ],
+            "coupons": [
+                {
+                    // showed in the UI for visual feedback
+                    "name": "My discount code",
+                    // will match what the user entered
+                    "code": "1234_5678_9012_3456"
+                }
+            ]
+        },
 
-		"Photostrips": {
-			"name":"Photostrips",
-			"printing_sizes": [
-				{	
-					"name":"4.25x17.78",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 4.25,
-						"height": 17.78
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 300,
-							"height": 500,
-						},
-						"minimum": {
-							"width": 333,
-							"height": 1333,	
-							"aspect": 0.5		
-						}
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 12,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 4999
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				}
-			],
-			"coupons": [
-				{
-					// showed in the UI for visual feedback
-					"name": "My discount code",
-					// will match what the user entered
-					"code": "1234_5678_9012_3456"
-				},
-			]
-		},
-		
-		"Poster": {
-			"name":"Poster",
-			"printing_sizes": [
-				{
-					"name":"20.1x29.1",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 20.1,
-						"height": 29.1
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 1800,
-							"height": 1100,
-						},
-						"minimum": {
-							"width": 1507,
-							"height": 2182,	
-							"aspect": 0.5			
-						}
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 1,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 12999
-						},
-						"additional": {
-							"price": 1575
-						}
-					}
-				},
-				
-			],
-			"coupons": [
-				{
-					// showed in the UI for visual feedback
-					"name": "My discount code",
-					// will match what the user entered
-					"code": "1234_5678_9012_3456"
-				},
-			]
-		},
+        {
+            id: "photostrips",
+            "name": "Photostrips",
+            "products": [
+                {
+                    "name": "4.25x17.78",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 4.25,
+                        "height": 17.78
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 300,
+                            "height": 500
+                        },
+                        "minimum": {
+                            "width": 333,
+                            "height": 1333,
+                            "aspect": "portrait"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 12,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 4999
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                }
+            ],
+            "coupons": [
+                {
+                    // showed in the UI for visual feedback
+                    "name": "My discount code",
+                    // will match what the user entered
+                    "code": "1234_5678_9012_3456"
+                }
+            ]
+        },
 
-		"Gran Formato": {
-			"name":"Gran Formato",
-			"printing_sizes": [
-				{
-					"name":"11x17",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 11,
-						"height": 17
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 1800,
-							"height": 1100,
-						},
-						"minimum": {
-							"width": 825,
-							"height": 1275,	
-							"aspect": 0.5			
-						}
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 2,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 12999
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				},
-				{
-					"name":"14x20",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 14,
-						"height": 20
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 1050,
-							"height": 1500,
-						},
-						"minimum": {
-							"width": 1050,
-							"height": 1500,	
-							"aspect": 0.5		
-						}
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 2,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 13999
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				},
-				{
-					"name":"20.1 x 29.1",
-					"real_size": {
-						// this measures NEEDS to be in inches.
-						// Use dot for decimals like 9.5 X 12
-						"width": 20.1,
-						"height": 29.1
-					},
-					"pixel_size": {
-						// any measure inside here should to be in pixels
-						"optimal": {
-							"width": 1050,
-							"height": 1500,
-						},
-						"minimum": {
-							"width": 1507,
-							"height": 2181,	
-							"aspect": 0.5		
-						}
-					},
-					"prices": {
-						"first_items": {
-							"quantity": 1,
-							// use `.` for decimals 
-							// for example one dollar with fifty cents = 1.50
-							// do not separate big numbers like 20,000.50
-							// just use 20000.50
-							"price": 14999
-						},
-						"additional": {
-							"price": 1000
-						}
-					}
-				}
-				
-			],
-			"coupons": [
-				{
-					// showed in the UI for visual feedback
-					"name": "My discount code",
-					// will match what the user entered
-					"code": "1234_5678_9012_3456"
-				},
-			]
-		}
-	}
-});
-controllers.controller('AppCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
-    // Form data for the login modal
-    $scope.loginData = {};
-    $scope.user = {
-        "instagra_username": "Raiam"
-    };
-    $scope.validate = false;
+        {
+            id: "poster",
+            "name": "Poster",
+            "products": [
+                {
+                    "name": "20.1x29.1",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 20.1,
+                        "height": 29.1
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 1800,
+                            "height": 1100
+                        },
+                        "minimum": {
+                            "width": 1507,
+                            "height": 2182,
+                            "aspect": "portrait"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 1,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 12999
+                        },
+                        "additional": {
+                            "price": 1575
+                        }
+                    }
+                }
+            ],
+            "coupons": [
+                {
+                    // showed in the UI for visual feedback
+                    "name": "My discount code",
+                    // will match what the user entered
+                    "code": "1234_5678_9012_3456"
+                }
+            ]
+        },
 
-    // Create the login modal that we will use later
-    $ionicModal.fromTemplateUrl('templates/login.html', {
-        scope: $scope
-    }).then(function(modal) {
-        $scope.modal = modal;
-    });
+        {
+            id: "largeFormat",
+            "name": "Gran Formato",
+            "products": [
+                {
+                    "name": "11x17",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 11,
+                        "height": 17
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 1800,
+                            "height": 1100
+                        },
+                        "minimum": {
+                            "width": 825,
+                            "height": 1275,
+                            "aspect": "portrait"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 2,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 12999
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                },
+                {
+                    "name": "14x20",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 14,
+                        "height": 20
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 1050,
+                            "height": 1500
+                        },
+                        "minimum": {
+                            "width": 1050,
+                            "height": 1500,
+                            "aspect": "portrait"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 2,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 13999
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                },
+                {
+                    "name": "20.1 x 29.1",
+                    "real_size": {
+                        // this measures NEEDS to be in inches.
+                        // Use dot for decimals like 9.5 X 12
+                        "width": 20.1,
+                        "height": 29.1
+                    },
+                    "pixel_size": {
+                        // any measure inside here should to be in pixels
+                        "optimal": {
+                            "width": 1050,
+                            "height": 1500
+                        },
+                        "minimum": {
+                            "width": 1507,
+                            "height": 2181,
+                            "aspect": "portrait"
+                        }
+                    },
+                    "prices": {
+                        "first_items": {
+                            "quantity": 1,
+                            // use `.` for decimals
+                            // for example one dollar with fifty cents = 1.50
+                            // do not separate big numbers like 20,000.50
+                            // just use 20000.50
+                            "price": 14999
+                        },
+                        "additional": {
+                            "price": 1000
+                        }
+                    }
+                }
 
-    // Triggered in the login modal to close it
-    $scope.closeLogin = function() {
-        $scope.modal.hide();
-    };
-
-    // Open the login modal
-    $scope.login = function() {
-        $scope.modal.show();
-    };
-
-    $scope.insert_url = function() {
-        if ($scope.validate == false) {
-            $scope.validate = true;
-            Nacion_Service.set_username($scope.user.instagra_username);
-            $timeout(function() {
-                $scope.closeLogin();
-                Nacion_Service.createEvent('update-username', $scope.user.instagra_username);
-            }, 1000);
+            ],
+            "coupons": [
+                {
+                    // showed in the UI for visual feedback
+                    "name": "My discount code",
+                    // will match what the user entered
+                    "code": "1234_5678_9012_3456"
+                }
+            ]
         }
-
-    };
-    // Perform the login action when the user submits the login form
-    $scope.doLogin = function() {
-        console.log('Doing login', $scope.loginData);
-
-        // Simulate a login delay. Remove this and replace with your login
-        // code if using a login system
-        $timeout(function() {
-            $scope.closeLogin();
-        }, 1000);
-    };
+    ]
 });
-/* ChooseCrtl para controlar la pantalla de escoger
- * $scope - Scope de la pantalla
- * Nacion_Service - Servicio de datos de nacion, service.js
- */
-controllers.controller('checkCtrl', function($scope,$ionicPopup, $timeout, SelectedImagesFactory, Nacion_Service, Market) {
-    //Variables for using on the app
-    //$scope.images = ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp_xyq9C4GVc79lShg4Uo5gTZoBPdimQEHQKHn6cjibxe69Im-A','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp_xyq9C4GVc79lShg4Uo5gTZoBPdimQEHQKHn6cjibxe69Im-A'];
-    $scope.images = SelectedImagesFactory.getToPrintOnes();
+controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "$timeout", "SelectedImagesFactory", "MessageService", "Market", function($scope, $state, $ionicPopup, $timeout, SelectedImages, Messages, Market) {
+    $scope.images = SelectedImages.getToPrintOnes();
     $scope.dkrm;
 
-    angular.forEach($scope.images, function(value) {
-      value.quantity = 1;
-    });
-
+    /*
+     * Esta es la funcion de crop que se encarga de llamar a la ventana de 
+     * cropeo, donde se abrira un popup para que se pueda seleccionar el 
+     * area de cropeo.
+     * */
     $scope.crop = function ($index) {
         $scope.showPopup($index);
     };
 
-    $scope.showPopup = function($index) {
-      $scope.data = {}
-      $scope.img = $scope.images[$index].images.low_resolution;
 
-      // An elaborate, custom popup
-      var myPopup = $ionicPopup.show({
-        template: ' <img id="cropArea" src="{{img.url}}" width="{{img.width}}" alt="$index">',
-        title: 'Cortar la Fotografía',
-        subTitle: 'Selecciona el area a cortar',
-        scope: $scope,
-        buttons: [
-          { 
-            text: 'Cancelar'
-          },
-          {
-            text: '<b>Save</b>',
-            type: 'button-positive',
-            onTap: function(e) {
-                $scope.images[$index].images.low_resolution.url = $scope.dkrm.snapshotImage();
-                myPopup.close();
-            }
-          },
-        ]
-      });
+    /*
+     * Se encarga de abrir el popup con la informacion, 
+     * recibe un indice, el cual corresponde al indice del array
+     * donde obtendra la imagen seleccionada
+     * Ademas tiene un template y opciones determinada a escoger.
+     * */
+    $scope.showPopup = function ($index) {
+        $scope.data = {};
+        $scope.img = $scope.images[$index].images.standard_resolution;
 
-      $timeout(function(){
-        $scope.executeCrop();
-      },100);
-     };
+        var cropPopup = $ionicPopup.show({
 
+            template: ' <img id="cropArea" src="{{img.url}}" alt="$index">',
+            title: 'Cortar la Fotografía',
+            subTitle: 'Selecciona el area a cortar',
+            scope: $scope,
+            buttons: [
+                {text: 'Cancelar'},
+                {text: '<b>Save</b>',
+                 type: 'button-positive',
+                 onTap: function (e) {
+                     $scope.images[$index].images.standard_resolution.url = $scope.dkrm.snapshotImage();
+                    cropPopup.close();
+                 }
+                }]
+        });
 
+        $timeout(function () {
+            $scope.executeCrop();
+        }, 100);
+    };
 
-     $scope.executeCrop = function () {
+    /*
+     * Se llama para mantener un area de cropeo por default
+     * el cual sera las esquinas de la imagen, ademas se le asigna
+     * el valor a la variable de scope dkrm, donde se podra acceder desde el boton 
+     * de tap del modal.
+     * */
+    $scope.executeCrop = function () {
         $scope.dkrm = new Darkroom('#cropArea', {
-          minWidth: 100,
-          minHeight: 100,
-          maxWidth: 650,
-          maxHeight: 500,
+            minWidth: 100,
+            minHeight: 100,
+            maxWidth: 650,
+            maxHeight: 500,
+            plugins: {
+                crop: {quickCropKey: 67}
+            },
 
-          plugins: {
-            crop: {
-              quickCropKey: 67
+            init: function () {
+                var cropPlugin = this.getPlugin('crop');
+                cropPlugin.selectZone(170, 25, 300, 300);
             }
-          },
-
-          init: function() {
-            var cropPlugin = this.getPlugin('crop');
-            cropPlugin.selectZone(170, 25, 300, 300);
-          }
         });
-     };
+    };
 
-     $scope.addToCart = function () {
+    /*
+     * Se encarga de ingresar en el carrito de compras los datos que ya se encuentran 
+     * en el array de imagenes, se guardan todos los tipos de fotos asi como la cantidad de cada una
+     * y se redirecciona la pantalla de confirmacion.
+     * */
+    $scope.addToCart = function () {
+        var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_check_screen"),
+            confirmPopup = $ionicPopup.confirm(cache);
 
-        var confirmPopup = $ionicPopup.confirm({
-         title: 'Confirmar',
-         template: 'Estas seguro de utilizar estas fotos?',
-         cancelText: 'Cancelar',
-         okText: 'Aceptar'
+        confirmPopup.then(function (res) {
+            if (res) {
+                Market.insert($scope.images);
+                $state.go("app.confirm");
+            }
         });
-
-       confirmPopup.then(function(res) {
-         if(res) {
-           Market.insertMarket($scope.images);
-           window.location.href = '#/app/confirm';
-         } else {
-           console.log('You are not sure');
-         }
-       });
-
-
-     };
-
-
-});
+    };
+}]);
 /* ChooseCrtl para controlar la pantalla de escoger
  * $scope - Scope de la pantalla
  * Nacion_Service - Servicio de datos de nacion, service.js
@@ -1398,74 +1131,11 @@ controllers.controller('infoCtrl', function($scope) {
 	};
 
 });
-/* Instagram para controlar la pantalla de isntagram
- * $scope - Scope de la pantalla
- * Nacion_Service - Servicio de datos de nacion, service.js
- */
-controllers.controller('InstagramCrtl', function($scope, Nacion_Service) {
-    $scope.instagram_pics = Nacion_Service.get_entire_ins_pics();
-    $scope.picked_pics = Nacion_Service.get_instagram_pics_on_queue();
-    $scope.load_more = Nacion_Service.getNextUrl();
-    Nacion_Service.hide();
-    console.log($scope.load_more);
-
-    $scope.pick_song = function(index, data) {
-        if ($scope.instagram_pics[index].picked) {
-            $scope.instagram_pics[index].picked = false;
-            var index = $scope.picked_pics.indexOf(data);
-            $scope.picked_pics.splice(index, 1);
-        } else {
-            $scope.instagram_pics[index].picked = true;
-            $scope.picked_pics.push(data);
-        }
-    };
-
-    $scope.insert_into_queue = function() {
-        Nacion_Service.set_instagram_pics_on_queue($scope.picked_pics);
-        window.picked = $scope.picked_pics;
-        window.history.back();
-    };
-
-    $scope.loadMore = function(){
-        var instagram_v = new Instagram();
-            instagram_v.loadMore($scope.load_more);
-    };
-
-    document.addEventListener('finish', function(e) {
-        //Open the loading popup
-        Nacion_Service.show(hacelo.messages.Loading);
-        //little timeout to ensure the pop up to appear
-        setTimeout(function() {
-            var nextPage = e.detail;
-            var array = [];
-            for (var el = 0; el < nextPage.length; el++) {
-                var obj = {
-                    "img": nextPage[el],
-                    "picked": false
-                };
-                array.push(obj);
-            }
-            $scope.instagram_pics = $scope.instagram_pics.concat(array);
-            console.debug(array);
-            Nacion_Service.set_entire_ins_pics($scope.instagram_pics);
-            Nacion_Service.hide();
-
-            Nacion_Service.setNextUrl('');
-            $scope.load_more = Nacion_Service.getNextUrl();
-        }, 100);
-
-    });
-
-    document.addEventListener('pagination', function(e) {
-        Nacion_Service.setNextUrl(e.detail);
-        $scope.load_more = Nacion_Service.getNextUrl();
-    });
-});
-controllers.controller('PhotoSourceCtrl', ['$scope', '$filter', '$ionicPopup', '$ionicLoading', 'SelectedImagesFactory', 'MessageService', 'InstagramService', 'CordovaCameraService', 'ImageFactory','Nacion_Service', function ($scope, $filter, $ionicPopup, $ionicLoading, SelectedImagesFactory, MessageService, InstagramService, CordovaCameraService, ImageFactory, Nacion_Service) {
-    var lastInstagramLoad;
-
+controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$ionicLoading', 'SelectedImagesFactory', 'MessageService', 'InstagramService', 'ImageFactory', 'PhotoSizeChecker', function ($scope, $filter, $ionicPopup, $ionicLoading, SelectedImagesFactory, MessageService, InstagramService, ImageFactory, PhotoSizeChecker) {
     $scope.loading = false;
-    $scope.imageStack = [];
+    $scope.imageStack = SelectedImagesFactory.getAll();
+    $scope.canLoadMore = false;
+
     $scope.$watch('loading', function(newVal, oldVal) {// for showing and hiding load spinner
         var cache = angular.isDefined(cache)? cache: MessageService.search("loading");
         if (newVal !== oldVal) {
@@ -1476,27 +1146,36 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$filter', '$ionicPopup', '
             }
         }
     });
-    $scope.$watch('imageStack', function(newVal, oldVal) {// to keep updated the Service
-        SelectedImagesFactory.setSelectedImages($scope.imageStack);
-    }, true);
 
-
-    function extractInstagramImages (apiResponse) {
-        lastInstagramLoad = apiResponse;
+    var extractInstagramImages = function(apiResponse) {
+        /*
+         *   Aquí reviso la respuesta que me devolvió Instagram, le quito los videos y
+         *   luego reviso si luego de filtrar lo quedaron  imágenes en caso de que no
+         *   quedaran muestro un mensaje al usuario diciéndole que no tiene imágenes
+         *   que su cuenta de Instagram y lo envió a la pantalla anterior.
+         *   Si hay imágenes las meto al scope para que el usuario decida cuales
+         *   imágenes va a imprimir.
+         * */
         var filteredResponse = $filter('filter')(apiResponse.data, {type:"image"}),
             j = filteredResponse.length;
 
         if (j === 0) {
-            $ionicPopup.alert(MessageService.search("no-images-found"));
+            $ionicPopup.alert(MessageService.search("no-images-found")).then(function(){
+                sendUserBackToChoose();
+            });
         } else {
             for (var i = 0; i < j; i++) {
                 $scope.imageStack.push(new ImageFactory(filteredResponse[i].images));
             }
         }
-    }
+    };
 
-
-    function getRecentMedia (){
+    var getRecentMedia = function(){
+        /*  Se conecta con la API de Instagram por medio del servicio y trae las
+         *  ultimas imágenes.En caso de que la respuesta de Instagram venga con
+         *  un error (token vencido o alguno otro) Fuerzo al servicio a que haga
+         *  un nuevo log in para refrescar el token.
+         * */
         $scope.loading = true;
         InstagramService.getRecentMedia()
             .then(function(response) {
@@ -1505,70 +1184,125 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$filter', '$ionicPopup', '
                     authenticateInstagramUser();
                 } else {
                     extractInstagramImages(response.data);
+                    canLoadMoreImages();
                 }
             }, function(err) {
                 $scope.loading = false;
                 $ionicPopup.alert(MessageService.search("cannot-load-media"));
             });
-    }
+    };
 
-    function authenticateInstagramUser (){
+    var sendUserBackToChoose = function(){
+        $state.go('app.choose');
+    };
+
+    var havePreviousImages = function(){
+        return (SelectedImagesFactory.getInstagramOnes().length>0)?true:false;
+    };
+
+    var authenticateInstagramUser = function (){
+        /*
+        * Muestra la ventana en la que el usuario inicia sesión con su cuenta de Instagram.
+        * si el usario no otorga aceso a la cuenta muestra un mensaje de error y redirecciona
+        * al usuario a la ventana anterior.
+        * */
         InstagramService.auth()
             .then(function(result) {
                 getRecentMedia();
             }, function(err) {
-                $ionicPopup.alert(MessageService.search("user-denied-access"));
+                $ionicPopup.alert(MessageService.search("user-denied-access")).then(function(){
+                    sendUserBackToChoose();
+                });
             });
-    }
+    };
 
-    $scope.instagramImageLoad = function() {
+    var canLoadMoreImages = function(){
+        $scope.canLoadMore = InstagramService.canLoadMore();
+    };
+
+    var init = function(){
         if (InstagramService.isAuthenticated()){
-            getRecentMedia();
+            if(havePreviousImages()){
+                canLoadMoreImages();
+            } else {
+                getRecentMedia();
+            }
         } else {
             authenticateInstagramUser();
         }
     };
 
-    $scope.phoneImageLoad = function() {
-        CordovaCameraService.getImage()
-            .then(function(result) {
-                $scope.imageStack.push(new ImageFactory(result));
-            }, function(result) {
-                // $ionicPopup.alert(MessageService.search("cordova-load-failed"));
-            });
+    $scope.loadMore = getRecentMedia;
+
+    $scope.checkRequirements = function(image){
+        if(image.toPrint === true) {
+            image.toPrint = false;
+        } else {
+            if(PhotoSizeChecker.meetsMinimumRequirements(image)) {
+                image.toPrint = true;
+            } else {
+                $ionicPopup.alert({
+                    title: 'La imagen es muy pequenna',
+                    template: 'Lo sentimos :( la foto tiene que ser'+
+                    'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
+                    'una impresión de la más alta calidad.'
+                });
+            }
+        }
     };
 
-    $scope.logArray = function(){
-        console.log($scope.imageStack);
-    };
-
-    InstagramService.getRecientTagMedia().then(function(response){
-        extractInstagramImages(response.data);
-    },function(err){});
+    init();
 }]);
-/* InfoCtrl Accordion List
- * $scope - Scope de la pantalla
- */
+controllers.controller('PhotoSourceCtrl', ['$scope', '$filter', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', function ($scope, $filter, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker) {
 
-controllers.controller('productCrtl', function($scope, SelectedImagesFactory, PhotoPrintConfig) {
+    $scope.loading = false;
+    $scope.imageStack = SelectedImagesFactory.getAll();
+    $scope.prepare = function () {
+        SelectedImagesFactory.prepareQuantity();
+    };
 
-	$scope.saveOption = function(option) {
-		if(PhotoPrintConfig.products.hasOwnProperty(option)){
-			SelectedImagesFactory.setCategory(PhotoPrintConfig.products[option]);
-		}
+    $scope.phoneImageLoad = function () {
+        CordovaCameraService.getImage().then(
+            function (result) {
+                (new ImageFactory(result)).phoneImageInit().then(
+                    function(result){
+                        if(PhotoSizeChecker.meetsMinimumRequirements(result)){
+                            $scope.imageStack.push(result);
+                        }else{
+                            $ionicPopup.alert({
+                                title: 'La imagen es muy pequenna',
+                                template: 'Lo sentimos :( la foto tiene que ser'+
+                                'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
+                                'una impresión de la más alta calidad.'
+                            });
+                        }
+                    }
+                );
+            }
+        );
+    };
+}]);
+controllers.controller('productCrtl', function($scope, $state, SelectedImagesFactory, PhotoPrintConfig) {
+
+	$scope.productLines = PhotoPrintConfig.products;
+
+	$scope.saveProductLine = function(pProductLine) {
+		SelectedImagesFactory.setProductLine(pProductLine);
+		$state.go("app.category");
 	};
 });
 
-controllers.controller('categoryCrtl', function($scope, SelectedImagesFactory, PhotoPrintConfig) {
-	$scope.options = SelectedImagesFactory.getCategory();
+controllers.controller('categoryCrtl', function($scope, $state, SelectedImagesFactory) {
+	$scope.productLine = SelectedImagesFactory.getProductLine();
 
-	$scope.pickCategory = function(model) {
-		SelectedImagesFactory.setSettings(model);
+	$scope.saveProduct = function(pProduct) {
+		SelectedImagesFactory.setProduct(pProduct);
+		$state.go("app.photo");
 	};
 });
 
 controllers.controller('photoCrtl', function($scope, SelectedImagesFactory, PhotoPrintConfig) {
-	$scope.settings = SelectedImagesFactory.getSettings();
+	$scope.product = SelectedImagesFactory.getProduct();
 });
 
 controllers.controller('confirmCtrl', function($scope, StorageFactory, Market) {
@@ -1585,13 +1319,27 @@ controllers.controller('cartCtrl', function($scope, StorageFactory, Market) {
 	angular.forEach($scope.items.market, function(value){
 		$scope.subtotal = $scope.subtotal + value.price;
 	});
+
+	$scope.delete = function ($index) {
+		StorageFactory.deleteNode($index);
+		init();
+	};
+
+	var init = function(){
+		$scope.items = StorageFactory.init();
+		$scope.subtotal = 0;
+
+		angular.forEach($scope.items.market, function(value){
+			$scope.subtotal = $scope.subtotal + value.price;
+		});
+	};
+
+	init();
 });
 
 controllers.controller('landingCtrl', function($scope, StorageFactory) {
 	$scope.market = StorageFactory.init();
 });
-
-
 controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
     
     $scope.shareFb = function(){
@@ -1606,39 +1354,60 @@ controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ion
         window.plugins.socialsharing.shareViaEmail('Hacelo','Hacelo');
     };
 });
-models.factory('ImageFactory', [function () {
+models.factory('ImageFactory', ['$q', function ($q) {
     function ImageWrapper (source) {
-        var self = this;
         this.origin = "phone";
-        this.images;
+        this.images = source;
         this.toPrint = false;
 
         if (angular.isObject(source)) {
             this.origin = "instagram";
-            this.images = source;
         } else if (angular.isString(source)) {
+            this._phoneSource = source;
+            this.toPrint = true;
+            this.deferred = $q.defer();
+            // most of this values cannot be filled without load the image
+            // So this values will be filled later when the image is loaded
             this.images = {
-                "low_resolution": {
-                    "url": source,
-                    "width": 306,
-                    "height": 306
-                },
                 "thumbnail": {
-                    "url": source,
+                    "url": "",
+                    // the generated thumbnail will have this width
                     "width": 150,
-                    "height": 150
+                    "height": 0
                 },
                 "standard_resolution": {
                     "url": source,
-                    "width": 640,
-                    "height": 640
+                    "width": 0,
+                    "height": 0
                 }
             }
         }
     }
 
+    ImageWrapper.prototype = {
+        constructor: ImageWrapper,
+
+        phoneImageInit: function(){
+            var self = this,
+                imgs = this.images;
+            fabric.Image.fromURL(this._phoneSource, function(oImg) {
+                // Setting standard_resolution values
+                imgs.standard_resolution.width = oImg.getWidth();
+                imgs.standard_resolution.height = oImg.getHeight();
+                // Setting thumbnail values
+                oImg.scaleToWidth(imgs.thumbnail.width);
+                imgs.thumbnail.url = oImg.toDataURL({"format": "jpeg"});
+                imgs.thumbnail.height = oImg.getHeight();
+                // All done here. Now notify the controller with success response
+                self.deferred.resolve(self);
+            });
+
+            return this.deferred.promise;
+        }
+    };
+
     return ImageWrapper;
-}])
+}]);
 models.factory('Market', ['$filter','SelectedImagesFactory', function ($filter,SelectedImagesFactory) {
 	/**
 	 * A simple service that returns the array of selected images.
@@ -1647,7 +1416,7 @@ models.factory('Market', ['$filter','SelectedImagesFactory', function ($filter,S
 
      function insertInfo(obj, categoryName, subCategoryName, size, quantity, price){
         model = {
-            'order_id': Math.floor((Math.random() * 100) + 1),
+            'order_id': Math.floor((Math.random() * 1000) + 1),
             'category':categoryName,
             'subCategory':subCategoryName,
             'size':size.width+'x'+size.height,
@@ -1659,9 +1428,9 @@ models.factory('Market', ['$filter','SelectedImagesFactory', function ($filter,S
 
 	return {
 		
-        insertMarket : function(model) {
-            var category = SelectedImagesFactory.getCategory(),
-                setting = SelectedImagesFactory.getSettings(),
+        insert: function(model) {
+            var category = SelectedImagesFactory.getProductLine(),
+                setting = SelectedImagesFactory.getProduct(),
                 promise = false,
                 price = 0,
                 quantity = 0,
@@ -1690,32 +1459,47 @@ models.factory('Market', ['$filter','SelectedImagesFactory', function ($filter,S
 	};
 }]);
 models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
-	/**
-	 * A simple service that returns the array of selected images.
-	 */
-	var selectedImages = [];
-	var category = [];
-	var settings = [];
+    /**
+     * A simple service that returns the array of selected images.
+     * Also store the selected product with his parent product line
+     */
+    var selectedImages = [];
+    var category = {};
+    var product = {};
+    var prints = [];
 
-	return {
-		setSelectedImages: function(pSelectedImages) {
-			if (angular.isArray(pSelectedImages)) {
-				selectedImages = pSelectedImages;
-			}
-		},
+    return {
+        setSelectedImages: function(pSelectedImages) {
+            if (angular.isArray(pSelectedImages)) {
+                selectedImages = pSelectedImages;
+            }
+        },
         addItem: function(pItem) {
-			if (angular.isObject(pItem)) {
-				selectedImages.push(pItem);
-			}
-		},
-		getInstagramOnes: function() {
-			return $filter('filter')(selectedImages, {origin:"instagram"});
-		},
-		getPhoneOnes: function() {
+            if (angular.isObject(pItem)) {
+                angular.copy(pItem, selectedImages);
+            }
+        },
+        addItems: function(pItems) {
+            if (angular.isArray(pItems)) {
+                angular.copy(pItems, selectedImages);
+            }
+        },
+        getInstagramOnes: function() {
+            return $filter('filter')(selectedImages, {origin:"instagram"});
+        },
+        getPhoneOnes: function() {
             return $filter('filter')(selectedImages, {origin:"phone"});
         },
         getToPrintOnes: function() {
             return $filter('filter')(selectedImages, {toPrint:true});
+        },
+        prepareQuantity: function() {
+            angular.forEach(this.getToPrintOnes(), function(value){
+                if (!value.hasOwnProperty('quantity')) {value.quantity = 1;}
+            }); 
+        },
+        setPrintPhotos: function(pData) {
+            prints = pData;
         },
         getAll: function() {
             return selectedImages;
@@ -1723,19 +1507,19 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         getOne: function(id){
             return selectedImages[id];
         },
-        setCategory: function(id){
-        	category = id;
+        setProductLine: function(pCategory){
+            category = pCategory;
         },
-        getCategory: function(){
-        	return category;
+        getProductLine: function(){
+            return category;
         },
-        setSettings: function(id){
-        	settings = id;
+        setProduct: function(pProduct){
+            product = pProduct;
         },
-        getSettings: function(){
-        	return settings;
+        getProduct: function(){
+            return product;
         }
-	};
+    };
 }]);
 models.factory('StorageFactory', ['$window', function ($window) {
 	var storage = $window.localStorage;
@@ -1743,7 +1527,7 @@ models.factory('StorageFactory', ['$window', function ($window) {
 
 	var addStructure = function() {
 		if(!storage.getItem(prefix)){
-			saveMarket({"market":[]});
+			saveMarket([]);
 		}
 	};
 
@@ -1764,8 +1548,14 @@ models.factory('StorageFactory', ['$window', function ($window) {
 		}
 	};
 
-	var saveMarket = function(newJson) {
-		return storage.setItem(prefix, angular.toJson(newJson));
+	var pDeleteNode = function ($index) {
+		var market = load().market;
+		market.splice($index, 1);
+		saveMarket(market);
+	};
+
+	var saveMarket = function(newObj) {
+		return storage.setItem(prefix, angular.toJson({"market":newObj}));
 	};
 
 	var load = function() {
@@ -1773,7 +1563,7 @@ models.factory('StorageFactory', ['$window', function ($window) {
 	};
 
 	var destroy = function() {
-		return storage.removeItem(prefix);
+		return storage[prefix] = '';
 	};
 
 	addStructure();
@@ -1790,6 +1580,10 @@ models.factory('StorageFactory', ['$window', function ($window) {
 
 		destroy: function() {
 			return destroy();
+		},
+
+		deleteNode: function ($index){
+			pDeleteNode($index);
 		},
 
 		init: function() {
@@ -1839,6 +1633,7 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
     var self = this,
         user,
         accessToken,
+        lastInstagramLoad,
         config = {
             clientId: '70a2ae9262fc4805a5571e8036695a4d',
             redirectUri: 'http://www.wikipedia.org/',
@@ -1855,7 +1650,8 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
         var prms = {
                 client_id: config.clientId,
                 callback: 'JSON_CALLBACK'
-            };
+            }
+            deferred = $q.defer();
         if (self.isAuthenticated()) {
             prms.access_token = accessToken;
         }
@@ -1866,7 +1662,15 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
                 params: angular.extend(prms, params)
             };
 
-        return $http(cnfg);
+        $http(cnfg).then(function(response){
+            lastInstagramLoad = response.data;
+            console.log(lastInstagramLoad);
+            deferred.resolve(response);
+        },function(response){
+            deferred.reject(response);
+        });
+
+        return deferred.promise;
     };
 
     var getUrlParameters = function (parameter, staticURL, decode) {
@@ -1897,7 +1701,7 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
 
     var bindAuthEvents = function(authTab) {
         // This function bind the evens to the instagram autentication screen
-        // If every thing goes good then load the user information
+        // If every thing goes good then store the token
         // Also handle how the app respond to an authentication error
         var deferred = $q.defer();
         authTab.addEventListener('loadstart', function(e) {
@@ -1936,8 +1740,34 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
         return bindAuthEvents($window.open(authUrl, '_blank', 'location=yes'));
     };
 
-    this.getRecentMedia = function(params) {
-        return fetch('users/self/media/recent', params);
+    this.hasLastInstagramLoad = function(){
+        return angular.isDefined(lastInstagramLoad);
+    };
+
+    this.canLoadMore = function(){
+        var can;
+        console.log(lastInstagramLoad);
+        if(!self.hasLastInstagramLoad()){
+            can = true;
+        } else if (angular.isDefined(lastInstagramLoad.pagination)) {
+            if (angular.isDefined(lastInstagramLoad.pagination.next_url)){
+                can = true;
+            } else {
+                can = false;
+            }
+        } else {
+            can = false;
+        }
+        return can;
+    };
+
+    this.getRecentMedia = function() {
+        var prms = {};
+
+        if (self.hasLastInstagramLoad() && self.canLoadMore()) {
+            prms.max_tag_id = lastInstagramLoad.pagination.next_max_tag_id;
+        }
+        return fetch('users/self/media/recent', prms);
     };
 
     this.getCurrentUser = function() {
@@ -1945,7 +1775,12 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
     };
 
     this.getRecientTagMedia = function() {
-        return fetch('tags/angularjs/media/recent');
+        var prms = {};
+
+        if (self.hasLastInstagramLoad() && self.canLoadMore()) {
+            prms.max_tag_id = lastInstagramLoad.pagination.next_max_tag_id;
+        }
+        return fetch('tags/angularjs/media/recent',prms);
     };
 }]);
 services.service('LocationPrvdr', ['$http', function ($http) {
@@ -2095,4 +1930,53 @@ services.service('Nacion_Service',['$ionicLoading',function($ionicLoading){
         }
         return object;
     }
+}]);
+/**
+ * Created by joseph on 24/11/2014.
+ */
+services.service('PhotoSizeChecker', ['SelectedImagesFactory', function (SelectedImagesFactory) {
+    var self = this,
+        actualProduct,
+        minimumSize,
+        imageDimensions;
+
+    var meetsOrientation = function(){
+        var expectedOrientation = self.getOrientation(minimumSize.width, minimumSize.height),
+            imageOrientation = self.getOrientation(imageDimensions.width, imageDimensions.height);
+        return (expectedOrientation === imageOrientation);
+    };
+
+    var meetsArea = function(){
+        var minimumArea = self.computeArea(minimumSize.width, minimumSize.height),
+            imageArea = self.computeArea(imageDimensions.width, imageDimensions.height);
+
+        return (imageArea >= minimumArea);
+    };
+
+    this.getExpectedSize = function(){
+        return minimumSize.width+"px x "+ minimumSize.height+"px";
+    };
+
+    this.computeArea = function(w, h){
+        return ( w*h );
+    };
+
+    this.getOrientation = function(width, height){
+        var orientation = "square";
+        if(width > height) {
+            orientation = "landscape";
+        } else if(width < height) {
+            orientation = "portrait";
+        }
+        return orientation;
+    };
+
+    this.meetsMinimumRequirements = function(ImageWrapper){
+        // update global variable
+        actualProduct = SelectedImagesFactory.getProduct();
+        minimumSize  = actualProduct.pixel_size.minimum;
+        imageDimensions = ImageWrapper.images.standard_resolution;
+        // then decide if the provided image meets the minimum requirements
+        return ( meetsArea() );
+    };
 }]);

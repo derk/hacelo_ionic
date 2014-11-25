@@ -14,9 +14,9 @@
                 <img ng-src="{{sResolution.url}}" ng-click="crop($index)" style="max-width: 100%;height: auto;">
 
                 <div class="quantity-container" ng-init="quantity = image.quantity">
-                    <button ng-disabled="quantity==1" ng-click="quantity=quantity-1" class="minus">-</button>
-                    &times;{{quantity}}
-                    <button class="add" ng-click="quantity=quantity+1">+</button>
+                    <button ng-disabled="image.quantity==1" ng-click="image.quantity=image.quantity-1" class="minus">-</button>
+                    &times;{{image.quantity}}
+                    <button class="add" ng-click="image.quantity=image.quantity+1">+</button>
                 </div>
             </div>
         </div>

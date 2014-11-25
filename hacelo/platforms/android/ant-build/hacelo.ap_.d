@@ -101,7 +101,6 @@
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/common \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/hacelo-digital.js \
-/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/instagram.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/models \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/providers \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/script.js \
@@ -111,7 +110,6 @@
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/common/module.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/common/PhotoPrintConfig.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/common/posible-cart-v1.json \
-/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/AppController.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/CheckController.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/ChooseController.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/controllers/InfoController.js \
@@ -132,6 +130,7 @@
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/services/MessageService.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/services/module.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/services/NacionService.js \
+/Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/js/services/PhotoSizeCheckerService.js \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/lib/fabric \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/lib/ionic \
 /Users/raiamquesada/Documents/Phonegap/hacelo-latest/hacelo_ionic/hacelo/platforms/android/assets/www/lib/jquery \

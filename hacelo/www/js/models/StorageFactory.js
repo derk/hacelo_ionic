@@ -4,7 +4,7 @@ models.factory('StorageFactory', ['$window', function ($window) {
 
 	var addStructure = function() {
 		if(!storage.getItem(prefix)){
-			saveMarket({"market":[]});
+			saveMarket([]);
 		}
 	};
 
@@ -25,8 +25,14 @@ models.factory('StorageFactory', ['$window', function ($window) {
 		}
 	};
 
-	var saveMarket = function(newJson) {
-		return storage.setItem(prefix, angular.toJson(newJson));
+	var pDeleteNode = function ($index) {
+		var market = load().market;
+		market.splice($index, 1);
+		saveMarket(market);
+	};
+
+	var saveMarket = function(newObj) {
+		return storage.setItem(prefix, angular.toJson({"market":newObj}));
 	};
 
 	var load = function() {
@@ -34,7 +40,7 @@ models.factory('StorageFactory', ['$window', function ($window) {
 	};
 
 	var destroy = function() {
-		return storage.removeItem(prefix);
+		return storage[prefix] = '';
 	};
 
 	addStructure();
@@ -51,6 +57,10 @@ models.factory('StorageFactory', ['$window', function ($window) {
 
 		destroy: function() {
 			return destroy();
+		},
+
+		deleteNode: function ($index){
+			pDeleteNode($index);
 		},
 
 		init: function() {

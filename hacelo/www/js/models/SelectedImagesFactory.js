@@ -6,6 +6,7 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
     var selectedImages = [];
     var category = {};
     var product = {};
+    var prints = [];
 
     return {
         setSelectedImages: function(pSelectedImages) {
@@ -31,6 +32,14 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         },
         getToPrintOnes: function() {
             return $filter('filter')(selectedImages, {toPrint:true});
+        },
+        prepareQuantity: function() {
+            angular.forEach(this.getToPrintOnes(), function(value){
+                if (!value.hasOwnProperty('quantity')) {value.quantity = 1;}
+            }); 
+        },
+        setPrintPhotos: function(pData) {
+            prints = pData;
         },
         getAll: function() {
             return selectedImages;

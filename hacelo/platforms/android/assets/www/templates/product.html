@@ -1,14 +1,10 @@
-<ion-view title="PRODUCTOS" class="products-page" >
-	
-  	<ion-content class="has-header">
-    	<div class="products-container">
-			<div class="photo" ng-click="saveOption('Fotografias')"><div><a href="#/app/category" class="button button-balanced">Fotografia</a></div></div>
-			<div class="photo-album" ng-click="saveOption('Cuadradas')"><div><a href="#/app/category"  class="button button-balanced" href="">Cuadradas</a></div></div>
-			<div class="poster" ng-click="saveOption('Photobook')"><div><a href="#/app/category"  class="button button-balanced" href="">Photobook</a></div></div>
-			<div class="poster" ng-click="saveOption('Marco de Madera')"><div><a href="#/app/category"  class="button button-balanced" href="">Marco de Madera</a></div></div>
-			<div class="poster" ng-click="saveOption('Photostrips')"><div><a href="#/app/category"  class="button button-balanced" href="">Photostrips</a></div></div>
-			<div class="poster" ng-click="saveOption('Poster')"><div><a href="#/app/category" class="button button-balanced" href="">Poster</a></div></div>
-			<div class="poster" ng-click="saveOption('Gran Formato')"><div><a href="#/app/category" class="button button-balanced" href="">Gran Formato</a></div></div>
-		</div>
-  	</ion-content>
+<ion-view title="PRODUCTOS" class="products-page">
+
+    <ion-content class="has-header">
+        <div class="products-container">
+            <div ng-repeat="productLine in productLines" class="product {{productLine.id}}">
+                <div><a class="button button-balanced" ng-click="saveProductLine(productLine)">{{productLine.name}}</a></div>
+            </div>
+        </div>
+    </ion-content>
 </ion-view>
