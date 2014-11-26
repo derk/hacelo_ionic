@@ -98,47 +98,49 @@ body{
    =============  Index Page Styles  ============= 
 */
 
-.options-index {
-    position: absolute;
-    height: 35%;
-    bottom: 0;
-    width: 100%;
-    a {
-        position: relative;
-        width: 90%;
-        display: inline-block;
-        margin: 3% 5%;
-        background: white;
-        text-transform: uppercase;
-        //padding: 5% 0;
-        float: left;
-        text-align: center;
-        font-weight: bold;
+.index-page{
+    background: url('../img/bg-landing.jpg') no-repeat center 44px fixed;
+    background-size: cover;
+    .options-index {
+        position: absolute;
+        height: 26%;
+        bottom: 0;
+        width: 100%;
+        a {
+            position: relative;
+            width: 90%;
+            display: inline-block;
+            margin: 3% 5%;
+            text-transform: uppercase;
+            float: left;
+            text-align: center;
+            font-weight: bold;
 
-        &.button-positive{
-            color: green;
-            margin-bottom: 5%;
+            &.button-positive{
+                color: $green;
+                margin-bottom: 5%;
 
-            &:hover{
-                color: green;
+                &:hover{
+                    color: $green;
+                }
+            }
+
+            &.info{
+                color: $blue;
             }
         }
-
-        &.info{
-            color: blue;
-        }
-    }
-    .info-buttons{
-        overflow: hidden;
-        width: 90%;
-        margin: auto;
-        a{
-            float: left;
-            width: 48%;
-            display: block;
-            margin: 0;
-            &:first-child{
-                margin-right: 4%;
+        .info-buttons{
+            overflow: hidden;
+            width: 90%;
+            margin: auto;
+            a{
+                float: left;
+                width: 48%;
+                display: block;
+                margin: 0;
+                &:first-child{
+                    margin-right: 4%;
+                }
             }
         }
     }
@@ -159,6 +161,9 @@ body{
         border-bottom: 1px solid #000;
         background: #c2c2c2;
         position: relative;
+        &.photo{
+            background: url('../img/bg-fotos.jpg') no-repeat center center;
+        }
         & > div {
             height: 100%;
             width: 100%;
@@ -181,15 +186,14 @@ body{
 }
 .photo-page {
     .photo-cover {
-        background: #c2c2c2;
-        height: 60%;
-        width: 100%;
+        max-width: 100%;
     }
     .cover {
         color:white;
         height: 10%;
         background: $red;
         position: relative;
+        margin-top: -5px;
         span {
             @include center-element(absolute);
             width: 100%;
@@ -426,11 +430,8 @@ body{
     text-align: center;
     text-transform: uppercase;
     position: relative;
-    //REPLACE FOR THE IMAGE 
-    .image {
-        width: 100%;
-        background: $grey;
-        height: 300px;
+    .photo {
+        max-width: 100%;
     }
     p{
         color: $text-grey;
@@ -493,11 +494,9 @@ body{
    .cart-container {
         text-align: center;
         text-transform: uppercase;
-        .image-placeholder{
-            width: 100%;
+        .photo-cover{
+            max-width: 100%;
             min-height: 140px;
-            background: #ccc;
-            margin-bottom: 8%;
         }
         p {
             text-align: left;
