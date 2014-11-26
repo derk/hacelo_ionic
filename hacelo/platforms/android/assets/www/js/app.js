@@ -156,7 +156,8 @@ angular.module('hacelo', [
         url: "/processing-order",
         views: {
             'haceloContent': {
-                templateUrl: "templates/processing-order.html"
+                templateUrl: "templates/processing-order.html",
+                controller: "processingCtrl"
             }
         }
     })

@@ -56,3 +56,17 @@ controllers.controller('cartCtrl', function($scope, StorageFactory, Market) {
 controllers.controller('landingCtrl', function($scope, StorageFactory) {
 	$scope.market = StorageFactory.init();
 });
+
+controllers.controller('processingCtrl', function($scope, $sce, StorageFactory) {
+	// TODO add this url into a configuration file, since it is globally, and depends on the ftp.
+	$scope.api = $sce.trustAsResourceUrl("https://grooveshark-c9-raiam1234.c9.io/workspace/public/nacion.php");
+	$scope.market = StorageFactory.init();
+
+	$scope.range = function(n) {
+        return new Array(n);
+    };
+
+});
+
+
+

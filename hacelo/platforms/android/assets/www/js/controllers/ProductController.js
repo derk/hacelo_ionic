@@ -56,3 +56,17 @@ controllers.controller('cartCtrl', function($scope, StorageFactory, Market) {
 controllers.controller('landingCtrl', function($scope, StorageFactory) {
 	$scope.market = StorageFactory.init();
 });
+
+controllers.controller('processingCtrl', function($scope, StorageFactory) {
+
+	$scope.market = StorageFactory.init();
+	
+	$scope.range = function(n) {
+        return new Array(n);
+    };
+	console.log($scope.market);
+
+});
+
+
+

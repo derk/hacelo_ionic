@@ -12,6 +12,18 @@
 			<p class="disclaimer">
 				Por favor espere mientras subimos sus fotos y luego procesamos su pago, gracias.
 			</p>
+				<form action="https://grooveshark-c9-raiam1234.c9.io/workspace/public/nacion.php" method="post" >
+					<input type="text" name="data" value="mobileTest"/>
+					<input type="submit" value="Submit">
+					<div ng-repeat="photo in market.market">
+						<div ng-repeat="single in photo.items">
+							<div ng-repeat="number in range(single.quantity)">
+								<input value="{{single.images.standard_resolution.url}}" type="text" name="images[]"/>
+								<input value="{{photo.category}}_{{photo.subCategory}}"	/>
+							</div>
+						</div>
+					</div>
+				</form>
 		</div>
   	</ion-content>
 </ion-view>

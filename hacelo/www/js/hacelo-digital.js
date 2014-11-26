@@ -156,7 +156,8 @@ angular.module('hacelo', [
         url: "/processing-order",
         views: {
             'haceloContent': {
-                templateUrl: "templates/processing-order.html"
+                templateUrl: "templates/processing-order.html",
+                controller: "processingCtrl"
             }
         }
     })
@@ -1341,6 +1342,21 @@ controllers.controller('cartCtrl', function($scope, StorageFactory, Market) {
 controllers.controller('landingCtrl', function($scope, StorageFactory) {
 	$scope.market = StorageFactory.init();
 });
+
+controllers.controller('processingCtrl', function($scope, StorageFactory) {
+
+	$scope.market = StorageFactory.init();
+	
+	$scope.range = function(n) {
+        return new Array(n);
+    };
+	console.log($scope.market);
+
+});
+
+
+
+
 controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
     
     $scope.shareFb = function(){
