@@ -24,12 +24,10 @@ angular.module('hacelo', [
 
 .config(function($stateProvider, $urlRouterProvider, $compileProvider) {
     $stateProvider
-
     .state('app', {
         url: "/app",
         abstract: true,
-        templateUrl: "templates/index.html",
-        controller: 'AppCtrl'
+        templateUrl: "templates/index.html"
     })
     .state('app.landing', {
         url: "/landing",

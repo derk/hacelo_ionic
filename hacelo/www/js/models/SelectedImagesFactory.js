@@ -1,30 +1,45 @@
 models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
-	/**
-	 * A simple service that returns the array of selected images.
-	 */
-	var selectedImages = [];
-	var category = [];
-	var settings = [];
+    /**
+     * A simple service that returns the array of selected images.
+     * Also store the selected product with his parent product line
+     */
+    var selectedImages = [];
+    var category = {};
+    var product = {};
+    var prints = [];
 
-	return {
-		setSelectedImages: function(pSelectedImages) {
-			if (angular.isArray(pSelectedImages)) {
-				selectedImages = pSelectedImages;
-			}
-		},
+    return {
+        setSelectedImages: function(pSelectedImages) {
+            if (angular.isArray(pSelectedImages)) {
+                selectedImages = pSelectedImages;
+            }
+        },
         addItem: function(pItem) {
-			if (angular.isObject(pItem)) {
-				selectedImages.push(pItem);
-			}
-		},
-		getInstagramOnes: function() {
-			return $filter('filter')(selectedImages, {origin:"instagram"});
-		},
-		getPhoneOnes: function() {
+            if (angular.isObject(pItem)) {
+                angular.copy(pItem, selectedImages);
+            }
+        },
+        addItems: function(pItems) {
+            if (angular.isArray(pItems)) {
+                angular.copy(pItems, selectedImages);
+            }
+        },
+        getInstagramOnes: function() {
+            return $filter('filter')(selectedImages, {origin:"instagram"});
+        },
+        getPhoneOnes: function() {
             return $filter('filter')(selectedImages, {origin:"phone"});
         },
         getToPrintOnes: function() {
             return $filter('filter')(selectedImages, {toPrint:true});
+        },
+        prepareQuantity: function() {
+            angular.forEach(this.getToPrintOnes(), function(value){
+                if (!value.hasOwnProperty('quantity')) {value.quantity = 1;}
+            }); 
+        },
+        setPrintPhotos: function(pData) {
+            prints = pData;
         },
         getAll: function() {
             return selectedImages;
@@ -32,17 +47,17 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         getOne: function(id){
             return selectedImages[id];
         },
-        setCategory: function(id){
-        	category = id;
+        setProductLine: function(pCategory){
+            category = pCategory;
         },
-        getCategory: function(){
-        	return category;
+        getProductLine: function(){
+            return category;
         },
-        setSettings: function(id){
-        	settings = id;
+        setProduct: function(pProduct){
+            product = pProduct;
         },
-        getSettings: function(){
-        	return settings;
+        getProduct: function(){
+            return product;
         }
-	};
+    };
 }]);

@@ -6,7 +6,7 @@ models.factory('Market', ['$filter','SelectedImagesFactory', function ($filter,S
 
      function insertInfo(obj, categoryName, subCategoryName, size, quantity, price){
         model = {
-            'order_id': Math.floor((Math.random() * 100) + 1),
+            'order_id': Math.floor((Math.random() * 1000) + 1),
             'category':categoryName,
             'subCategory':subCategoryName,
             'size':size.width+'x'+size.height,
@@ -18,9 +18,9 @@ models.factory('Market', ['$filter','SelectedImagesFactory', function ($filter,S
 
 	return {
 		
-        insertMarket : function(model) {
-            var category = SelectedImagesFactory.getCategory(),
-                setting = SelectedImagesFactory.getSettings(),
+        insert: function(model) {
+            var category = SelectedImagesFactory.getProductLine(),
+                setting = SelectedImagesFactory.getProduct(),
                 promise = false,
                 price = 0,
                 quantity = 0,

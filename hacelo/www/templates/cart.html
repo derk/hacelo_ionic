@@ -4,7 +4,7 @@
     	<div class="cart-container">
     		<img class="photo-cover" src="../www/img/bg-fotos.jpg" alt="">
     		<p class="subtotal">Ordenes</h3>
-            <p ng-repeat="item in items.market track by $index">{{item.quantity}} items <span>= {{item.price}}.00</span></p>
+            <p ng-repeat="item in items.market track by $index" ng-animate="'animate'" class="animate-repeat">{{item.quantity}} items <span>= {{item.price}}.00</span> <span ng-click="delete($index)" class="delete">-</span></p>
           
     		
     		<!-- <span class="input-label">Cupón de Descuento</span> -->
