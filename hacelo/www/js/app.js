@@ -4,7 +4,6 @@ angular.module('hacelo', [
     'hacelo.config',
     'hacelo.models',
     'hacelo.controllers',
-    'hacelo.providers',
     'hacelo.services'
 ])
 
