@@ -4,7 +4,6 @@ angular.module('hacelo', [
     'hacelo.config',
     'hacelo.models',
     'hacelo.controllers',
-    'hacelo.providers',
     'hacelo.services'
 ])
 
@@ -218,24 +217,9 @@ angular.module('hacelo', [
     // more info at: http://goo.gl/8PfN8I
     $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob|content):|data:image\//);    
 });
- (function(){
-
- 	window.hacelo = window.hacelo || {};
- 	window.hacelo = {
- 		alert : function(string){
- 			alert(string);
- 		},
-
- 		messages :{
- 			"Loading":"<span>Cargando...</span><i class='icon ion-looping'></i>"
- 		}
- 	};
-
- })();
 var commons = angular.module('hacelo.config', []);
 var controllers = angular.module('hacelo.controllers', []);
 var models = angular.module('hacelo.models', []);
-var providers = angular.module('hacelo.providers', []);
 var services = angular.module('hacelo.services', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
@@ -1050,70 +1034,6 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "$timeou
         });
     };
 }]);
-/* ChooseCrtl para controlar la pantalla de escoger
- * $scope - Scope de la pantalla
- * Nacion_Service - Servicio de datos de nacion, service.js
- */
-controllers.controller('chooseCtrl', function($scope, Nacion_Service) {
-    //Variables for using on the app
-    $scope.username = '';
-    $scope.instagram_pics = Nacion_Service.get_entire_ins_pics();
-    $scope.all_pics_for_print = Nacion_Service.get_instagram_pics_on_queue();
-
-    //Function for init the isntagram
-    $scope.init_instagram = function(username) {
-        var instagram_v = new Instagram(username);
-        instagram_v.init();
-    };
-
-    //Open the new window with the correct url for using
-    $scope.call_popup = function() {
-        if (Nacion_Service.get_entire_ins_pics().length <= 0) {
-            var instagram_v = new Instagram();
-            instagram_v.init();
-            //$scope.modal.show();
-        } else {
-            Nacion_Service.show(hacelo.messages.Loading);
-            setTimeout(function() {
-                window.location.href = '#/app/instagram';
-            }, 500);
-
-        }
-    };
-
-    //Document listener for when updating username
-    document.addEventListener('update-username', function(e) {
-        $scope.username = e.detail;
-        $scope.init_instagram($scope.username);
-    });
-    document.addEventListener('pagination', function(e) {
-        Nacion_Service.setNextUrl(e.detail);
-    });
-    //Listener when the page just got the code and the images as well.
-    document.addEventListener('finish', function(e) {
-        //Open the loading popup
-        Nacion_Service.show(hacelo.messages.Loading);
-        //little timeout to ensure the pop up to appear
-        setTimeout(function() {
-            $scope.instagram_pics = e.detail;
-            var array = [];
-            for (var el = 0; el < $scope.instagram_pics.length; el++) {
-                var obj = {
-                    "img": $scope.instagram_pics[el],
-                    "picked": false
-                };
-                array.push(obj);
-            }
-            $scope.instagram_pics = array;
-            Nacion_Service.set_entire_ins_pics($scope.instagram_pics);
-            $scope.$apply();
-            if ($scope.instagram_pics.length > 0) {
-                window.location.hash = "#/app/instagram";
-            };
-        }, 100);
-
-    });
-});
 /* InfoCtrl Accordion List
  * $scope - Scope de la pantalla
  */
@@ -1343,14 +1263,14 @@ controllers.controller('landingCtrl', function($scope, StorageFactory) {
 	$scope.market = StorageFactory.init();
 });
 
-controllers.controller('processingCtrl', function($scope, StorageFactory) {
-
+controllers.controller('processingCtrl', function($scope, $sce, StorageFactory) {
+	// TODO add this url into a configuration file, since it is globally, and depends on the ftp.
+	$scope.api = $sce.trustAsResourceUrl("https://grooveshark-c9-raiam1234.c9.io/workspace/public/nacion.php");
 	$scope.market = StorageFactory.init();
-	
+
 	$scope.range = function(n) {
         return new Array(n);
     };
-	console.log($scope.market);
 
 });
 
@@ -1663,12 +1583,11 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
         return angular.isDefined(accessToken);
     };
 
-    var fetch = function (url, params) {
+    var fetch = function (url, options) {
         var prms = {
                 client_id: config.clientId,
                 callback: 'JSON_CALLBACK'
-            }
-            deferred = $q.defer();
+            };
         if (self.isAuthenticated()) {
             prms.access_token = accessToken;
         }
@@ -1676,18 +1595,9 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
                 url: config.apiUrl + url,
                 method: 'jsonp',
                 responseType: 'json',
-                params: angular.extend(prms, params)
+                params: angular.extend({}, prms, options)
             };
-
-        $http(cnfg).then(function(response){
-            lastInstagramLoad = response.data;
-            console.log(lastInstagramLoad);
-            deferred.resolve(response);
-        },function(response){
-            deferred.reject(response);
-        });
-
-        return deferred.promise;
+        return $http(cnfg);
     };
 
     var getUrlParameters = function (parameter, staticURL, decode) {
@@ -1763,7 +1673,6 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
 
     this.canLoadMore = function(){
         var can;
-        console.log(lastInstagramLoad);
         if(!self.hasLastInstagramLoad()){
             can = true;
         } else if (angular.isDefined(lastInstagramLoad.pagination)) {
@@ -1779,25 +1688,24 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
     };
 
     this.getRecentMedia = function() {
-        var prms = {};
+        var prms = {},
+            deferred = $q.defer();
 
-        if (self.hasLastInstagramLoad() && self.canLoadMore()) {
-            prms.max_tag_id = lastInstagramLoad.pagination.next_max_tag_id;
+        if (self.hasLastInstagramLoad()) {
+            if(self.canLoadMore()) {
+                prms.max_id = lastInstagramLoad.pagination.next_max_id;
+            }
         }
-        return fetch('users/self/media/recent', prms);
-    };
-
-    this.getCurrentUser = function() {
-        return fetch('users/self');
-    };
-
-    this.getRecientTagMedia = function() {
-        var prms = {};
-
-        if (self.hasLastInstagramLoad() && self.canLoadMore()) {
-            prms.max_tag_id = lastInstagramLoad.pagination.next_max_tag_id;
-        }
-        return fetch('tags/angularjs/media/recent',prms);
+        fetch('users/self/media/recent', prms).then(
+            function(response){
+                lastInstagramLoad = response.data;
+                deferred.resolve(response);
+            },
+            function(response){
+                deferred.reject(response);
+            }
+        );
+        return deferred.promise;
     };
 }]);
 services.service('LocationPrvdr', ['$http', function ($http) {

@@ -54,6 +54,12 @@ body{
     font-family: verdana;
 }
 
+.button{
+    text-transform: uppercase;
+    font-family: Arial;
+    font-weight: bold;
+}
+
 .button.button-balanced{
     border: none;
     background-color: $green;
@@ -427,66 +433,82 @@ body{
 /* 
    =============  Confirm page  ============= 
 */
- .confirm-container {
-    text-align: center;
-    text-transform: uppercase;
-    position: relative;
-    .photo {
-        max-width: 100%;
-    }
-    p{
-        color: $text-grey;
-        margin: 7% 0;
-        span{
-            color: $darkerGrey;
-            font-size: 1.6em;
-            margin-left: 20%;
+
+.confirm-page{
+     .confirm-container {
+        text-align: center;
+        text-transform: uppercase;
+        position: relative;
+        .photo {
+            max-width: 100%;
         }
+        p{
+            color: $text-grey;
+            margin: 7% 0;
+            span{
+                color: $darkerGrey;
+                font-size: 1.6em;
+                margin-left: 20%;
+            }
+        }
+        h2 {
+            font-size: 1.2em;
+            margin-top: 4%;
+            color: $darkerRed;
+        }
+        
     }
-    h2 {
-        font-size: 1.2em;
-        margin-top: 4%;
-        color: $darkerRed;
-    }
-    .button {
-        width: 92%;
-        margin: auto;
+    .bar-footer{
+        height: 60px;
+       .button {
+            width: 92%;
+            margin: auto;
+            font-size: 1.2em;
+            line-height: 40px;
+        } 
     }
 }
+
 /* 
    =============  Added-cart page  ============= 
 */
- .added-cart {
-    background: $blue;
-    text-transform: uppercase;
-    text-align: center;
-    color: #FFF;
-    h3:first-child {
-        font-size: 1.2em;
-        margin: 15% 0 20% 0;
+.added-page{
+    .added-cart {
+        background: $blue;
+        text-transform: uppercase;
+        text-align: center;
         color: #FFF;
-    }
-    img.car{
-        max-width: 42%;
-        display: block;
-        margin: 0 auto 10%;
-    }
-    p {
-        margin-bottom: 15%;
-        &.msj{
-            width: 60%;
-            text-align: center;
-            margin: 0 auto 20%;
+        h3:first-child {
+            font-size: 1.2em;
+            margin: 15% 0 25% 0;
+            color: #FFF;
         }
-    }
-    .button {
-        width: 92%;
-        margin: auto;
-        &.button-light {
-            margin-bottom: 10px;
+        img.car{
+            max-width: 42%;
+            display: block;
+            margin: 0 auto 10%;
         }
+        p {
+            margin-bottom: 15%;
+            &.msj{
+                width: 65%;
+                text-align: center;
+                margin: 0 auto 20%;
+            }
+        }
+
+        .button {
+            width: 92%;
+            margin: auto;
+            line-height: 45px;
+            &.button-light {
+                margin-bottom: 10px;
+            }
+        }  
     }
 }
+
+ 
 /* 
    =============  Cart page  ============= 
 */
@@ -496,8 +518,10 @@ body{
         text-align: center;
         text-transform: uppercase;
         .photo-cover{
-            max-width: 100%;
-            min-height: 140px;
+            width: 100%;
+            height: 155px;
+            background: url('../img/bg-fotos.jpg') no-repeat center center;
+            background-size: 100%;
         }
         p {
             text-align: left;
@@ -591,10 +615,18 @@ body{
                 }
             }
         }
-        .button-balanced {
+        
+    }
+    .bar-footer{
+        height: 60px;
+        background: none;
+       .button-balanced {
             display: block;
             width: 92%;
-            margin: 7% auto 0;
+            margin: 0.5% auto 2.5%;
+            text-transform: uppercase;
+            font-size: 1.2em;
+            line-height: 40px;
         }
     } 
 }
@@ -704,6 +736,12 @@ body{
             }
 
         }// end list
+        .button-balanced{
+            width: 100%;
+            font-size: 1.2em;
+            line-height: 45px;
+            margin-top: 2%;
+        }
     }
 }
 
@@ -729,19 +767,32 @@ body{
     p {
         margin: auto;
         width: 85%;
-        color: #999;
+        color: $grey;
+        overflow: hidden;
         &.subt {
+            font-weight: bold;
+        }
+        span{
+            float: right;
+            font-size: 1.4em;
             font-weight: bold;
         }
     }
     .button {
         margin-top: 20px;
         font-weight: bold;
-        font-size: 21px;
-        width: 85%;
-        margin: auto;
+        font-size: 1.3em;
+        line-height: 47px;
+        width: 80%;
+        margin: 0 auto 30px;
         display: block;
-        margin-bottom: 30px;
+        &.pay-button{
+            margin: 10% auto 30px;
+            width: 90%;
+            &.disabled{
+                opacity: 0.5;
+            }
+        }
     }
 }
 /* 
@@ -822,6 +873,11 @@ body{
                         text-transform: uppercase;
                     }
                 }
+                &:last-child{
+                    p{
+                        margin-top: 5%;
+                    }
+                }
             }
         }
         label{
@@ -836,8 +892,15 @@ body{
                 }
             }
         }
+    }
+    .bar-footer{
+        display: block;
+        height: 250px;
+        padding: 4%;
+        background: url('../img/bg-fotos.jpg') no-repeat center center;
+        background-size: 100%;
         h3.photos{
-            width: 55%;
+            width: 58%;
             background: #FFF;
             padding: 2% 6%;
             color: $green;
@@ -845,17 +908,21 @@ body{
         }
         h4.total{
             background: $red;
-            width: 40%;
+            width: 42%;
+            color: #FFF;
             padding: 2.2%;
             font-size: 1.1em;
             margin-bottom: 16%;
             font-weight: bold;
         }
         a.button{
-            min-height: 40px;
-            width: 100%;
+            width: 91%;
             text-transform: uppercase;
             padding: 0;
+            position: absolute;
+            bottom: 5%;
+            font-size: 1.2em;
+            line-height: 40px;
         }
     }
 }
@@ -1034,12 +1101,20 @@ body{
         text-align: center;
         font-size: 1.4em;
         color: #FFF;
+        margin-top: 10%;
     }
-    .button {
-        display: block;
-        width: 92%;
-        margin: 40% auto 0;
-        font-size: 20px;
+    
+    .bar-footer{
+        height: 59px;
+        padding-bottom: 4%;
+        background: none;
+        .button {
+            display: block;
+            width: 94%;
+            margin: 0 auto;
+            font-size: 1.2em;
+            padding: 1.8%;
+        }
     }
 }
 
