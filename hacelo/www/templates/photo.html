@@ -1,8 +1,12 @@
 <ion-view title="FOTOS" class="photo-page">
-
+    <ion-nav-bar class="grey bar-stable" animation="slide-left-right">  
+      <ion-nav-back-button class="button-clear">
+        <div class="arrow"> ATRAS </div> 
+      </ion-nav-back-button>
+    </ion-nav-bar>
     <ion-content class="has-header">
         <div class="photo-container">
-            <img class="photo-cover" src="../www/img/bg-fotos.jpg" alt="">
+            <div class="photo-cover"></div>
             <div class="cover"><span>{{product.name}}</span></div>
             <div class="menu-content">
                 <p><span>{{product.prices.first_items.price | currency:"&#8353;"}}</span>
@@ -13,9 +17,7 @@
                 </p>
                 <p><span>{{product.prices.additional.price | currency:"&#8353;"}}</span> Cada impresión adicional</p>
             </div>
+            <a href="#/app/choose" class="button button-arrow">SELECCIONAR</a>
         </div>
     </ion-content>
-    <ion-footer-bar>
-        <a href="#/app/choose" class="button button-arrow">SELECCIONAR</a>
-    </ion-footer-bar>
 </ion-view>

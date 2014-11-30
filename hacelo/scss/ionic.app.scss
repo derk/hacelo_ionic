@@ -101,52 +101,141 @@ body{
     overflow: visible;
 }
 
+.bar-header, .bar{
+    height: 44px;
+    border: none;
+}
+
+.bar-header{
+    &.landing{
+        height: 80px;
+        img.img-logo{
+            width: 80px;
+            height: auto;
+            display: block;
+            margin: auto;
+        }
+    }
+    &.grey{
+        height: 48px;
+        background-color: $grey;
+        .back-button{
+            color: #fff;
+            font-size: 0.9em;
+            &.ion-ios7-arrow-back:before{
+                content: initial;
+            }
+            .arrow{
+                width: 70px;
+                height: 34px;
+                text-align: right;
+                padding-right: 8px;
+                background: url('../img/arrow-buttons-grey.png') no-repeat center;
+                background-position: 0 0;
+                &:hover{
+                    background-position: 0 34px;
+                }
+            }
+        }
+        &.bar-stable .title{
+            color: #FFF;
+        }
+    }
+    &.red{
+        height: 48px;
+        background-color: $red;
+        .back-button{
+            color: $red;
+            font-size: 0.9em;
+            &.ion-ios7-arrow-back:before{
+                content: initial;
+            }
+            .arrow{
+                width: 70px;
+                height: 34px;
+                text-align: right;
+                padding-right: 8px;
+                background: url('../img/arrow-buttons-white.png') no-repeat center;
+            }
+        }
+        &.bar-stable .title{
+            color: #FFF;
+        }
+    }
+    &.green{
+        height: 44px;
+        background-color: $green;
+        &.bar-stable .title{
+            color: #FFF;
+        }
+    }
+}
+
+.available-true {
+    visibility: hidden;
+}
+
+
 /* 
    =============  Index Page Styles  ============= 
 */
 
 .index-page{
-    background: url('../img/bg-landing.jpg') no-repeat center 44px fixed;
-    background-size: cover;
-    .options-index {
-        position: absolute;
-        height: 26%;
-        bottom: 0;
-        width: 100%;
-        a {
+    background: url('../img/bg-landing.jpg') no-repeat center 80px fixed;
+    background-size: 100%;
+    .has-header{
+        height: 100%;
+        top: 80px;
+       .slick-list{
+            height: 100%;
+            .slick-track{
+                height: 100%;
+            }
+        } 
+    }
+    .bar-footer{
+        height: 120px;
+        display: block;
+        background: none;
+        .options-index {
+            width: 100%;
             position: relative;
-            width: 90%;
-            display: inline-block;
-            margin: 3% 5%;
-            text-transform: uppercase;
-            float: left;
-            text-align: center;
-            font-weight: bold;
-
-            &.button-positive{
-                color: $green;
-                margin-bottom: 5%;
-
-                &:hover{
+            overflow: hidden;
+            .button{
+                line-height: 38px;
+                font-size: 1.2em;
+                position: relative;
+                width: 90%;
+                display: inline-block;
+                margin: 3% 5%;
+                text-transform: uppercase;
+                float: left;
+                text-align: center;
+                font-weight: bold;
+                &.button-positive{
                     color: $green;
+                    margin-bottom: 3%;
+
+                    &:hover{
+                        color: $green;
+                    }
+                }
+                &.info{
+                    color: $blue;
                 }
             }
-
-            &.info{
-                color: $blue;
-            }
-        }
-        .info-buttons{
-            overflow: hidden;
-            width: 90%;
-            margin: auto;
-            a{
-                float: left;
-                width: 48%;
-                display: block;
-                margin: 0;
-                &:first-child{
-                    margin-right: 4%;
+            .info-buttons{
+                overflow: hidden;
+                width: 90%;
+                margin: auto;
+                a{
+                    float: left;
+                    width: 48%;
+                    display: block;
+                    margin: 0;
+                    &:first-child{
+                        margin-right: 4%;
+                    }
                 }
             }
         }
@@ -198,10 +287,6 @@ body{
     }
 }
 
-.available-true {
-    visibility: hidden;
-}
-
 /* 
    =============  Photo Page  ============= 
 */
@@ -209,7 +294,8 @@ body{
 .photo-page {
     .photo-container{
         .photo-cover {
-            max-width: 100%;
+            background: url('../img/bg-fotos.jpg') no-repeat center center;
+            height: 190px;
         }
         .cover {
             color:white;
@@ -245,12 +331,9 @@ body{
                 }
             }
         }
-    }
-    .bar-footer{
-        height: 80px;
         .button-arrow{
             background: url('../img/arrow-green-buttons-small.png');
-            display: inline-block;
+            display: block;
             width: 240px;
             border: none;
             background-position: 0 65px;
@@ -259,13 +342,12 @@ body{
             font-weight: bold;
             font-size: 1.3em;
             line-height: 60px;
-            margin: 0 auto 5%;
+            margin: 2% auto 5%;
             &:hover{
                 background-position: 0 -3px;
             }
         }
     }
-    
 }
 
 .photo-pick-page {
@@ -377,7 +459,8 @@ body{
                         color: $blue;
                         display: block;
                         margin: auto;
-                        width: 50%;
+                        width: 65%;
+                        text-align: center;
                     }
                 }
             }
@@ -474,8 +557,9 @@ body{
         text-align: center;
         text-transform: uppercase;
         position: relative;
-        .photo {
-            max-width: 100%;
+        .photo-cover {
+            background: url('../img/bg-fotos.jpg') no-repeat center center;
+            height: 190px;
         }
         p{
             color: $text-grey;
@@ -491,13 +575,10 @@ body{
             margin-top: 4%;
             color: $darkerRed;
         }
-        
-    }
-    .bar-footer{
-        height: 60px;
-       .button {
+        .button {
             width: 92%;
-            margin: auto;
+            margin: 2% auto 0;
+            display: block;
             font-size: 1.2em;
             line-height: 40px;
         } 
@@ -1008,6 +1089,7 @@ body{
     .order-sent-container{
         text-transform: uppercase;
         font-family: verdana;
+        margin-top: 5%;
         h2{ 
             color: $green;
             text-align: center;
@@ -1034,10 +1116,6 @@ body{
             height: 150px;
             margin: 0 auto 10%;
         }
-    }
-
-    .bar-footer{
-        margin-bottom: 10%;
         a.button{
             width: 98%;
             margin: auto;
@@ -1056,6 +1134,9 @@ body{
 */
 
 .show-love-page{
+    .show-love-container{
+        margin-top: 3%;
+    }
     p{
         color: $text-grey;
         font-size: 0.9em;
@@ -1066,50 +1147,45 @@ body{
             margin-bottom: 0;
         }
     }
-    .bar-footer{
-        margin-bottom: 6%;
+    a.instagram{
+        width: 100%;
         display: block;
-        min-height: 140px;
-        a.instagram{
-            width: 100%;
-            display: block;
-            float: none;
-            margin-bottom: 1px;
+        float: none;
+        margin-bottom: 1px;
+        text-transform: uppercase;
+        padding: 5px;
+        font-size: 1.15em;
+    }
+    div.buttons{
+        a{
             text-transform: uppercase;
             padding: 5px;
-            font-size: 1.15em;
         }
-        div.buttons{
-            a{
-                text-transform: uppercase;
-                padding: 5px;
+        &.socialbtns{
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 1px;
+            .twitter{
+                width: 49.5%;
+                float: left;
+                margin-right: 0.5%;
             }
-            &.socialbtns{
-                width: 100%;
-                overflow: hidden;
-                margin-bottom: 1px;
-                .twitter{
-                    width: 49.5%;
-                    float: left;
-                    margin-right: 0.5%;
-                }
-                .fb{
-                    float: left;
-                    width: 49.9%;
-                }
+            .fb{
+                float: left;
+                width: 49.9%;
             }
-            &.btns{
-                width: 100%;
-                overflow: hidden;
-                .comment{
-                    width: 49.5%;
-                    float: left;
-                    margin-right: 0.5%;
-                }
-                .return{
-                    float: left;
-                    width: 49.9%;
-                }
+        }
+        &.btns{
+            width: 100%;
+            overflow: hidden;
+            .comment{
+                width: 49.5%;
+                float: left;
+                margin-right: 0.5%;
+            }
+            .return{
+                float: left;
+                width: 49.9%;
             }
         }
     }
@@ -1138,18 +1214,13 @@ body{
         color: #FFF;
         margin-top: 10%;
     }
-    
-    .bar-footer{
-        height: 59px;
-        padding-bottom: 4%;
-        background: none;
-        .button {
-            display: block;
-            width: 94%;
-            margin: 0 auto;
-            font-size: 1.2em;
-            padding: 1.8%;
-        }
+
+    .button {
+        display: block;
+        width: 94%;
+        margin: 2% auto 0;
+        font-size: 1.2em;
+        padding: 1.8%;
     }
 }
 
@@ -1238,18 +1309,15 @@ body{
         line-height: 27px;
     }
 
-    .bar-footer{
-        background: $green;
-        margin-bottom: 6%;
-        a.button{
-            width: 90%;
-            margin: auto;
-            display: block;
-            font-size: 1.2em;
-            padding: 6px;
-        }
+    background: $green;
+    margin-bottom: 6%;
+    a.button{
+        width: 90%;
+        margin: 8% auto 0;
+        display: block;
+        font-size: 1.2em;
+        padding: 6px;
     }
-
 }
 
 
