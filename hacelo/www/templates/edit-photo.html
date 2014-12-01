@@ -1,0 +1,21 @@
+<ion-view title="CORTAR" class="photo-edit-page">
+    <ion-nav-buttons side="right">
+        <a ng-click="done()" class="button button-icon icon ion-checkmark"></a>
+    </ion-nav-buttons>
+
+
+    <ion-content scroll="false" class="has-header">
+        <div class="photo-edit-wrapper">
+            <div class="photo-edit-header">
+                <h4>Selecciona el area a cortar</h4>
+            </div>
+            <div class="photo-edit-body">
+                <div class="canvas">
+                    <img ng-src="{{sResolution.url}}" alt="" id="editableImage" when-loaded="[darkroomInit]"/>
+                </div>
+            </div>
+            <div class="photo-edit-controls">
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

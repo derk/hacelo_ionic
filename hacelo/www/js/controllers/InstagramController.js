@@ -63,8 +63,8 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
         $state.go('app.choose');
     };
 
-    var havePreviousImages = function(){
-        return (SelectedImagesFactory.getInstagramOnes().length>0)?true:false;
+    var havePreviousImages = function () {
+        return (SelectedImagesFactory.getInstagramOnes().length > 0);
     };
 
     var authenticateInstagramUser = function (){

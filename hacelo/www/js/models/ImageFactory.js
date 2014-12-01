@@ -3,6 +3,7 @@ models.factory('ImageFactory', ['$q', function ($q) {
         this.origin = "phone";
         this.images = source;
         this.toPrint = false;
+        this.quantity = 0;
 
         if (angular.isObject(source)) {
             this.origin = "instagram";

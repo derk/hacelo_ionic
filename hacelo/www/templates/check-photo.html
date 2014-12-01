@@ -11,7 +11,7 @@
             <p>Tocar cualquier foto para ajusar.</p>
 
             <div class="singeImage" ng-repeat="image in images track by $index" ng-init="sResolution = image.images.standard_resolution">
-                <img ng-src="{{sResolution.url}}" ng-click="crop($index)" style="max-width: 100%;height: auto;">
+                <a ng-href="#/app/edit/{{$index}}"><img ng-src="{{sResolution.url}}" style="max-width: 100%;height: auto;"></a>
 
                 <div class="quantity-container" ng-init="quantity = image.quantity">
                     <button ng-disabled="image.quantity==1" ng-click="image.quantity=image.quantity-1" class="minus">-</button>

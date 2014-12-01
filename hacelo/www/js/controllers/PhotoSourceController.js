@@ -1,16 +1,9 @@
-controllers.controller('PhotoSourceCtrl', ['$scope', '$filter', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', function ($scope, $filter, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker) {
-
-    $scope.loading = false;
+controllers.controller('PhotoSourceCtrl', ['$scope', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', function ($scope, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker) {
     $scope.imageStack = SelectedImagesFactory.getAll();
-    $scope.prepare = function () {
-        SelectedImagesFactory.prepareQuantity();
-    };
 
     $scope.phoneImageLoad = function () {
-        CordovaCameraService.getImage().then(
-            function (result) {
-                (new ImageFactory(result)).phoneImageInit().then(
-                    function(result){
+        CordovaCameraService.getImage().then(function (result) {
+            (new ImageFactory(result)).phoneImageInit().then(function(result){
                         if(PhotoSizeChecker.meetsMinimumRequirements(result)){
                             $scope.imageStack.push(result);
                         }else{
@@ -21,9 +14,7 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$filter', '$ionicPopup', '
                                 'una impresión de la más alta calidad.'
                             });
                         }
-                    }
-                );
-            }
-        );
+            });
+        });
     };
 }]);

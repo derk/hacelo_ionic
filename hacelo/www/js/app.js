@@ -2,6 +2,7 @@ angular.module('hacelo', [
     'ionic',
     'slick',
     'hacelo.config',
+    'hacelo.directives',
     'hacelo.models',
     'hacelo.controllers',
     'hacelo.services'
@@ -89,6 +90,15 @@ angular.module('hacelo', [
             'haceloContent': {
                 templateUrl: "templates/check-photo.html",
                 controller: 'checkCtrl'
+            }
+        }
+    })
+    .state('app.photoEdit', {
+        url: "/edit/:id",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/edit-photo.html",
+                controller: 'PhotoEditCtrl'
             }
         }
     })
