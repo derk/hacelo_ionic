@@ -38,6 +38,7 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
         this.productLine = pProductLine;
         this.product = pProduct;
         this.items = pItems;
+        this.id2 = makeId();
 
         // ---
         // PUBLIC METHODS.

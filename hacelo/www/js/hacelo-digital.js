@@ -228,14 +228,14 @@ angular.module('hacelo', [
     $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob|content):|data:image\//);    
 });
 var commons = angular.module('hacelo.config', []);
-var controllers = angular.module('hacelo.controllers', []);
 /**
  * Created by joseph on 30/11/2014.
  */
 var directives = angular.module('hacelo.directives', []);
 
-var models = angular.module('hacelo.models', []);
+var controllers = angular.module('hacelo.controllers', []);
 var services = angular.module('hacelo.services', []);
+var models = angular.module('hacelo.models', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
         /*
@@ -966,21 +966,23 @@ commons.constant('PhotoPrintConfig', {
 /**
  * Created by joseph on 30/11/2014.
  */
-controllers.controller('cartCtrl', function($scope, StorageFactory, Market) {
-    $scope.items = StorageFactory.init();
+controllers.controller('cartCtrl', function($scope, StorageService, ShoppingCartFactory) {
+    $scope.items = StorageService.load();
+    console.log(ShoppingCartFactory.loadShoppingCart().orders[0]);
+    console.log(ShoppingCartFactory.loadShoppingCart().orders[0].computeSubTotal());
     $scope.subtotal = 0;
 
-    angular.forEach($scope.items.market, function(value){
+    angular.forEach($scope.items.orders, function(value){
         $scope.subtotal = $scope.subtotal + value.price;
     });
 
     $scope.delete = function ($index) {
-        StorageFactory.deleteNode($index);
+        StorageService.deleteNode($index);
         init();
     };
 
     var init = function(){
-        $scope.items = StorageFactory.init();
+        $scope.items = StorageService.load();
         $scope.subtotal = 0;
 
         angular.forEach($scope.items.market, function(value){
@@ -1041,6 +1043,7 @@ controllers.controller('confirmCtrl', ['$scope', 'ShoppingCartFactory', 'Selecte
 
     $scope.addToCart = function(){
         ShoppingCartFactory.setActualOrder($scope.actualOrder);
+        console.log($scope.actualOrder);
         cart.addOrder($scope.actualOrder);
         ShoppingCartFactory.saveShoppingCart();
     };
@@ -1129,8 +1132,8 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
         $state.go('app.choose');
     };
 
-    var havePreviousImages = function(){
-        return (SelectedImagesFactory.getInstagramOnes().length>0)?true:false;
+    var havePreviousImages = function () {
+        return (SelectedImagesFactory.getInstagramOnes().length > 0);
     };
 
     var authenticateInstagramUser = function (){
@@ -1233,16 +1236,16 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$ionicPopup', 'SelectedIma
     $scope.phoneImageLoad = function () {
         CordovaCameraService.getImage().then(function (result) {
             (new ImageFactory(result)).phoneImageInit().then(function(result){
-                if(PhotoSizeChecker.meetsMinimumRequirements(result)){
-                    $scope.imageStack.push(result);
-                } else {
-                    $ionicPopup.alert({
-                        title: 'La imagen es muy pequenna',
-                        template: 'Lo sentimos :( la foto tiene que ser'+
-                        'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
-                        'una impresión de la más alta calidad.'
-                    });
-                }
+                        if(PhotoSizeChecker.meetsMinimumRequirements(result)){
+                            $scope.imageStack.push(result);
+                        }else{
+                            $ionicPopup.alert({
+                                title: 'La imagen es muy pequenna',
+                                template: 'Lo sentimos :( la foto tiene que ser'+
+                                'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
+                                'una impresión de la más alta calidad.'
+                            });
+                        }
             });
         });
     };
@@ -1270,14 +1273,15 @@ controllers.controller('photoCrtl', function($scope, SelectedImagesFactory, Phot
 	$scope.product = SelectedImagesFactory.getProduct();
 });
 
-controllers.controller('landingCtrl', function($scope, StorageFactory) {
-	$scope.market = StorageFactory.init();
+
+controllers.controller('landingCtrl', function($scope, StorageService,ShoppingCartFactory) {
+	$scope.market = StorageService.load();
 });
 
-controllers.controller('processingCtrl', function($scope, $sce, StorageFactory) {
+controllers.controller('processingCtrl', function($scope, $sce, StorageService) {
 	// TODO add this url into a configuration file, since it is globally, and depends on the ftp.
 	$scope.api = $sce.trustAsResourceUrl("https://grooveshark-c9-raiam1234.c9.io/workspace/public/nacion.php");
-	$scope.market = StorageFactory.init();
+	$scope.market = StorageService.load();
 
 	$scope.range = function(n) {
         return new Array(n);
@@ -1538,56 +1542,6 @@ models.factory("PreloaderFactory", function ($q, $rootScope) {
     // Return the factory instance.
     return ( Preloader );
 });
-models.factory('Market', ['$filter','SelectedImagesFactory', function ($filter,SelectedImagesFactory) {
-	/**
-	 * A simple service that returns the array of selected images.
-	 */
-     var model;
-
-     function insertInfo(obj, categoryName, subCategoryName, size, quantity, price){
-        model = {
-            'order_id': Math.floor((Math.random() * 1000) + 1),
-            'category':categoryName,
-            'subCategory':subCategoryName,
-            'size':size.width+'x'+size.height,
-            'items':obj,
-            'quantity':quantity,
-            'price':price
-        };
-     }
-
-	return {
-		
-        insert: function(model) {
-            var category = SelectedImagesFactory.getProductLine(),
-                setting = SelectedImagesFactory.getProduct(),
-                promise = false,
-                price = 0,
-                quantity = 0,
-                totalPrice = 0;
-
-            angular.forEach(model, function(value){
-                quantity = quantity + value.quantity;
-            });
-
-            if(quantity <= setting.prices.first_items.quantity){
-                price = price = setting.prices.first_items.price;;
-            } else {
-                var d = quantity - setting.prices.first_items.quantity;
-                price = setting.prices.first_items.price + (d * setting.prices.additional.price);
-            }
-
-            insertInfo(model, category.name, setting.name, setting.real_size, quantity, price);
-
-            return true;
-        },
-
-        getCurrentModel: function() {
-            return model;
-        }
-
-	};
-}]);
 models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
     /**
      * A simple service that returns the array of selected images.
@@ -1677,6 +1631,7 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
         this.productLine = pProductLine;
         this.product = pProduct;
         this.items = pItems;
+        this.id2 = makeId();
 
         // ---
         // PUBLIC METHODS.
@@ -1762,82 +1717,6 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
         }
     };
 }]);
-models.factory('StorageFactory', ['$window', function ($window) {
-	var storage = $window.localStorage;
-	var prefix = "hacelo";
-
-	var addStructure = function() {
-		if(!storage.getItem(prefix)){
-			saveMarket([]);
-		}
-	};
-
-	this.setPrefix = function(newPrefix) {
-		prefix = newPrefix;
-	};
-
-	var save = function(newObj) {
-		var model = load(),
-			json = null;
-	
-		if(model.hasOwnProperty('market')){
-			model.market.push(newObj);
-			storage.setItem(prefix, angular.toJson(model));
-			return true;
-		} else {
-			return false;
-		}
-	};
-
-	var pDeleteNode = function ($index) {
-		var market = load().market;
-		market.splice($index, 1);
-		saveMarket(market);
-	};
-
-	var saveMarket = function(newObj) {
-		return storage.setItem(prefix, angular.toJson({"market":newObj}));
-	};
-
-	var load = function() {
-		return angular.fromJson(storage.getItem(prefix));
-	};
-
-	var destroy = function() {
-		return storage[prefix] = '';
-	};
-
-	addStructure();
-
-
-	return {
-		save: function(newJson) {
-			return save(newJson);
-		},
-
-		load: function() {
-			return load();
-		},
-
-		destroy: function() {
-			return destroy();
-		},
-
-		deleteNode: function ($index){
-			pDeleteNode($index);
-		},
-
-		init: function() {
-			if (!load()) {
-				return save({
-					key: 'value'
-				});
-			}
-
-			return load();
-		}
-	};
-}])
 services.service('CordovaCameraService', ['$window','$q', function ($window,$q) {
     var cam,
         cameraOptions,
@@ -2085,82 +1964,6 @@ services.service('MessageService', ['$http', function ($http) {
     // Load the messages from JSON file
     initMessages();
 }]);
-services.service('Nacion_Service',['$ionicLoading',function($ionicLoading){
-  this.username = '';
-  this.instagram_pics = [];
-  this.instagram_pics_on_queue = [];
-  this.loadMore = '';
-
-  this.show = function(text) {
-    $ionicLoading.show({
-      template: text
-    });
-  };
-  this.hide = function(){
-    $ionicLoading.hide();
-  };
-
-
-  this.alert = function(){
-    alert('test');
-  };
-
-  this.set_username = function(data){
-    this.username = data;
-  };
-
-  this.setNextUrl = function(url){
-    this.loadMore = url;
-  };
-
-  this.getNextUrl = function(){
-    return this.loadMore;
-  };
-
-  this.createEvent = function(text,data){
-        var event;
-          if(data !=undefined){
-            event = new CustomEvent(text,{'detail':data});
-          }else {
-            event = new CustomEvent(text);
-          }
-          document.dispatchEvent(event);
-    };
-    this.set_entire_ins_pics = function(data){
-      this.instagram_pics = data;
-    };
-
-    this.get_entire_ins_pics = function(){
-      return this.instagram_pics;
-    };
-
-    this.set_instagram_pics_on_queue = function(data){
-      this.instagram_pics_on_queue = data;
-    };
-
-    this.addImageQueue = function (data) {
-      var promise = same(this.instagram_pics_on_queue, data);
-        if(promise == -1){
-          this.instagram_pics_on_queue.push(data);
-        } else {
-          this.instagram_pics_on_queue.splice(promise, 1);
-        }
-    };
-
-    this.get_instagram_pics_on_queue = function(){
-      return this.instagram_pics_on_queue;
-    };
-
-    function same(parent, data) {
-        var object = -1;
-        for(var el in parent){
-             if( JSON.stringify(parent[el]) == JSON.stringify(data) ){
-                object = el;
-            }
-        }
-        return object;
-    }
-}]);
 /**
  * Created by joseph on 24/11/2014.
  */
@@ -2241,5 +2044,14 @@ services.service('StorageService', ['$window', function ($window) {
 
     this.clear = function() {
         storage.clear();
+    };
+
+    this.deleteNode = function ($index) {
+        console.log($index);
+        var market = this.load().market;
+        console.log(market);
+        market.splice($index, 1);
+        console.log(market);
+        this.save(market);
     };
 }]);

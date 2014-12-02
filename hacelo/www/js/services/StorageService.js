@@ -30,4 +30,13 @@ services.service('StorageService', ['$window', function ($window) {
     this.clear = function() {
         storage.clear();
     };
+
+    this.deleteNode = function ($index) {
+        console.log($index);
+        var market = this.load().market;
+        console.log(market);
+        market.splice($index, 1);
+        console.log(market);
+        this.save(market);
+    };
 }]);
