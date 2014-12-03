@@ -228,14 +228,14 @@ angular.module('hacelo', [
     $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob|content):|data:image\//);    
 });
 var commons = angular.module('hacelo.config', []);
+var controllers = angular.module('hacelo.controllers', []);
 /**
  * Created by joseph on 30/11/2014.
  */
 var directives = angular.module('hacelo.directives', []);
 
-var controllers = angular.module('hacelo.controllers', []);
-var services = angular.module('hacelo.services', []);
 var models = angular.module('hacelo.models', []);
+var services = angular.module('hacelo.services', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
         /*
@@ -966,31 +966,13 @@ commons.constant('PhotoPrintConfig', {
 /**
  * Created by joseph on 30/11/2014.
  */
-controllers.controller('cartCtrl', function($scope, StorageService, ShoppingCartFactory) {
-    $scope.items = StorageService.load();
-    console.log(ShoppingCartFactory.loadShoppingCart().orders[0]);
-    console.log(ShoppingCartFactory.loadShoppingCart().orders[0].computeSubTotal());
-    $scope.subtotal = 0;
+controllers.controller('cartCtrl', function($scope, ShoppingCartFactory) {
+    $scope.cart = ShoppingCartFactory.loadShoppingCart();
 
-    angular.forEach($scope.items.orders, function(value){
-        $scope.subtotal = $scope.subtotal + value.price;
-    });
-
-    $scope.delete = function ($index) {
-        StorageService.deleteNode($index);
-        init();
+    $scope.removeOrder = function (pOrderToRemove) {
+        // es posible que luego tengamos que agregar un mensaje de confirmacion aca.
+        ShoppingCartFactory.removeOrder(pOrderToRemove.id);
     };
-
-    var init = function(){
-        $scope.items = StorageService.load();
-        $scope.subtotal = 0;
-
-        angular.forEach($scope.items.market, function(value){
-            $scope.subtotal = $scope.subtotal + value.price;
-        });
-    };
-
-    init();
 });
 controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "SelectedImagesFactory", "MessageService", function($scope, $state, $ionicPopup, SelectedImagesFactory, Messages) {
     $scope.images = SelectedImagesFactory.getToPrintOnes();
@@ -1043,7 +1025,6 @@ controllers.controller('confirmCtrl', ['$scope', 'ShoppingCartFactory', 'Selecte
 
     $scope.addToCart = function(){
         ShoppingCartFactory.setActualOrder($scope.actualOrder);
-        console.log($scope.actualOrder);
         cart.addOrder($scope.actualOrder);
         ShoppingCartFactory.saveShoppingCart();
     };
@@ -1236,22 +1217,25 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$ionicPopup', 'SelectedIma
     $scope.phoneImageLoad = function () {
         CordovaCameraService.getImage().then(function (result) {
             (new ImageFactory(result)).phoneImageInit().then(function(result){
-                        if(PhotoSizeChecker.meetsMinimumRequirements(result)){
-                            $scope.imageStack.push(result);
-                        }else{
-                            $ionicPopup.alert({
-                                title: 'La imagen es muy pequenna',
-                                template: 'Lo sentimos :( la foto tiene que ser'+
-                                'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
-                                'una impresión de la más alta calidad.'
-                            });
-                        }
+                if(PhotoSizeChecker.meetsMinimumRequirements(result)){
+                    $scope.imageStack.push(result);
+                } else {
+                    $ionicPopup.alert({
+                        title: 'La imagen es muy pequenna',
+                        template: 'Lo sentimos :( la foto tiene que ser'+
+                        'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
+                        'una impresión de la más alta calidad.'
+                    });
+                }
             });
         });
     };
 }]);
-controllers.controller('productCrtl', function($scope, $state, SelectedImagesFactory, PhotoPrintConfig) {
+controllers.controller('landingCtrl', function($scope, ShoppingCartFactory) {
+	$scope.cart = ShoppingCartFactory.loadShoppingCart();
+});
 
+controllers.controller('productCrtl', function($scope, $state, SelectedImagesFactory, PhotoPrintConfig) {
 	$scope.productLines = PhotoPrintConfig.products;
 
 	$scope.saveProductLine = function(pProductLine) {
@@ -1271,11 +1255,6 @@ controllers.controller('categoryCrtl', function($scope, $state, SelectedImagesFa
 
 controllers.controller('photoCrtl', function($scope, SelectedImagesFactory, PhotoPrintConfig) {
 	$scope.product = SelectedImagesFactory.getProduct();
-});
-
-
-controllers.controller('landingCtrl', function($scope, StorageService,ShoppingCartFactory) {
-	$scope.market = StorageService.load();
 });
 
 controllers.controller('processingCtrl', function($scope, $sce, StorageService) {
@@ -1616,13 +1595,6 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
             }
             return id;
         };
-        var getNumberOfItems = function () {
-            var numberOfItems = 0;
-            for (var i = self.items.length - 1; i >= 0; i--) {
-                numberOfItems += self.items[i].quantity;
-            }
-            return numberOfItems;
-        };
 
         // ---
         // PUBLIC ATTRIBUTES.
@@ -1631,14 +1603,21 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
         this.productLine = pProductLine;
         this.product = pProduct;
         this.items = pItems;
-        this.id2 = makeId();
 
         // ---
         // PUBLIC METHODS.
         // ---
+        this.getQuantity = function () {
+            var numberOfItems = 0;
+            for (var i = self.items.length - 1; i >= 0; i--) {
+                numberOfItems += self.items[i].quantity;
+            }
+            return numberOfItems;
+        };
+
         this.computeSubTotal = function () {
             var subTotal = 0,
-                numberOfItems = getNumberOfItems(),
+                numberOfItems = this.getQuantity(),
                 firstItems = this.product.prices.first_items,
                 additionalItem = this.product.prices.additional;
 
@@ -1668,7 +1647,12 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
                 district: ""
             }
         };
-        this.orders = pOrders || [];
+        this.orders = [];
+        if(angular.isDefined(pOrders)){
+            for (var i = 0, j = pOrders.length; i < j; i++) {
+                this.orders.push(new Order(pOrders[i].productLine, pOrders[i].product, pOrders[i].items));
+            }
+        }
 
         // ---
         // PUBLIC METHODS.
@@ -1678,36 +1662,53 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
             this.orders.push(DummyOrder);
             return this.orders[this.orders.length-1];
         };
+
         this.getDummyOrder = function(pProductLine, pProduct, pItems){
             return new Order(pProductLine, pProduct, pItems);
         };
-        this.removeOrder = function(pOrderRemove){
-            var i = angular.element.inArray(pOrderRemove, this.orders);
-            if (i !== -1 || i > -1) {
-                this.orders = this.orders.splice(i, 1);
+
+        this.removeOrder = function(pOrderId){
+            for (var i = this.orders.length - 1; i >= 0; i--) {
+                if (this.orders[i].id === pOrderId) {
+                    this.orders.splice(i,1);
+                }
             }
         };
+
+        this.computeSubTotal = function () {
+            var subTotal = 0;
+            for (var i = this.orders.length - 1; i >= 0; i--) {
+                subTotal += this.orders[i].computeSubTotal();
+            }
+            return subTotal;
+        }
     }
 
     return {
         saveShoppingCart: function(){
-            console.log(shoppingCart);
             return StorageService.save(shoppingCart);
         },
         loadShoppingCart: function(){
             /*
             * Load any data stored
             * then check if some shopping cart was already created
-            * if not create a new one or load the previews one
+            * if not create a new one and save it or load the previews one
             * and finally return the loaded/created shopping cart
             * */
             var lastShoppingCart = StorageService.load();
-            if(angular.element.isEmptyObject(lastShoppingCart)){
+            if(!angular.isObject(lastShoppingCart)){
                 shoppingCart = new ShoppingCart();
-            } else {
-                shoppingCart = new ShoppingCart(lastShoppingCart.customer, lastShoppingCart.orders)
+                this.saveShoppingCart();
+            } else if (angular.isUndefined(shoppingCart)){
+                if (!angular.element.isEmptyObject(lastShoppingCart)) {
+                    shoppingCart = new ShoppingCart(lastShoppingCart.customer, lastShoppingCart.orders);
+                }
             }
             return shoppingCart;
+        },
+        removeOrder: function (pOrderId) {
+            shoppingCart.removeOrder(pOrderId);
+            this.saveShoppingCart();
         },
         setActualOrder: function(pActualOrder){
             actualOrder = pActualOrder;
@@ -2022,36 +2023,19 @@ services.service('StorageService', ['$window', function ($window) {
 
     this.save = function(pCartData) {
         var saved = true;
-        if (angular.isObject(pCartData)) {
-            try {
-                storage.setItem(prefix, angular.toJson(pCartData, false));
-            } catch (e) {
-                saved = false;
-            }
-        } else {
+        try {
+            storage.setItem(prefix, angular.toJson(pCartData, false));
+        } catch (e) {
             saved = false;
         }
         return saved;
     };
 
     this.load = function() {
-        if (angular.isDefined(storage.getItem(prefix))) {
-            return angular.fromJson(storage.getItem(prefix));
-        } else {
-            return angular.fromJson(this.save({}))
-        }
+        return angular.fromJson(storage.getItem(prefix));
     };
 
     this.clear = function() {
-        storage.clear();
-    };
-
-    this.deleteNode = function ($index) {
-        console.log($index);
-        var market = this.load().market;
-        console.log(market);
-        market.splice($index, 1);
-        console.log(market);
-        this.save(market);
+        this.save("");
     };
 }]);

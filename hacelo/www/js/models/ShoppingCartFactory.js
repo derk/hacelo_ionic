@@ -23,13 +23,6 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
             }
             return id;
         };
-        var getNumberOfItems = function () {
-            var numberOfItems = 0;
-            for (var i = self.items.length - 1; i >= 0; i--) {
-                numberOfItems += self.items[i].quantity;
-            }
-            return numberOfItems;
-        };
 
         // ---
         // PUBLIC ATTRIBUTES.
@@ -38,14 +31,21 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
         this.productLine = pProductLine;
         this.product = pProduct;
         this.items = pItems;
-        this.id2 = makeId();
 
         // ---
         // PUBLIC METHODS.
         // ---
+        this.getQuantity = function () {
+            var numberOfItems = 0;
+            for (var i = self.items.length - 1; i >= 0; i--) {
+                numberOfItems += self.items[i].quantity;
+            }
+            return numberOfItems;
+        };
+
         this.computeSubTotal = function () {
             var subTotal = 0,
-                numberOfItems = getNumberOfItems(),
+                numberOfItems = this.getQuantity(),
                 firstItems = this.product.prices.first_items,
                 additionalItem = this.product.prices.additional;
 
@@ -75,7 +75,12 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
                 district: ""
             }
         };
-        this.orders = pOrders || [];
+        this.orders = [];
+        if(angular.isDefined(pOrders)){
+            for (var i = 0, j = pOrders.length; i < j; i++) {
+                this.orders.push(new Order(pOrders[i].productLine, pOrders[i].product, pOrders[i].items));
+            }
+        }
 
         // ---
         // PUBLIC METHODS.
@@ -85,36 +90,53 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
             this.orders.push(DummyOrder);
             return this.orders[this.orders.length-1];
         };
+
         this.getDummyOrder = function(pProductLine, pProduct, pItems){
             return new Order(pProductLine, pProduct, pItems);
         };
-        this.removeOrder = function(pOrderRemove){
-            var i = angular.element.inArray(pOrderRemove, this.orders);
-            if (i !== -1 || i > -1) {
-                this.orders = this.orders.splice(i, 1);
+
+        this.removeOrder = function(pOrderId){
+            for (var i = this.orders.length - 1; i >= 0; i--) {
+                if (this.orders[i].id === pOrderId) {
+                    this.orders.splice(i,1);
+                }
             }
         };
+
+        this.computeSubTotal = function () {
+            var subTotal = 0;
+            for (var i = this.orders.length - 1; i >= 0; i--) {
+                subTotal += this.orders[i].computeSubTotal();
+            }
+            return subTotal;
+        }
     }
 
     return {
         saveShoppingCart: function(){
-            console.log(shoppingCart);
             return StorageService.save(shoppingCart);
         },
         loadShoppingCart: function(){
             /*
             * Load any data stored
             * then check if some shopping cart was already created
-            * if not create a new one or load the previews one
+            * if not create a new one and save it or load the previews one
             * and finally return the loaded/created shopping cart
             * */
             var lastShoppingCart = StorageService.load();
-            if(angular.element.isEmptyObject(lastShoppingCart)){
+            if(!angular.isObject(lastShoppingCart)){
                 shoppingCart = new ShoppingCart();
-            } else {
-                shoppingCart = new ShoppingCart(lastShoppingCart.customer, lastShoppingCart.orders)
+                this.saveShoppingCart();
+            } else if (angular.isUndefined(shoppingCart)){
+                if (!angular.element.isEmptyObject(lastShoppingCart)) {
+                    shoppingCart = new ShoppingCart(lastShoppingCart.customer, lastShoppingCart.orders);
+                }
             }
             return shoppingCart;
+        },
+        removeOrder: function (pOrderId) {
+            shoppingCart.removeOrder(pOrderId);
+            this.saveShoppingCart();
         },
         setActualOrder: function(pActualOrder){
             actualOrder = pActualOrder;

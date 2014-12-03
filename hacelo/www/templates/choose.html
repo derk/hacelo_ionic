@@ -1,28 +1,30 @@
 <ion-view title="FOTOS" class="photo-pick-page">
-	<ion-nav-bar class="grey bar-stable" animation="slide-left-right">  
-      <ion-nav-back-button class="button-clear">
-        <div class="arrow"> ATRAS </div>
-      </ion-nav-back-button>
-      <h1 class="title">FOTOS</h1> 
+    <ion-nav-bar class="grey bar-stable" animation="slide-left-right">
+        <ion-nav-back-button class="button-clear">
+            <div class="arrow"> ATRAS</div>
+        </ion-nav-back-button>
+        <h1 class="title">FOTOS</h1>
+        <ion-nav-buttons side="right">
+            <a class="button button-icon icon ion-forward" href="#/app/check" ng-class="{'positive':imageStack.length>0, 'disabled':imageStack.length==0}"></a>
+        </ion-nav-buttons>
     </ion-nav-bar>
-	<!--ion-nav-buttons side="right">
-		<a class="button button-icon icon ion-forward" href="#/app/check"></a>
-	</ion-nav-buttons--> 
-	<ion-content class="has-header">
-		<div class="photo-pick-container">
-			<a class="button-picker" href="#/app/instagram">Instagram</a>
-			<a class="button-picker" ng-click="phoneImageLoad()">Albums</a>
-		</div>
-		<div class="photos">
-			<div class="images-container">
-				<div class="image" ng-repeat="image in imageStack | filter:{origin:'phone'} track by $index" ng-init="thumbnail = image.images.thumbnail">
-					<div class="image-inner" ng-class="{'positive-bg': image.toPrint}">
-						<a href="javascript:void(0);" ng-click="image.toPrint = !image.toPrint">
-							<img ng-src="{{thumbnail.url}}" width="{{thumbnail.width}}" height="{{thumbnail.height}}" alt="Photo">
-						</a>
-					</div>
-				</div>
-			</div>
-		</div>
-	</ion-content>
+    <ion-content class="has-header">
+        <div class="photo-pick-container">
+            <a class="button-picker" href="#/app/instagram">Instagram</a>
+            <a class="button-picker" ng-click="phoneImageLoad()">Albums</a>
+        </div>
+        <div class="photos">
+            <div class="images-container">
+                <div class="image" ng-repeat="image in imageStack | filter:{origin:'phone'} track by $index"
+                     ng-init="thumbnail = image.images.thumbnail">
+                    <div class="image-inner" ng-class="{'positive-bg': image.toPrint}">
+                        <a ng-click="image.toPrint = !image.toPrint">
+                            <img ng-src="{{thumbnail.url}}" width="{{thumbnail.width}}" height="{{thumbnail.height}}"
+                                 alt="Photo">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ion-content>
 </ion-view>

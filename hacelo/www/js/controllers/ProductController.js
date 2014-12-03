@@ -1,5 +1,8 @@
-controllers.controller('productCrtl', function($scope, $state, SelectedImagesFactory, PhotoPrintConfig) {
+controllers.controller('landingCtrl', function($scope, ShoppingCartFactory) {
+	$scope.cart = ShoppingCartFactory.loadShoppingCart();
+});
 
+controllers.controller('productCrtl', function($scope, $state, SelectedImagesFactory, PhotoPrintConfig) {
 	$scope.productLines = PhotoPrintConfig.products;
 
 	$scope.saveProductLine = function(pProductLine) {
@@ -19,11 +22,6 @@ controllers.controller('categoryCrtl', function($scope, $state, SelectedImagesFa
 
 controllers.controller('photoCrtl', function($scope, SelectedImagesFactory, PhotoPrintConfig) {
 	$scope.product = SelectedImagesFactory.getProduct();
-});
-
-
-controllers.controller('landingCtrl', function($scope, StorageService,ShoppingCartFactory) {
-	$scope.market = StorageService.load();
 });
 
 controllers.controller('processingCtrl', function($scope, $sce, StorageService) {
