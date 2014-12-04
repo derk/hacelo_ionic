@@ -6,11 +6,9 @@
 	</ion-nav-bar>
     <ion-content class="has-header">
         <div class="category-container">
-			<slick slides-to-show="1" slides-to-scroll="1" infinite="true" dots="true" arrows="false">
-	    		<div ng-repeat="product in productLine.products" class="photo">
-	                <div><a class="button button-balanced" ng-click="saveProduct(product)">{{product.name}}</a></div>
-	            </div>
-	    	</slick>
+    		<div ng-repeat="product in productLine.products" class="photo">
+                <div><a class="button button-balanced" ng-click="saveProduct(product)">{{product.name}}</a></div>
+            </div>
         </div>
     </ion-content>
 </ion-view>

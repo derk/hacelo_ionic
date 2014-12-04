@@ -169,6 +169,28 @@ body{
             color: #FFF;
         }
     }
+    &.info{
+        background-color: #fff;
+        height: 44px;
+        &.bar-stable {
+            .exit{
+                font-size: 2.1em;
+                text-decoration: none;
+                width: 25px;
+                height: 25px;
+                position: absolute;
+                display: block;
+                top: 12px;
+                left: 20px;
+                color: $green;
+            }
+            .title{
+                color: $green;
+                font-weight: bold;   
+            }
+            
+        }
+    }
 }
 
 .available-true {
@@ -295,7 +317,8 @@ body{
     .photo-container{
         .photo-cover {
             background: url('../img/bg-fotos.jpg') no-repeat center center;
-            height: 190px;
+            height: 220px;
+            width: 100%;
         }
         .cover {
             color:white;
@@ -448,10 +471,10 @@ body{
                 white-space: normal;
                 &.center{
                     text-align: center;
-                    font-weight: bold;
                 }
                 &.question{
                     color: $green;
+                    font-size: 16pt;
                 }
                 &.answer{
                     margin-bottom: 12%;
