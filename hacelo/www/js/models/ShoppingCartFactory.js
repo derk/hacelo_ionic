@@ -1,7 +1,7 @@
 /**
  * Created by joseph on 29/11/2014.
  */
-models.factory('ShoppingCartFactory', ['StorageService', function (StorageService) {
+models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', function (StorageService, ImageFactory) {
     var shoppingCart,
         actualOrder;
 
@@ -23,6 +23,11 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
             }
             return id;
         };
+        var restoreImages = function () {
+            for (var i = 0; i < pItems.length; i++) {
+                self.items.push(ImageFactory.restoreImage(pItems[i]));
+            }
+        };
 
         // ---
         // PUBLIC ATTRIBUTES.
@@ -30,15 +35,16 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
         this.id = makeId();
         this.productLine = pProductLine;
         this.product = pProduct;
-        this.items = pItems;
+        this.items = [];
+        restoreImages(); // ensure that every object loaded has their correct instance
 
         // ---
         // PUBLIC METHODS.
         // ---
         this.getQuantity = function () {
             var numberOfItems = 0;
-            for (var i = self.items.length - 1; i >= 0; i--) {
-                numberOfItems += self.items[i].quantity;
+            for (var i = this.items.length - 1; i >= 0; i--) {
+                numberOfItems += this.items[i].quantity;
             }
             return numberOfItems;
         };
@@ -62,9 +68,23 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
 
     function ShoppingCart(pCustomer, pOrders) {
         // ---
+        // PRIVATE ATTRIBUTES.
+        // ---
+        var self = this;
+        // ---
+        // PRIVATE METHODS.
+        // ---
+        var restoreOrders = function () {
+            if(angular.isDefined(pOrders)){
+                for (var i = 0, j = pOrders.length; i < j; i++) {
+                    self.orders.push(new Order(pOrders[i].productLine, pOrders[i].product, pOrders[i].items));
+                }
+            }
+        }
+        // ---
         // PUBLIC ATTRIBUTES.
         // ---
-        this.customer = pCustomer || {
+        this.customer = (angular.isObject(pCustomer))? pCustomer : {
             name: "",
             firstName: "",
             secondSurname: "",
@@ -76,11 +96,7 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
             }
         };
         this.orders = [];
-        if(angular.isDefined(pOrders)){
-            for (var i = 0, j = pOrders.length; i < j; i++) {
-                this.orders.push(new Order(pOrders[i].productLine, pOrders[i].product, pOrders[i].items));
-            }
-        }
+        restoreOrders(); // ensure that every object loaded has their correct instance
 
         // ---
         // PUBLIC METHODS.
@@ -123,12 +139,14 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
             * if not create a new one and save it or load the previews one
             * and finally return the loaded/created shopping cart
             * */
-            var lastShoppingCart = StorageService.load();
-            if(!angular.isObject(lastShoppingCart)){
-                shoppingCart = new ShoppingCart();
-                this.saveShoppingCart();
-            } else if (angular.isUndefined(shoppingCart)){
-                if (!angular.element.isEmptyObject(lastShoppingCart)) {
+            var lastShoppingCart;
+
+            if (angular.isUndefined(shoppingCart)) {
+                lastShoppingCart = StorageService.load();
+                if(!angular.isObject(lastShoppingCart)){
+                    shoppingCart = new ShoppingCart();
+                    this.saveShoppingCart();
+                } else {
                     shoppingCart = new ShoppingCart(lastShoppingCart.customer, lastShoppingCart.orders);
                 }
             }

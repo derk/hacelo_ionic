@@ -3,8 +3,14 @@
     </ion-nav-bar>
 
     <ion-content class="has-header">
-        <div class="cart-container">
-             <div ng-show="cart.orders.length>0" ng-hide="cart.orders.length===0">
+        <div class="cart-container" ng-switch="cart.orders.length">
+            <div ng-switch-when="0">
+                <div class="photo-cover no-cart-items"></div>
+                <a class="button button-balanced" href="#/app/products">SEGUIR COMPRANDO</a>
+
+                <h3 class="no-cart-items-title">PARECE QUE NO TIENES NADA EN TU CARRITO</h3>
+            </div>
+            <div ng-switch-default="">
                 <div class="photo-cover"></div>
                 <h3 class="subtotal">Ordenes</h3>
 
@@ -16,22 +22,18 @@
 
                 <!--span class="input-label">Cupón de Descuento</span>
                 <label class="item item-input">
-                    <input type="text" ng-model="">
-                    <span ng-class="" class="img valid"></span>
+                <input type="text" ng-model="">
+                <span ng-class="" class="img valid"></span>
                 </label>
                 <label class="item validate">
-                    <button ng-click="" class="button button-block button-positive" type="submit">Validar Descuento</button>
+                <button ng-click="" class="button button-block button-positive" type="submit">Validar Descuento</button>
                 </label-->
-            </div>
-            <div ng-show="cart.orders.length===0" ng-hide="cart.orders.length>0">
-                <div class="photo-cover no-cart-items"></div>
-                <a class="button button-balanced" href="#/app/products">SEGUIR COMPRANDO</a>
-                <h3 class="no-cart-items-title">PARECE QUE NO TIENES NADA EN TU CARRITO</h3>
             </div>
             <p class="subtotal">Subtotal<span>= {{cart.computeSubTotal() | currency:"&#8353;"}}</span></p>
         </div>
     </ion-content>
     <ion-footer-bar>
-        <a class="button button-balanced" href="#/app/cart-checkout" ng-class="{'disabled':cart.orders.length===0}">Pagar Ahora</a>
+        <a class="button button-balanced" href="#/app/cart-checkout" ng-class="{'disabled':cart.orders.length===0}">Pagar
+            Ahora</a>
     </ion-footer-bar>
 </ion-view>

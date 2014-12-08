@@ -10,15 +10,47 @@
 
             <p>Tocar cualquier foto para ajusar.</p>
 
-            <div class="singeImage" ng-repeat="image in images track by $index" ng-init="sResolution = image.images.standard_resolution">
-                <a ng-href="#/app/edit/{{$index}}"><img ng-src="{{sResolution.url}}" style="max-width: 100%;height: auto;"></a>
+            <div ng-switch="isLoading">
+                <!-- BEGIN: Loading View. -->
+                <p ng-switch-when="true">
+                    Sus imágenes se están cargando... {{ percentLoaded }}%
+                </p>
+                <!-- END: Loading View. -->
 
-                <div class="quantity-container" ng-init="quantity = image.quantity">
-                    <button ng-disabled="image.quantity==1" ng-click="image.quantity=image.quantity-1" class="minus">-</button>
-                    &times;{{image.quantity}}
-                    <button class="add" ng-click="image.quantity=image.quantity+1">+</button>
+                <!-- BEGIN: Results View. -->
+                <div ng-switch-when="false"
+                     ng-switch="isSuccessful">
+
+                    <div ng-switch-when="true">
+                        <div class="singeImage"
+                             ng-repeat="image in images"
+                             ng-init="sResolution = image.images.standard_resolution">
+
+                            <a ng-href="#/app/edit/{{$index}}">
+                                <img ng-src="{{sResolution.url}}"
+                                     style="max-width: 100%;height: auto;">
+                            </a>
+
+                            <div class="quantity-container"
+                                 ng-init="quantity = image.quantity">
+                                <button class="minus"
+                                        ng-disabled="image.quantity==1"
+                                        ng-click="image.quantity=image.quantity-1">-</button>
+                                &times;{{image.quantity}}
+                                <button class="add"
+                                        ng-click="image.quantity=image.quantity+1">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p ng-switch-when="false">
+                        <strong>Ups</strong>: Una de sus imágenes no se pudo cargar :(
+                    </p>
+
                 </div>
+                <!-- END: Results View. -->
             </div>
+
         </div>
     </ion-content>
 </ion-view>

@@ -966,16 +966,76 @@ commons.constant('PhotoPrintConfig', {
 /**
  * Created by joseph on 30/11/2014.
  */
-controllers.controller('cartCtrl', function($scope, ShoppingCartFactory) {
+controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', function($scope, $ionicPopup, Messages, ShoppingCartFactory) {
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
 
     $scope.removeOrder = function (pOrderToRemove) {
-        // es posible que luego tengamos que agregar un mensaje de confirmacion aca.
-        ShoppingCartFactory.removeOrder(pOrderToRemove.id);
+        var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_order_delete"),
+            confirmPopup = $ionicPopup.confirm(cache);
+
+        confirmPopup.then(function (res) {
+            if (res) {
+                ShoppingCartFactory.removeOrder(pOrderToRemove.id);
+            }
+        });
     };
-});
-controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "SelectedImagesFactory", "MessageService", function($scope, $state, $ionicPopup, SelectedImagesFactory, Messages) {
+}]);
+controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "SelectedImagesFactory", "MessageService", "PreloaderFactory", function($scope, $state, $ionicPopup, SelectedImagesFactory, Messages, preloader) {
     $scope.images = SelectedImagesFactory.getToPrintOnes();
+    // keep track of the state of the loading images.
+    $scope.isLoading = true;
+    $scope.isSuccessful = false;
+    $scope.percentLoaded = 0;
+
+    var getImageLocations = function () {
+        var images = $scope.images,
+            result = [];
+        for (var i = images.length - 1; i >= 0; i--) {
+            result.push(images[i].images.standard_resolution.url);
+        }
+
+        return result;
+    };
+
+    var preload = function () {
+        preloader.preloadImages( getImageLocations() ).then(
+            function handleResolve( imageLocations ) {
+
+                // Loading was successful.
+                $scope.isLoading = false;
+                $scope.isSuccessful = true;
+            },
+            function handleReject( imageLocation ) {
+
+                // Loading failed on at least one image.
+                $scope.isLoading = false;
+                $scope.isSuccessful = false;
+
+                console.error( "Image Failed", imageLocation );
+                console.info( "Preload Failure" );
+
+            },
+            function handleNotify( event ) {
+
+                // Update UI to show progress percentage
+                $scope.percentLoaded = event.percent;
+            }
+        );
+    };
+
+    var init = function () {
+        /*
+         * Ensure that every selected image have at least a quantity equals to one
+         * If the image has other quantity already jus preserve that value
+         * */
+        for (var i = $scope.images.length - 1; i >= 0; i--) {
+            if ($scope.images[i].quantity === 0) {
+                $scope.images[i].quantity = 1;
+            }
+        }
+
+        preload();
+    };
 
     /*
      * Se encarga de ingresar en el carrito de compras los datos que ya se encuentran 
@@ -994,18 +1054,7 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
         });
     };
 
-    /*
-    * Ensure that every selected image have at least a quantity equals to one
-    * If don't have other preview value
-    * */
-    var initQuantity = function(){
-        angular.forEach($scope.images, function(image){
-            if (image.quantity === 0) {
-                image.quantity = 1;
-            }
-        });
-    };
-    initQuantity();
+    init();
 }]);
 /**
  * Created by joseph on 30/11/2014.
@@ -1014,7 +1063,7 @@ controllers.controller('confirmCtrl', ['$scope', 'ShoppingCartFactory', 'Selecte
     var cart = ShoppingCartFactory.loadShoppingCart();
     $scope.actualOrder = ShoppingCartFactory.getActualOrder();
 
-    if(angular.isUndefined($scope.actualOrder)){
+    if(angular.isObject($scope.actualOrder) === false){
         var dummyOrder = cart.getDummyOrder(
             SelectedImagesFactory.getProductLine(),
             SelectedImagesFactory.getProduct(),
@@ -1024,10 +1073,17 @@ controllers.controller('confirmCtrl', ['$scope', 'ShoppingCartFactory', 'Selecte
     }
 
     $scope.addToCart = function(){
-        ShoppingCartFactory.setActualOrder($scope.actualOrder);
         cart.addOrder($scope.actualOrder);
         ShoppingCartFactory.saveShoppingCart();
+        ShoppingCartFactory.setActualOrder(null); // remove already saved order
+        SelectedImagesFactory.clearSelection(); // remove already selected images as well the productLine and product
     };
+}]);
+/**
+ * Created by joseph on 07/12/2014.
+ */
+controllers.controller('congratsCtrl', ['clearSelection', function (clearSelection) {
+    clearSelection.clearSelection();
 }]);
 /* InfoCtrl Accordion List
  * $scope - Scope de la pantalla
@@ -1082,7 +1138,8 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
             });
         } else {
             for (var i = 0; i < j; i++) {
-                $scope.imageStack.push(new ImageFactory(filteredResponse[i].images));
+                var img = ImageFactory.getInstagramLoadedImg(filteredResponse[i].images);
+                $scope.imageStack.push(img);
             }
         }
     };
@@ -1155,7 +1212,7 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
         if(image.toPrint === true) {
             image.toPrint = false;
         } else {
-            if(PhotoSizeChecker.meetsMinimumRequirements(image)) {
+            if(PhotoSizeChecker.meetsMinimumRequirements(image, SelectedImagesFactory.getProduct())) {
                 image.toPrint = true;
             } else {
                 $ionicPopup.alert({
@@ -1216,17 +1273,18 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$ionicPopup', 'SelectedIma
 
     $scope.phoneImageLoad = function () {
         CordovaCameraService.getImage().then(function (result) {
-            (new ImageFactory(result)).phoneImageInit().then(function(result){
-                        if(PhotoSizeChecker.meetsMinimumRequirements(result)){
-                            $scope.imageStack.push(result);
-                        }else{
-                            $ionicPopup.alert({
-                                title: 'La imagen es muy pequenna',
-                                template: 'Lo sentimos :( la foto tiene que ser'+
-                                'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
-                                'una impresión de la más alta calidad.'
-                            });
-                        }
+            var img = ImageFactory.getPhoneLoadedImg(result);
+            img.imageInit().then(function(result){
+                if(PhotoSizeChecker.meetsMinimumRequirements(result, SelectedImagesFactory.getProduct())){
+                    $scope.imageStack.push(result);
+                } else {
+                    $ionicPopup.alert({
+                        title: 'La imagen es muy pequenna',
+                        template: 'Lo sentimos :( la foto tiene que ser'+
+                        'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
+                        'una impresión de la más alta calidad.'
+                    });
+                }
             });
         });
     };
@@ -1300,43 +1358,42 @@ directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $tim
     };
 }]);
 models.factory('ImageFactory', ['$q', function ($q) {
-    function ImageWrapper (source) {
-        this.origin = "phone";
-        this.images = source;
-        this.toPrint = false;
-        this.quantity = 0;
+    function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
+        this.origin = pOrigin;
+        this._originalSource = pOriginalSource;
+        this.images = pImages;
+        this.toPrint = pToPrint || false;
+        this.quantity = pQuantity || 0;
 
-        if (angular.isObject(source)) {
-            this.origin = "instagram";
-        } else if (angular.isString(source)) {
-            this._phoneSource = source;
-            this.toPrint = true;
-            this.deferred = $q.defer();
-            // most of this values cannot be filled without load the image
-            // So this values will be filled later when the image is loaded
-            this.images = {
-                "thumbnail": {
-                    "url": "",
-                    // the generated thumbnail will have this width
-                    "width": 150,
-                    "height": 0
-                },
-                "standard_resolution": {
-                    "url": source,
-                    "width": 0,
-                    "height": 0
-                }
-            }
-        }
+        return this;
     }
+    ImageWrapper.sources = {
+        INS: "instagram",
+        PHN: "phone"
+    };
 
-    ImageWrapper.prototype = {
-        constructor: ImageWrapper,
+// Class used as an abstraction of images loaded from phone gallery
+    function PhoneLoadedImg (uri) {
+        ImageWrapper.call(this, ImageWrapper.sources.PHN, uri, {}, true);
+        this.images.thumbnail = {
+            "url": "",
+            // the generated thumbnail will have this width
+            "width": 150,
+            "height": 0
+        };
+        this.images.standard_resolution = {
+            "url": uri,
+            "width": 0,
+            "height": 0
+        };
 
-        phoneImageInit: function(){
+        this._originalSource = uri;
+
+        this.imageInit = function(){
             var self = this,
-                imgs = this.images;
-            fabric.Image.fromURL(this._phoneSource, function(oImg) {
+                deferred = $q.defer();
+            fabric.Image.fromURL(this._originalSource, function(oImg) {
+                var imgs = self.images;
                 // Setting standard_resolution values
                 imgs.standard_resolution.width = oImg.getWidth();
                 imgs.standard_resolution.height = oImg.getHeight();
@@ -1345,14 +1402,44 @@ models.factory('ImageFactory', ['$q', function ($q) {
                 imgs.thumbnail.url = oImg.toDataURL({"format": "jpeg"});
                 imgs.thumbnail.height = oImg.getHeight();
                 // All done here. Now notify the controller with success response
-                self.deferred.resolve(self);
+                deferred.resolve(self);
             });
 
-            return this.deferred.promise;
+            return deferred.promise;
+        };
+    }
+// PhoneLoadedImg inherits from ImageWrapper
+    PhoneLoadedImg.prototype = new ImageWrapper();
+    PhoneLoadedImg.prototype.constructor = PhoneLoadedImg;
+
+// Class used as an abstraction of images loaded from Instagram
+    function InstagramLoadedImg (imagesObj) {
+        ImageWrapper.call(this, ImageWrapper.sources.INS, imagesObj, angular.copy(imagesObj,{}));
+    }
+// InstagramLoadedImg inherits from ImageWrapper
+    InstagramLoadedImg.prototype = new ImageWrapper();
+    InstagramLoadedImg.prototype.constructor = InstagramLoadedImg;
+
+    return {
+        getPhoneLoadedImg: function (pUri) {
+            return new PhoneLoadedImg(pUri);
+        },
+        getInstagramLoadedImg: function (pImagesObj) {
+            return new InstagramLoadedImg(pImagesObj);
+        },
+        restoreImage: function(pObj){
+            var restoredImage;
+            switch (pObj.origin) {
+                case ImageWrapper.sources.PHN:
+                    restoredImage = this.getPhoneLoadedImg(pObj._originalSource);
+                    break;
+                case ImageWrapper.sources.INS:
+                    restoredImage = this.getInstagramLoadedImg(pObj.images);
+                    break;
+            }
+            return restoredImage;
         }
     };
-
-    return ImageWrapper;
 }]);
 
 // I provide a utility class for preloading image objects.
@@ -1566,6 +1653,12 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         },
         getImagesAfterEdited: function(){
             return imagesAfterEdited;
+        },
+        clearSelection: function () {
+            selectedImages = [];
+            imagesAfterEdited = [];
+            productLine = {};
+            product = {};
         }
     };
 }]);
@@ -1573,7 +1666,7 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
 /**
  * Created by joseph on 29/11/2014.
  */
-models.factory('ShoppingCartFactory', ['StorageService', function (StorageService) {
+models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', function (StorageService, ImageFactory) {
     var shoppingCart,
         actualOrder;
 
@@ -1595,6 +1688,11 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
             }
             return id;
         };
+        var restoreImages = function () {
+            for (var i = 0; i < pItems.length; i++) {
+                self.items.push(ImageFactory.restoreImage(pItems[i]));
+            }
+        };
 
         // ---
         // PUBLIC ATTRIBUTES.
@@ -1602,15 +1700,16 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
         this.id = makeId();
         this.productLine = pProductLine;
         this.product = pProduct;
-        this.items = pItems;
+        this.items = [];
+        restoreImages(); // ensure that every object loaded has their correct instance
 
         // ---
         // PUBLIC METHODS.
         // ---
         this.getQuantity = function () {
             var numberOfItems = 0;
-            for (var i = self.items.length - 1; i >= 0; i--) {
-                numberOfItems += self.items[i].quantity;
+            for (var i = this.items.length - 1; i >= 0; i--) {
+                numberOfItems += this.items[i].quantity;
             }
             return numberOfItems;
         };
@@ -1634,9 +1733,23 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
 
     function ShoppingCart(pCustomer, pOrders) {
         // ---
+        // PRIVATE ATTRIBUTES.
+        // ---
+        var self = this;
+        // ---
+        // PRIVATE METHODS.
+        // ---
+        var restoreOrders = function () {
+            if(angular.isDefined(pOrders)){
+                for (var i = 0, j = pOrders.length; i < j; i++) {
+                    self.orders.push(new Order(pOrders[i].productLine, pOrders[i].product, pOrders[i].items));
+                }
+            }
+        }
+        // ---
         // PUBLIC ATTRIBUTES.
         // ---
-        this.customer = pCustomer || {
+        this.customer = (angular.isObject(pCustomer))? pCustomer : {
             name: "",
             firstName: "",
             secondSurname: "",
@@ -1648,11 +1761,7 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
             }
         };
         this.orders = [];
-        if(angular.isDefined(pOrders)){
-            for (var i = 0, j = pOrders.length; i < j; i++) {
-                this.orders.push(new Order(pOrders[i].productLine, pOrders[i].product, pOrders[i].items));
-            }
-        }
+        restoreOrders(); // ensure that every object loaded has their correct instance
 
         // ---
         // PUBLIC METHODS.
@@ -1695,12 +1804,14 @@ models.factory('ShoppingCartFactory', ['StorageService', function (StorageServic
             * if not create a new one and save it or load the previews one
             * and finally return the loaded/created shopping cart
             * */
-            var lastShoppingCart = StorageService.load();
-            if(!angular.isObject(lastShoppingCart)){
-                shoppingCart = new ShoppingCart();
-                this.saveShoppingCart();
-            } else if (angular.isUndefined(shoppingCart)){
-                if (!angular.element.isEmptyObject(lastShoppingCart)) {
+            var lastShoppingCart;
+
+            if (angular.isUndefined(shoppingCart)) {
+                lastShoppingCart = StorageService.load();
+                if(!angular.isObject(lastShoppingCart)){
+                    shoppingCart = new ShoppingCart();
+                    this.saveShoppingCart();
+                } else {
                     shoppingCart = new ShoppingCart(lastShoppingCart.customer, lastShoppingCart.orders);
                 }
             }
@@ -1968,9 +2079,8 @@ services.service('MessageService', ['$http', function ($http) {
 /**
  * Created by joseph on 24/11/2014.
  */
-services.service('PhotoSizeChecker', ['SelectedImagesFactory', function (SelectedImagesFactory) {
+services.service('PhotoSizeChecker', [function () {
     var self = this,
-        actualProduct,
         minimumSize,
         imageDimensions;
 
@@ -2005,10 +2115,9 @@ services.service('PhotoSizeChecker', ['SelectedImagesFactory', function (Selecte
         return orientation;
     };
 
-    this.meetsMinimumRequirements = function(ImageWrapper){
-        // update global variable
-        actualProduct = SelectedImagesFactory.getProduct();
-        minimumSize  = actualProduct.pixel_size.minimum;
+    this.meetsMinimumRequirements = function(ImageWrapper, pSelectedProduct){
+        // update local helper variables
+        minimumSize  = pSelectedProduct.pixel_size.minimum;
         imageDimensions = ImageWrapper.images.standard_resolution;
         // then decide if the provided image meets the minimum requirements
         return ( meetsArea() );

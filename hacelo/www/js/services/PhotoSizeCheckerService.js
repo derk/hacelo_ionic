@@ -1,9 +1,8 @@
 /**
  * Created by joseph on 24/11/2014.
  */
-services.service('PhotoSizeChecker', ['SelectedImagesFactory', function (SelectedImagesFactory) {
+services.service('PhotoSizeChecker', [function () {
     var self = this,
-        actualProduct,
         minimumSize,
         imageDimensions;
 
@@ -38,10 +37,9 @@ services.service('PhotoSizeChecker', ['SelectedImagesFactory', function (Selecte
         return orientation;
     };
 
-    this.meetsMinimumRequirements = function(ImageWrapper){
-        // update global variable
-        actualProduct = SelectedImagesFactory.getProduct();
-        minimumSize  = actualProduct.pixel_size.minimum;
+    this.meetsMinimumRequirements = function(ImageWrapper, pSelectedProduct){
+        // update local helper variables
+        minimumSize  = pSelectedProduct.pixel_size.minimum;
         imageDimensions = ImageWrapper.images.standard_resolution;
         // then decide if the provided image meets the minimum requirements
         return ( meetsArea() );

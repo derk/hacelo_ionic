@@ -4,18 +4,23 @@
     },
     "danger-msjs" : { 
         "instagram-related" : { 
-            "no-pics" : "No hay im genes la cuenta!",
+            "no-pics" : "No hay imï¿½genes la cuenta!",
             "no-user" : "El usuario no existe!",
             "user-denied-access" : { 
-                "title" : "­Ups! Algo va mal aqu1",
+                "title" : "ï¿½Ups! Algo va mal aqu1",
                 "template" : "Necesitamos de tu permiso para poder imprimir tus imagenes.",
                 "okText" : "Aceptar"
             }
         },
-        "incomplete-form" : "Por favor, completar los espacios!",
         "confirm_check_screen" : { 
             "title" : "Confirmar",
             "template" : "Estas seguro de utilizar estas fotos?",
+            "cancelText" : "Cancelar",
+            "okText" : "Aceptar"
+        },
+        "confirm_order_delete" : {
+            "title" : "Confirmar",
+            "template" : "Estas seguro de eliminar esta orden?",
             "cancelText" : "Cancelar",
             "okText" : "Aceptar"
         }

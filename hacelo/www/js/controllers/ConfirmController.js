@@ -5,7 +5,7 @@ controllers.controller('confirmCtrl', ['$scope', 'ShoppingCartFactory', 'Selecte
     var cart = ShoppingCartFactory.loadShoppingCart();
     $scope.actualOrder = ShoppingCartFactory.getActualOrder();
 
-    if(angular.isUndefined($scope.actualOrder)){
+    if(angular.isObject($scope.actualOrder) === false){
         var dummyOrder = cart.getDummyOrder(
             SelectedImagesFactory.getProductLine(),
             SelectedImagesFactory.getProduct(),
@@ -15,8 +15,9 @@ controllers.controller('confirmCtrl', ['$scope', 'ShoppingCartFactory', 'Selecte
     }
 
     $scope.addToCart = function(){
-        ShoppingCartFactory.setActualOrder($scope.actualOrder);
         cart.addOrder($scope.actualOrder);
         ShoppingCartFactory.saveShoppingCart();
+        ShoppingCartFactory.setActualOrder(null); // remove already saved order
+        SelectedImagesFactory.clearSelection(); // remove already selected images as well the productLine and product
     };
 }]);

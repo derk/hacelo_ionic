@@ -1,41 +1,40 @@
 models.factory('ImageFactory', ['$q', function ($q) {
-    function ImageWrapper (source) {
-        this.origin = "phone";
-        this.images = source;
-        this.toPrint = false;
-        this.quantity = 0;
+    function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
+        this.origin = pOrigin;
+        this._originalSource = pOriginalSource;
+        this.images = pImages;
+        this.toPrint = pToPrint || false;
+        this.quantity = pQuantity || 0;
 
-        if (angular.isObject(source)) {
-            this.origin = "instagram";
-        } else if (angular.isString(source)) {
-            this._phoneSource = source;
-            this.toPrint = true;
-            this.deferred = $q.defer();
-            // most of this values cannot be filled without load the image
-            // So this values will be filled later when the image is loaded
-            this.images = {
-                "thumbnail": {
-                    "url": "",
-                    // the generated thumbnail will have this width
-                    "width": 150,
-                    "height": 0
-                },
-                "standard_resolution": {
-                    "url": source,
-                    "width": 0,
-                    "height": 0
-                }
-            }
-        }
+        return this;
     }
+    ImageWrapper.sources = {
+        INS: "instagram",
+        PHN: "phone"
+    };
 
-    ImageWrapper.prototype = {
-        constructor: ImageWrapper,
+// Class used as an abstraction of images loaded from phone gallery
+    function PhoneLoadedImg (uri) {
+        ImageWrapper.call(this, ImageWrapper.sources.PHN, uri, {}, true);
+        this.images.thumbnail = {
+            "url": "",
+            // the generated thumbnail will have this width
+            "width": 150,
+            "height": 0
+        };
+        this.images.standard_resolution = {
+            "url": uri,
+            "width": 0,
+            "height": 0
+        };
 
-        phoneImageInit: function(){
+        this._originalSource = uri;
+
+        this.imageInit = function(){
             var self = this,
-                imgs = this.images;
-            fabric.Image.fromURL(this._phoneSource, function(oImg) {
+                deferred = $q.defer();
+            fabric.Image.fromURL(this._originalSource, function(oImg) {
+                var imgs = self.images;
                 // Setting standard_resolution values
                 imgs.standard_resolution.width = oImg.getWidth();
                 imgs.standard_resolution.height = oImg.getHeight();
@@ -44,12 +43,42 @@ models.factory('ImageFactory', ['$q', function ($q) {
                 imgs.thumbnail.url = oImg.toDataURL({"format": "jpeg"});
                 imgs.thumbnail.height = oImg.getHeight();
                 // All done here. Now notify the controller with success response
-                self.deferred.resolve(self);
+                deferred.resolve(self);
             });
 
-            return this.deferred.promise;
+            return deferred.promise;
+        };
+    }
+// PhoneLoadedImg inherits from ImageWrapper
+    PhoneLoadedImg.prototype = new ImageWrapper();
+    PhoneLoadedImg.prototype.constructor = PhoneLoadedImg;
+
+// Class used as an abstraction of images loaded from Instagram
+    function InstagramLoadedImg (imagesObj) {
+        ImageWrapper.call(this, ImageWrapper.sources.INS, imagesObj, angular.copy(imagesObj,{}));
+    }
+// InstagramLoadedImg inherits from ImageWrapper
+    InstagramLoadedImg.prototype = new ImageWrapper();
+    InstagramLoadedImg.prototype.constructor = InstagramLoadedImg;
+
+    return {
+        getPhoneLoadedImg: function (pUri) {
+            return new PhoneLoadedImg(pUri);
+        },
+        getInstagramLoadedImg: function (pImagesObj) {
+            return new InstagramLoadedImg(pImagesObj);
+        },
+        restoreImage: function(pObj){
+            var restoredImage;
+            switch (pObj.origin) {
+                case ImageWrapper.sources.PHN:
+                    restoredImage = this.getPhoneLoadedImg(pObj._originalSource);
+                    break;
+                case ImageWrapper.sources.INS:
+                    restoredImage = this.getInstagramLoadedImg(pObj.images);
+                    break;
+            }
+            return restoredImage;
         }
     };
-
-    return ImageWrapper;
 }]);

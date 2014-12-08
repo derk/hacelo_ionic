@@ -3,17 +3,18 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$ionicPopup', 'SelectedIma
 
     $scope.phoneImageLoad = function () {
         CordovaCameraService.getImage().then(function (result) {
-            (new ImageFactory(result)).phoneImageInit().then(function(result){
-                        if(PhotoSizeChecker.meetsMinimumRequirements(result)){
-                            $scope.imageStack.push(result);
-                        }else{
-                            $ionicPopup.alert({
-                                title: 'La imagen es muy pequenna',
-                                template: 'Lo sentimos :( la foto tiene que ser'+
-                                'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
-                                'una impresión de la más alta calidad.'
-                            });
-                        }
+            var img = ImageFactory.getPhoneLoadedImg(result);
+            img.imageInit().then(function(result){
+                if(PhotoSizeChecker.meetsMinimumRequirements(result, SelectedImagesFactory.getProduct())){
+                    $scope.imageStack.push(result);
+                } else {
+                    $ionicPopup.alert({
+                        title: 'La imagen es muy pequenna',
+                        template: 'Lo sentimos :( la foto tiene que ser'+
+                        'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
+                        'una impresión de la más alta calidad.'
+                    });
+                }
             });
         });
     };

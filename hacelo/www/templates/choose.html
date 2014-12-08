@@ -5,7 +5,7 @@
         </ion-nav-back-button>
         <h1 class="title">FOTOS</h1>
         <ion-nav-buttons side="right">
-            <a class="button button-icon icon ion-forward" href="#/app/check" ng-class="{'positive':imageStack.length>0, 'disabled':imageStack.length==0}"></a>
+            <a class="button button-icon icon ion-forward positive" href="#/app/check" ng-show="imageStack.length>0" ng-hide="imageStack.length===0"></a>
         </ion-nav-buttons>
     </ion-nav-bar>
     <ion-content class="has-header">
@@ -15,14 +15,17 @@
         </div>
         <div class="photos">
             <div class="images-container">
-                <div class="image" ng-repeat="image in imageStack | filter:{origin:'phone'} track by $index"
-                     ng-init="thumbnail = image.images.thumbnail">
-                    <div class="image-inner" ng-class="{'positive-bg': image.toPrint}">
-                        <a ng-click="image.toPrint = !image.toPrint">
-                            <img ng-src="{{thumbnail.url}}" width="{{thumbnail.width}}" height="{{thumbnail.height}}"
-                                 alt="Photo">
-                        </a>
-                    </div>
+                <div class="image"
+                     ng-repeat="image in imageStack | filter:{origin:'phone'}"
+                     ng-init="mini = image.images.thumbnail"
+                     ng-class="{selected: image.toPrint}">
+                    <a ng-click="image.toPrint = !image.toPrint">
+                        <i class="icon ion-checkmark-circled"></i>
+                        <img ng-src="{{mini.url}}"
+                             width="{{mini.width}}"
+                             height="{{mini.height}}"
+                             alt="Photo">
+                    </a>
                 </div>
             </div>
         </div>

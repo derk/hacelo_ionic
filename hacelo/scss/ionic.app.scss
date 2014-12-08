@@ -1,4 +1,20 @@
 /*
+
+
+
+    LUIS O RAIAM:
+    No se quien fue el cochino que metio slick asi a lo cerdo
+    slick tiene una version SASS platano!
+    se vale hacer @import playo, no estamos escribiendo css puro.
+    Si asi es el codigo que hace no quiero saber como se baña.
+
+    Yo ya meti el archivo sass pero se despedaza la app
+    como hiso los cambios directo en el css.
+    actualize el archivo sass y descomente la linea 67 de este file si quiere.
+
+    Metan CUALQUIER libreria externa en la carpeta www/lib 
+
+
 To customize the look and feel of Ionic, you can override the variables
 in ionic's _variables.scss file.
 
@@ -45,6 +61,10 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
+
+
+$slick-font-path: "../lib/slick/fonts/";
+//@import "slick";
 
 /* 
    =============  General Styles  ============= 
@@ -374,56 +394,39 @@ body{
 }
 
 .photo-pick-page {
-    div.imagen {
-        width: 25%;
-        float:left;
+
+    .images-container {
+        overflow: auto;
+    }
+
+    .image {
+        float: left;
+        max-width: 33.3333%;
         position: relative;
-        box-sizing:border-box;
-        &.true {
-            border: 5px solid red;
-        }
+        text-align: center;
+
         img {
-            width: 100%;
+            max-width: 100%;
+            height: auto;
         }
-        .pick-img {
+
+        .icon {
+            color: rgba(201, 201, 201, .7);
+            font-size: 3em;
             position: absolute;
-            right: 0;
-            width: 30%;
-            height: 30%;
-            background: url("http://www.prudentialvanlines.com/moving-services/images/checkmark.png");
-            background-size: 100% 100%;
-            outline: none;
-            border: 0;
+            right: 5%;
+            top: 5%;
         }
-    }
-}
-.instagram-page {
-    .instagram-container {
-        div.imagen {
-            width: 33.3%;
-            float:left;
-            position: relative;
-            box-sizing:border-box;
-            &.true {
-                border: 5px solid red;
-            }
-            img {
-                width: 100%;
-                float:left;
-            }
-            .pick-img {
-                position: absolute;
-                right: 0;
-                width: 30%;
-                height: 30%;
-                background: url("http://www.prudentialvanlines.com/moving-services/images/checkmark.png");
-                background-size: 100% 100%;
-                outline: none;
-                border: 0;
+
+        &.selected {
+
+            .icon {
+                color: $orange;
             }
         }
     }
 }
+
 .index-page, .products-page, .photo-page {
     .scroll {
         height: 100%;

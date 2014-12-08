@@ -43,6 +43,12 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         },
         getImagesAfterEdited: function(){
             return imagesAfterEdited;
+        },
+        clearSelection: function () {
+            selectedImages = [];
+            imagesAfterEdited = [];
+            productLine = {};
+            product = {};
         }
     };
 }]);
