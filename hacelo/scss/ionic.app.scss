@@ -213,6 +213,15 @@ body{
     }
 }
 
+.btn-container-short{
+    text-align: center;
+    .btn-short{
+        padding-left: 10px;
+        padding-right: 10px;
+        display: inline-block;
+    }
+}
+
 .available-true {
     visibility: hidden;
 }
@@ -303,9 +312,8 @@ body{
                 padding: 20% 0;
                 text-align: center;
                 a {
-                    padding: 3% 0;
-                    border: 1px solid #000;
-                    width: 80%;
+                    //border: 1px solid #000;
+                    line-height: 47px;
                 }
             }
         }
@@ -320,9 +328,7 @@ body{
                 padding: 20% 0;
                 text-align: center;
                 a {
-                    padding: 3% 0;
-                    border: 1px solid #000;
-                    width: 80%;
+                    //border: 1px solid #000;
                 }
             }
         }
@@ -453,6 +459,7 @@ body{
             border: 2px solid #FFF;
             font-size: 1.2em;
             font-weight: bold;
+            
             &.activated, &.active{
                 background: $darkerGreen;
             }
@@ -502,40 +509,51 @@ body{
                     margin-bottom: 5%;
                 }
             }
-            .item-stable{
-                line-height: 5px;
+            .btn-container-short{
                 text-align: center;
-                font-size: 1em;
-                margin-bottom: 3%;
+                .envio{
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    display: inline-block;
+                    line-height: 5px;
+                    text-align: center;
+                    font-size: 1em;
+                    margin-bottom: 3%;
+                }
             }
-            a{
-                &.share{
-                    width: 80px;
-                    height: 80px;
-                    background: url('../img/share-sprite-smaller.png');
-                    background-position: 0 80px; 
-                    display: block;
-                    margin: 3%;
-                    border-radius: 50%;
-                    float: left;
-                    &:hover{
-                        background-position: 0 0; 
+            .social-btns{
+                width: 294px;
+                margin: auto;
+                padding: 4% 0;
+                a{
+                    &.share{
+                        width: 80px;
+                        height: 80px;
+                        background: url('../img/share-sprite-smaller.png');
+                        background-position: 0 80px; 
+                        display: block;
+                        margin: 3%;
+                        border-radius: 50%;
+                        float: left;
+                        &:hover{
+                            background-position: 0 0; 
+                        }
+                    }
+                    &.twitter{
+                        background-position: -80px 80px;
+                        &:hover{
+                            background-position: -80px 0; 
+                        }
+                    }
+                    &.email{
+                        background-position: -160px 80px;
+                        &:hover{
+                            background-position: -160px 0; 
+                        }
                     }
                 }
-                &.twitter{
-                    background-position: -80px 80px;
-                    &:hover{
-                        background-position: -80px 0; 
-                    }
-                }
-                &.email{
-                    background-position: -160px 80px;
-                    &:hover{
-                        background-position: -160px 0; 
-                    }
-                }
-
             }
+            
             .item-input{
                 border-radius: 4px;
                 margin-top: 5%;
@@ -562,6 +580,7 @@ body{
                 font-weight: bold;
             }
         }//item-accordion
+
         &.item-accordion.ng-hide{
             line-height: 0px;
             opacity: 0;
@@ -621,7 +640,7 @@ body{
         text-align: center;
         color: #FFF;
         h3:first-child {
-            font-size: 1.2em;
+            font-size: 18pt;
             margin: 15% 0 25% 0;
             color: #FFF;
         }
