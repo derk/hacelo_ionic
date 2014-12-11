@@ -1,12 +1,17 @@
 <ion-view title="CONFIRMAR" class="confirm-page" >
-	
+	<ion-nav-bar class="grey bar-stable" animation="slide-left-right">  
+      <ion-nav-back-button class="button-clear">
+        <div class="arrow"> ATRAS </div>
+      </ion-nav-back-button>
+    </ion-nav-bar>
   	<ion-content class="has-header">
     	<div class="confirm-container">
-    		<img class="photo" src="../www/img/bg-fotos.jpg" alt="">
-			<h2>fotos</h2>
+    		<div class="photo-cover"></div>
+			<h2>{{actualOrder.productLine.name}}<br/>{{actualOrder.product.name}}</h2>
 			<p>Quieres ordenar</p>
-			<p>{{order.quantity}} fotos <span>= &#8353;{{order.price}}.00</span></p>
+			<p>{{actualOrder.items.length}} fotos <span>= {{actualOrder.computeSubTotal() | currency:"&#8353;"}}</span></p>
 			<a class="button button-balanced" ng-click="addToCart()" href="#/app/added">Añadir a Carrito</a>
 		</div>
+		
   	</ion-content>
 </ion-view>

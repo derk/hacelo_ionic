@@ -1,11 +1,15 @@
-<ion-view title="added" class="added-page" >
-	
+<ion-view title="AGREGADO" class="added-page" >
+	  <ion-nav-bar class="grey bar-stable" animation="slide-left-right">  
+      <ion-nav-back-button class="button-clear">
+        <div class="arrow"> ATRAS </div>
+      </ion-nav-back-button>
+    </ion-nav-bar>
   	<ion-content class="has-header added-cart">
     	<div class="added-cart-container">
     		<h3>¡EXITO!</h3>
     		<img class="car" src="../www/img/car-icon-small.png" alt="">
-			<p class="msj">Fotos ha sido agregado a su carrito</p>
-    		<a class="button button-light" href="#/app/products">Seguir comprando</a>
+			<p class="msj">{{actualOrder.productLine.name}} ha sido agregado a su carrito</p>
+    	<a class="button button-light" href="#/app/products">Seguir comprando</a>
 			<a class="button button-balanced" href="#/app/cart">Ver Carrito</a>
 		</div>
   	</ion-content>

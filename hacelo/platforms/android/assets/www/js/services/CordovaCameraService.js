@@ -1,4 +1,4 @@
-services.service('CordovaCameraService', ['$window','$q','ImageFactory','MessageService','$ionicPopup', function ($window,$q,ImageFactory,MessageService,$ionicPopup) {
+services.service('CordovaCameraService', ['$window','$q', function ($window,$q) {
     var cam,
         cameraOptions,
         init = function() {
@@ -29,4 +29,4 @@ services.service('CordovaCameraService', ['$window','$q','ImageFactory','Message
 
     // wait until the device is ready to setup everything
     ionic.Platform.ready(init);
-}])
+}]);

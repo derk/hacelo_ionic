@@ -1,70 +1,58 @@
-controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "$timeout", "SelectedImagesFactory", "MessageService", "Market", function($scope, $state, $ionicPopup, $timeout, SelectedImages, Messages, Market) {
-    $scope.images = SelectedImages.getToPrintOnes();
-    $scope.dkrm;
+controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "SelectedImagesFactory", "MessageService", "PreloaderFactory", function($scope, $state, $ionicPopup, SelectedImagesFactory, Messages, preloader) {
+    $scope.images = SelectedImagesFactory.getToPrintOnes();
+    // keep track of the state of the loading images.
+    $scope.isLoading = true;
+    $scope.isSuccessful = false;
+    $scope.percentLoaded = 0;
 
-    /*
-     * Esta es la funcion de crop que se encarga de llamar a la ventana de 
-     * cropeo, donde se abrira un popup para que se pueda seleccionar el 
-     * area de cropeo.
-     * */
-    $scope.crop = function ($index) {
-        $scope.showPopup($index);
+    var getImageLocations = function () {
+        var images = $scope.images,
+            result = [];
+        for (var i = images.length - 1; i >= 0; i--) {
+            result.push(images[i].images.standard_resolution.url);
+        }
+
+        return result;
     };
 
+    var preload = function () {
+        preloader.preloadImages( getImageLocations() ).then(
+            function handleResolve( imageLocations ) {
 
-    /*
-     * Se encarga de abrir el popup con la informacion, 
-     * recibe un indice, el cual corresponde al indice del array
-     * donde obtendra la imagen seleccionada
-     * Ademas tiene un template y opciones determinada a escoger.
-     * */
-    $scope.showPopup = function ($index) {
-        $scope.data = {};
-        $scope.img = $scope.images[$index].images.standard_resolution;
-
-        var cropPopup = $ionicPopup.show({
-
-            template: ' <img id="cropArea" src="{{img.url}}" alt="$index">',
-            title: 'Cortar la Fotografía',
-            subTitle: 'Selecciona el area a cortar',
-            scope: $scope,
-            buttons: [
-                {text: 'Cancelar'},
-                {text: '<b>Save</b>',
-                 type: 'button-positive',
-                 onTap: function (e) {
-                     $scope.images[$index].images.standard_resolution.url = $scope.dkrm.snapshotImage();
-                    cropPopup.close();
-                 }
-                }]
-        });
-
-        $timeout(function () {
-            $scope.executeCrop();
-        }, 100);
-    };
-
-    /*
-     * Se llama para mantener un area de cropeo por default
-     * el cual sera las esquinas de la imagen, ademas se le asigna
-     * el valor a la variable de scope dkrm, donde se podra acceder desde el boton 
-     * de tap del modal.
-     * */
-    $scope.executeCrop = function () {
-        $scope.dkrm = new Darkroom('#cropArea', {
-            minWidth: 100,
-            minHeight: 100,
-            maxWidth: 650,
-            maxHeight: 500,
-            plugins: {
-                crop: {quickCropKey: 67}
+                // Loading was successful.
+                $scope.isLoading = false;
+                $scope.isSuccessful = true;
             },
+            function handleReject( imageLocation ) {
 
-            init: function () {
-                var cropPlugin = this.getPlugin('crop');
-                cropPlugin.selectZone(170, 25, 300, 300);
+                // Loading failed on at least one image.
+                $scope.isLoading = false;
+                $scope.isSuccessful = false;
+
+                console.error( "Image Failed", imageLocation );
+                console.info( "Preload Failure" );
+
+            },
+            function handleNotify( event ) {
+
+                // Update UI to show progress percentage
+                $scope.percentLoaded = event.percent;
             }
-        });
+        );
+    };
+
+    var init = function () {
+        /*
+         * Ensure that every selected image have at least a quantity equals to one
+         * If the image has other quantity already jus preserve that value
+         * */
+        for (var i = $scope.images.length - 1; i >= 0; i--) {
+            if ($scope.images[i].quantity === 0) {
+                $scope.images[i].quantity = 1;
+            }
+        }
+
+        preload();
     };
 
     /*
@@ -78,9 +66,11 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "$timeou
 
         confirmPopup.then(function (res) {
             if (res) {
-                Market.insert($scope.images);
+                SelectedImagesFactory.setImagesAfterEdited($scope.images);
                 $state.go("app.confirm");
             }
         });
     };
+
+    init();
 }]);

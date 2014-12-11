@@ -1,4 +1,9 @@
 <ion-view title="PROCESANDO ORDEN" class="processing-order-page" >
+  	<ion-nav-bar class="red bar-stable" animation="slide-left-right">  
+      <ion-nav-back-button class="button-clear">
+        <div class="arrow"> ATRAS </div>
+      </ion-nav-back-button>
+    </ion-nav-bar>
   	<ion-content class="has-header">
     	<div class="processing-order-container">
 			<div class="loading"></div>
@@ -12,7 +17,7 @@
 			<p class="disclaimer">
 				Por favor espere mientras subimos sus fotos y luego procesamos su pago, gracias.
 			</p>
-				<form action="https://grooveshark-c9-raiam1234.c9.io/workspace/public/nacion.php" method="post" >
+				<form action="{{api}}" method="post" >
 					<input type="text" name="data" value="mobileTest"/>
 					<input type="submit" value="Submit">
 					<div ng-repeat="photo in market.market">

@@ -2,9 +2,9 @@ angular.module('hacelo', [
     'ionic',
     'slick',
     'hacelo.config',
+    'hacelo.directives',
     'hacelo.models',
     'hacelo.controllers',
-    'hacelo.providers',
     'hacelo.services'
 ])
 
@@ -93,6 +93,15 @@ angular.module('hacelo', [
             }
         }
     })
+    .state('app.photoEdit', {
+        url: "/edit/:id",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/edit-photo.html",
+                controller: 'PhotoEditCtrl'
+            }
+        }
+    })
     .state('app.confirm', {
         url: "/confirm",
         views: {
@@ -106,7 +115,8 @@ angular.module('hacelo', [
         url: "/added",
         views: {
             'haceloContent': {
-                templateUrl: "templates/added-cart.html"
+                templateUrl: "templates/added-cart.html",
+                controller: "addedCtrl"
             }
         }
     })

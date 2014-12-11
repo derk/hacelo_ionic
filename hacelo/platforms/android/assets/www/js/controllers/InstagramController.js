@@ -32,7 +32,8 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
             });
         } else {
             for (var i = 0; i < j; i++) {
-                $scope.imageStack.push(new ImageFactory(filteredResponse[i].images));
+                var img = ImageFactory.getInstagramLoadedImg(filteredResponse[i].images);
+                $scope.imageStack.push(img);
             }
         }
     };
@@ -63,8 +64,8 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
         $state.go('app.choose');
     };
 
-    var havePreviousImages = function(){
-        return (SelectedImagesFactory.getInstagramOnes().length>0)?true:false;
+    var havePreviousImages = function () {
+        return (SelectedImagesFactory.getInstagramOnes().length > 0);
     };
 
     var authenticateInstagramUser = function (){
@@ -105,7 +106,7 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
         if(image.toPrint === true) {
             image.toPrint = false;
         } else {
-            if(PhotoSizeChecker.meetsMinimumRequirements(image)) {
+            if(PhotoSizeChecker.meetsMinimumRequirements(image, SelectedImagesFactory.getProduct())) {
                 image.toPrint = true;
             } else {
                 $ionicPopup.alert({

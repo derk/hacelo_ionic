@@ -1,5 +1,7 @@
 <ion-view title="HACELO DIGITAL" class="info-page" >
-	
+	<ion-nav-bar class="info bar-stable" animation="slide-left-right">  
+      <a class="exit" href="#/app/landing">X</a>
+    </ion-nav-bar>
   	<ion-content class="has-header">
     	<div class="info-container">
 			<ion-list>
@@ -42,10 +44,19 @@
 						<li>Recibirás un e-mail automatizado cuando tu orden salga para entrega.</li>
 						<li>No hay servicio de entrega en áreas peligrosas del país.</li>
 					</ul>
-					<ion-item class="item-stable envio">Sucursal Curridabat</ion-item>
-					<ion-item class="item-stable envio">Sucursal Desamparados</ion-item>
-					<ion-item class="item-stable envio">Sucursal Guadalupe</ion-item>
-					<ion-item class="item-stable envio">Sucursal Llorente</ion-item>
+					<div class="btn-container-short">
+						<ion-item class="item-stable btn-short envio">Sucursal Curridabat</ion-item>
+					</div>
+					<div class="btn-container-short">
+						<ion-item class="item-stable btn-short envio">Sucursal Desamparados</ion-item>
+					</div>
+					<div class="btn-container-short">
+						<ion-item class="item-stable btn-short envio">Sucursal Guadalupe</ion-item>
+					</div>
+					<div class="btn-container-short">
+						<ion-item class="item-stable btn-short envio">Sucursal Llorente</ion-item>
+					</div>
+					
 					<p class="center question">Sucursal San José</p>
 					<p>
 						Av. 1a., calles 3 y 5, contiguo al Cine Omni.<br>
@@ -67,14 +78,16 @@
 				<ion-item ng-model="share" class="item-stable" ng-click="toggleGroup('share')" ng-class="{active: isGroupShown('share')}">
 				Comparte
 				</ion-item>
-				<div class="item-accordion item" ng-show="isGroupShown('share')">
+				<div class="item-accordion item social-btns" ng-show="isGroupShown('share')">
 					<a href="#" class="share fb"></a>
 					<a href="#" class="share twitter"></a>
 					<a href="3" class="share email"></a>
 				</div>
-				<ion-item ng-model="contacto" class="item-stable" ng-click="toggleGroup('contacto')" ng-class="{active: isGroupShown('contacto')}">
-				Contactenos
-				</ion-item>
+				<div class="btn-container-short">
+					<ion-item ng-model="contacto" class="item-stable btn-short contact-item-info" ng-click="toggleGroup('contacto')" ng-class="{active: isGroupShown('contacto')}">
+					Contactenos
+					</ion-item>
+				</div>
 				<div class="item-accordion item" ng-show="isGroupShown('contacto')">
 					<label class="item item-input">
 						<input class="name" type="text" placeholder="nombre">

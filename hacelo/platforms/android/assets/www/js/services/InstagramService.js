@@ -15,12 +15,11 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
         return angular.isDefined(accessToken);
     };
 
-    var fetch = function (url, params) {
+    var fetch = function (url, options) {
         var prms = {
                 client_id: config.clientId,
                 callback: 'JSON_CALLBACK'
-            }
-            deferred = $q.defer();
+            };
         if (self.isAuthenticated()) {
             prms.access_token = accessToken;
         }
@@ -28,18 +27,9 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
                 url: config.apiUrl + url,
                 method: 'jsonp',
                 responseType: 'json',
-                params: angular.extend(prms, params)
+                params: angular.extend({}, prms, options)
             };
-
-        $http(cnfg).then(function(response){
-            lastInstagramLoad = response.data;
-            console.log(lastInstagramLoad);
-            deferred.resolve(response);
-        },function(response){
-            deferred.reject(response);
-        });
-
-        return deferred.promise;
+        return $http(cnfg);
     };
 
     var getUrlParameters = function (parameter, staticURL, decode) {
@@ -115,7 +105,6 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
 
     this.canLoadMore = function(){
         var can;
-        console.log(lastInstagramLoad);
         if(!self.hasLastInstagramLoad()){
             can = true;
         } else if (angular.isDefined(lastInstagramLoad.pagination)) {
@@ -131,24 +120,23 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
     };
 
     this.getRecentMedia = function() {
-        var prms = {};
+        var prms = {},
+            deferred = $q.defer();
 
-        if (self.hasLastInstagramLoad() && self.canLoadMore()) {
-            prms.max_tag_id = lastInstagramLoad.pagination.next_max_tag_id;
+        if (self.hasLastInstagramLoad()) {
+            if(self.canLoadMore()) {
+                prms.max_id = lastInstagramLoad.pagination.next_max_id;
+            }
         }
-        return fetch('users/self/media/recent', prms);
-    };
-
-    this.getCurrentUser = function() {
-        return fetch('users/self');
-    };
-
-    this.getRecientTagMedia = function() {
-        var prms = {};
-
-        if (self.hasLastInstagramLoad() && self.canLoadMore()) {
-            prms.max_tag_id = lastInstagramLoad.pagination.next_max_tag_id;
-        }
-        return fetch('tags/angularjs/media/recent',prms);
+        fetch('users/self/media/recent', prms).then(
+            function(response){
+                lastInstagramLoad = response.data;
+                deferred.resolve(response);
+            },
+            function(response){
+                deferred.reject(response);
+            }
+        );
+        return deferred.promise;
     };
 }]);
