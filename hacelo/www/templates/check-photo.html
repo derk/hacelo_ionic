@@ -1,7 +1,15 @@
 <ion-view title="REVISAR" class="check-page">
-    <ion-nav-buttons side="right">
-        <a ng-click="addToCart()" class="button button-icon icon ion-checkmark"></a>
-    </ion-nav-buttons>
+    <ion-nav-bar class="grey bar-stable" animation="slide-left-right">
+        <ion-nav-back-button class="button-clear">
+            <div class="arrow"> ATRAS</div>
+        </ion-nav-back-button>
+        <h1 class="title">REVISAR</h1>
+        <ion-nav-buttons side="right">
+            <a class="button button-icon accept-button positive" ng-click="addToCart()" >ACEPTAR</a>
+        </ion-nav-buttons>
+    </ion-nav-bar>
+
+
 
 
     <ion-content class="has-header">

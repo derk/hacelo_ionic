@@ -115,7 +115,8 @@ angular.module('hacelo', [
         url: "/added",
         views: {
             'haceloContent': {
-                templateUrl: "templates/added-cart.html"
+                templateUrl: "templates/added-cart.html",
+                controller: "addedCtrl"
             }
         }
     })

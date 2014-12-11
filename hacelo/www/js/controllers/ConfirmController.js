@@ -17,7 +17,6 @@ controllers.controller('confirmCtrl', ['$scope', 'ShoppingCartFactory', 'Selecte
     $scope.addToCart = function(){
         cart.addOrder($scope.actualOrder);
         ShoppingCartFactory.saveShoppingCart();
-        ShoppingCartFactory.setActualOrder(null); // remove already saved order
-        SelectedImagesFactory.clearSelection(); // remove already selected images as well the productLine and product
+        
     };
 }]);
