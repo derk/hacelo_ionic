@@ -34,23 +34,3 @@ controllers.controller('processingCtrl', function($scope, $sce, StorageService) 
     };
 
 });
-
-controllers.controller('addedCtrl', ['$scope', 'ShoppingCartFactory', 'SelectedImagesFactory', function ($scope, ShoppingCartFactory, SelectedImagesFactory) {
-    var cart = ShoppingCartFactory.loadShoppingCart();
-    $scope.actualOrder = ShoppingCartFactory.getActualOrder();
-
-    console.log($scope.actualOrder);
-
-    if(angular.isObject($scope.actualOrder) === false){
-        var dummyOrder = cart.getDummyOrder(
-            SelectedImagesFactory.getProductLine(),
-            SelectedImagesFactory.getProduct(),
-            SelectedImagesFactory.getImagesAfterEdited()
-        );
-        $scope.actualOrder = dummyOrder;
-    }
-    console.log($scope.actualOrder);
-
-    ShoppingCartFactory.setActualOrder(null); // remove already saved order
-    SelectedImagesFactory.clearSelection();
-}]);

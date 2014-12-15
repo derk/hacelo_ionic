@@ -4,7 +4,6 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
      * Also store the selected product with his parent product line
      */
     var selectedImages = [],
-        imagesAfterEdited = [],
         productLine = {},
         product = {};
 
@@ -38,15 +37,8 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         getProduct: function(){
             return product;
         },
-        setImagesAfterEdited: function(pImagesAfterEdited){
-            imagesAfterEdited = pImagesAfterEdited;
-        },
-        getImagesAfterEdited: function(){
-            return imagesAfterEdited;
-        },
         clearSelection: function () {
             selectedImages = [];
-            imagesAfterEdited = [];
             productLine = {};
             product = {};
         }

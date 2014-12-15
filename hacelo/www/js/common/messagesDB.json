@@ -23,6 +23,11 @@
             "template" : "Estas seguro de eliminar esta orden?",
             "cancelText" : "Cancelar",
             "okText" : "Aceptar"
+        },
+        "shopping_cart_full" : {
+            "title" : "Houston, tenemos un problema",
+            "template" : "Parece que tu carrito de compras esta completamente lleno. \n Intenta quitar algunos fotos o completar el proceso de compra de las que ya tienes seleccionadas.",
+            "okText" : "Aceptar"
         }
     }
 }

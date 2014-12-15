@@ -5,18 +5,8 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
     $scope.isSuccessful = false;
     $scope.percentLoaded = 0;
 
-    var getImageLocations = function () {
-        var images = $scope.images,
-            result = [];
-        for (var i = images.length - 1; i >= 0; i--) {
-            result.push(images[i].images.standard_resolution.url);
-        }
-
-        return result;
-    };
-
-    var preload = function () {
-        preloader.preloadImages( getImageLocations() ).then(
+    var preload = function (imageLocations) {
+        preloader.preloadImages( imageLocations ).then(
             function handleResolve( imageLocations ) {
 
                 // Loading was successful.
@@ -44,15 +34,19 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
     var init = function () {
         /*
          * Ensure that every selected image have at least a quantity equals to one
-         * If the image has other quantity already jus preserve that value
+         * If the image has other quantity already just preserve that value.
+         * Also create a new array of image locations (URLs) to be preloaded
          * */
-        for (var i = $scope.images.length - 1; i >= 0; i--) {
-            if ($scope.images[i].quantity === 0) {
-                $scope.images[i].quantity = 1;
-            }
+        var imageLocations = [];
+         for (var i = $scope.images.length - 1; i >= 0; i--) {
+             if ($scope.images[i].quantity === 0) {
+                 $scope.images[i].quantity = 1;
+             }
+
+             imageLocations.push($scope.images[i].images.standard_resolution.url);
         }
 
-        preload();
+        preload(imageLocations);
     };
 
     /*
@@ -66,7 +60,6 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
 
         confirmPopup.then(function (res) {
             if (res) {
-                SelectedImagesFactory.setImagesAfterEdited($scope.images);
                 $state.go("app.confirm");
             }
         });

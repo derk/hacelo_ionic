@@ -8,12 +8,15 @@ models.factory('ImageFactory', ['$q', function ($q) {
 
         return this;
     }
+    // ---
+    // STATIC ATTRIBUTES.
+    // ---
     ImageWrapper.sources = {
         INS: "instagram",
         PHN: "phone"
     };
 
-// Class used as an abstraction of images loaded from phone gallery
+    // Class used as an abstraction of images loaded from phone gallery
     function PhoneLoadedImg (uri) {
         ImageWrapper.call(this, ImageWrapper.sources.PHN, uri, {}, true);
         this.images.thumbnail = {
@@ -49,15 +52,13 @@ models.factory('ImageFactory', ['$q', function ($q) {
             return deferred.promise;
         };
     }
-// PhoneLoadedImg inherits from ImageWrapper
     PhoneLoadedImg.prototype = new ImageWrapper();
     PhoneLoadedImg.prototype.constructor = PhoneLoadedImg;
 
-// Class used as an abstraction of images loaded from Instagram
+    // Class used as an abstraction of images loaded from Instagram
     function InstagramLoadedImg (imagesObj) {
         ImageWrapper.call(this, ImageWrapper.sources.INS, imagesObj, angular.copy(imagesObj,{}));
     }
-// InstagramLoadedImg inherits from ImageWrapper
     InstagramLoadedImg.prototype = new ImageWrapper();
     InstagramLoadedImg.prototype.constructor = InstagramLoadedImg;
 
@@ -75,9 +76,12 @@ models.factory('ImageFactory', ['$q', function ($q) {
                     restoredImage = this.getPhoneLoadedImg(pObj._originalSource);
                     break;
                 case ImageWrapper.sources.INS:
-                    restoredImage = this.getInstagramLoadedImg(pObj.images);
+                    restoredImage = this.getInstagramLoadedImg(pObj._originalSource);
                     break;
             }
+            restoredImage.images = pObj.images;
+            restoredImage.toPrint = pObj.toPrint;
+            restoredImage.quantity = pObj.quantity;
             return restoredImage;
         }
     };

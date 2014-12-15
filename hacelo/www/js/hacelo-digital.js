@@ -964,6 +964,9 @@ commons.constant('PhotoPrintConfig', {
         }
     ]
 });
+controllers.controller('addedCtrl', ['$scope', '$stateParams', function ($scope, $stateParams) {
+    $scope.productName = $stateParams.productName;
+}]);
 /**
  * Created by joseph on 30/11/2014.
  */
@@ -988,18 +991,8 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
     $scope.isSuccessful = false;
     $scope.percentLoaded = 0;
 
-    var getImageLocations = function () {
-        var images = $scope.images,
-            result = [];
-        for (var i = images.length - 1; i >= 0; i--) {
-            result.push(images[i].images.standard_resolution.url);
-        }
-
-        return result;
-    };
-
-    var preload = function () {
-        preloader.preloadImages( getImageLocations() ).then(
+    var preload = function (imageLocations) {
+        preloader.preloadImages( imageLocations ).then(
             function handleResolve( imageLocations ) {
 
                 // Loading was successful.
@@ -1027,15 +1020,19 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
     var init = function () {
         /*
          * Ensure that every selected image have at least a quantity equals to one
-         * If the image has other quantity already jus preserve that value
+         * If the image has other quantity already just preserve that value.
+         * Also create a new array of image locations (URLs) to be preloaded
          * */
-        for (var i = $scope.images.length - 1; i >= 0; i--) {
-            if ($scope.images[i].quantity === 0) {
-                $scope.images[i].quantity = 1;
-            }
+        var imageLocations = [];
+         for (var i = $scope.images.length - 1; i >= 0; i--) {
+             if ($scope.images[i].quantity === 0) {
+                 $scope.images[i].quantity = 1;
+             }
+
+             imageLocations.push($scope.images[i].images.standard_resolution.url);
         }
 
-        preload();
+        preload(imageLocations);
     };
 
     /*
@@ -1049,7 +1046,6 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
 
         confirmPopup.then(function (res) {
             if (res) {
-                SelectedImagesFactory.setImagesAfterEdited($scope.images);
                 $state.go("app.confirm");
             }
         });
@@ -1060,23 +1056,38 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
 /**
  * Created by joseph on 30/11/2014.
  */
-controllers.controller('confirmCtrl', ['$scope', 'ShoppingCartFactory', 'SelectedImagesFactory', function ($scope, ShoppingCartFactory, SelectedImagesFactory) {
+controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', 'SelectedImagesFactory', function ($scope, $state, $ionicPopup, Messages, ShoppingCartFactory, SelectedImagesFactory) {
     var cart = ShoppingCartFactory.loadShoppingCart();
-    $scope.actualOrder = ShoppingCartFactory.getActualOrder();
-
-    if(angular.isObject($scope.actualOrder) === false){
-        var dummyOrder = cart.getDummyOrder(
-            SelectedImagesFactory.getProductLine(),
-            SelectedImagesFactory.getProduct(),
-            SelectedImagesFactory.getImagesAfterEdited()
-        );
-        $scope.actualOrder = dummyOrder;
+    /*
+     * Create a new order based on the selected: product line, product, and images
+     * */
+    if (angular.isObject($scope.actualOrder)){
+        $scope.actualOrder = null; // trash collector help
     }
 
+    $scope.actualOrder = cart.getDummyOrder(
+        SelectedImagesFactory.getProductLine(),
+        SelectedImagesFactory.getProduct(),
+        SelectedImagesFactory.getToPrintOnes()
+    );
+
     $scope.addToCart = function(){
+        // todo: revisar porque no se estan enviando los parametros por URL hacia el estado app.added
+        var stateParams = {
+                productName: SelectedImagesFactory.getProduct().name
+            },
+            cache;
+
         cart.addOrder($scope.actualOrder);
-        ShoppingCartFactory.saveShoppingCart();
-        
+
+        // Checking if the order was saved
+        if(ShoppingCartFactory.saveShoppingCart()) {
+            SelectedImagesFactory.clearSelection();
+            $state.go("app.added",stateParams);
+        } else {
+            var cache = angular.isDefined(cache) ? cache: Messages.search("shopping_cart_full");
+            $ionicPopup.alert(cache);
+        }
     };
 }]);
 /**
@@ -1326,26 +1337,6 @@ controllers.controller('processingCtrl', function($scope, $sce, StorageService) 
 
 });
 
-controllers.controller('addedCtrl', ['$scope', 'ShoppingCartFactory', 'SelectedImagesFactory', function ($scope, ShoppingCartFactory, SelectedImagesFactory) {
-    var cart = ShoppingCartFactory.loadShoppingCart();
-    $scope.actualOrder = ShoppingCartFactory.getActualOrder();
-
-    console.log($scope.actualOrder);
-
-    if(angular.isObject($scope.actualOrder) === false){
-        var dummyOrder = cart.getDummyOrder(
-            SelectedImagesFactory.getProductLine(),
-            SelectedImagesFactory.getProduct(),
-            SelectedImagesFactory.getImagesAfterEdited()
-        );
-        $scope.actualOrder = dummyOrder;
-    }
-    console.log($scope.actualOrder);
-
-    ShoppingCartFactory.setActualOrder(null); // remove already saved order
-    SelectedImagesFactory.clearSelection();
-}]);
-
 controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
     
     $scope.shareFb = function(){
@@ -1387,12 +1378,15 @@ models.factory('ImageFactory', ['$q', function ($q) {
 
         return this;
     }
+    // ---
+    // STATIC ATTRIBUTES.
+    // ---
     ImageWrapper.sources = {
         INS: "instagram",
         PHN: "phone"
     };
 
-// Class used as an abstraction of images loaded from phone gallery
+    // Class used as an abstraction of images loaded from phone gallery
     function PhoneLoadedImg (uri) {
         ImageWrapper.call(this, ImageWrapper.sources.PHN, uri, {}, true);
         this.images.thumbnail = {
@@ -1428,15 +1422,13 @@ models.factory('ImageFactory', ['$q', function ($q) {
             return deferred.promise;
         };
     }
-// PhoneLoadedImg inherits from ImageWrapper
     PhoneLoadedImg.prototype = new ImageWrapper();
     PhoneLoadedImg.prototype.constructor = PhoneLoadedImg;
 
-// Class used as an abstraction of images loaded from Instagram
+    // Class used as an abstraction of images loaded from Instagram
     function InstagramLoadedImg (imagesObj) {
         ImageWrapper.call(this, ImageWrapper.sources.INS, imagesObj, angular.copy(imagesObj,{}));
     }
-// InstagramLoadedImg inherits from ImageWrapper
     InstagramLoadedImg.prototype = new ImageWrapper();
     InstagramLoadedImg.prototype.constructor = InstagramLoadedImg;
 
@@ -1454,9 +1446,12 @@ models.factory('ImageFactory', ['$q', function ($q) {
                     restoredImage = this.getPhoneLoadedImg(pObj._originalSource);
                     break;
                 case ImageWrapper.sources.INS:
-                    restoredImage = this.getInstagramLoadedImg(pObj.images);
+                    restoredImage = this.getInstagramLoadedImg(pObj._originalSource);
                     break;
             }
+            restoredImage.images = pObj.images;
+            restoredImage.toPrint = pObj.toPrint;
+            restoredImage.quantity = pObj.quantity;
             return restoredImage;
         }
     };
@@ -1634,7 +1629,6 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
      * Also store the selected product with his parent product line
      */
     var selectedImages = [],
-        imagesAfterEdited = [],
         productLine = {},
         product = {};
 
@@ -1668,15 +1662,8 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         getProduct: function(){
             return product;
         },
-        setImagesAfterEdited: function(pImagesAfterEdited){
-            imagesAfterEdited = pImagesAfterEdited;
-        },
-        getImagesAfterEdited: function(){
-            return imagesAfterEdited;
-        },
         clearSelection: function () {
             selectedImages = [];
-            imagesAfterEdited = [];
             productLine = {};
             product = {};
         }
@@ -1687,14 +1674,15 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
  * Created by joseph on 29/11/2014.
  */
 models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', function (StorageService, ImageFactory) {
-    var shoppingCart,
-        actualOrder;
+    // ---
+    // PRIVATE ATTRIBUTES.
+    // ---
+    var shoppingCart;
 
+    // ---
+    // APPLICATION OBJECT MODELS
+    // ---
     function Order (pProductLine, pProduct, pItems){
-        // ---
-        // PRIVATE ATTRIBUTES.
-        // ---
-        var self = this;
         // ---
         // PRIVATE METHODS.
         // ---
@@ -1708,11 +1696,6 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             }
             return id;
         };
-        var restoreImages = function () {
-            for (var i = 0; i < pItems.length; i++) {
-                self.items.push(ImageFactory.restoreImage(pItems[i]));
-            }
-        };
 
         // ---
         // PUBLIC ATTRIBUTES.
@@ -1720,8 +1703,7 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
         this.id = makeId();
         this.productLine = pProductLine;
         this.product = pProduct;
-        this.items = [];
-        restoreImages(); // ensure that every object loaded has their correct instance
+        this.items = pItems;
 
         // ---
         // PUBLIC METHODS.
@@ -1753,20 +1735,6 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
 
     function ShoppingCart(pCustomer, pOrders) {
         // ---
-        // PRIVATE ATTRIBUTES.
-        // ---
-        var self = this;
-        // ---
-        // PRIVATE METHODS.
-        // ---
-        var restoreOrders = function () {
-            if(angular.isDefined(pOrders)){
-                for (var i = 0, j = pOrders.length; i < j; i++) {
-                    self.orders.push(new Order(pOrders[i].productLine, pOrders[i].product, pOrders[i].items));
-                }
-            }
-        }
-        // ---
         // PUBLIC ATTRIBUTES.
         // ---
         this.customer = (angular.isObject(pCustomer))? pCustomer : {
@@ -1780,14 +1748,14 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
                 district: ""
             }
         };
-        this.orders = [];
-        restoreOrders(); // ensure that every object loaded has their correct instance
+        this.orders = pOrders;
 
         // ---
         // PUBLIC METHODS.
         // ---
         this.addOrder = function(DummyOrder){
-            if((DummyOrder instanceof Order) === false) {return;}
+            if( (DummyOrder instanceof Order) === false ) {return;}
+
             this.orders.push(DummyOrder);
             return this.orders[this.orders.length-1];
         };
@@ -1813,6 +1781,35 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
         }
     }
 
+    // ---
+    // FACTORY HELPER METHODS.
+    // ---
+    var restoreImages = function (pImages2Restore) {
+        var restored = [];
+
+        for (var i = 0, j = pImages2Restore.length; i < j; i++) {
+            restored.push(ImageFactory.restoreImage(pImages2Restore[i]));
+        }
+
+        return restored;
+    };
+
+    var restoreOrders = function (pOrders2Restore) {
+        var restored = [];
+
+        for (var i = 0, j = pOrders2Restore.length; i < j; i++) {
+            restored.push(
+                new Order(
+                    pOrders2Restore[i].productLine,
+                    pOrders2Restore[i].product,
+                    restoreImages(pOrders2Restore[i].items)
+                )
+            );
+        }
+
+        return restored;
+    };
+
     return {
         saveShoppingCart: function(){
             return StorageService.save(shoppingCart);
@@ -1821,18 +1818,21 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             /*
             * Load any data stored
             * then check if some shopping cart was already created
-            * if not create a new one and save it or load the previews one
+            * if yes load it or create a new one and save it (for future usage)
             * and finally return the loaded/created shopping cart
             * */
-            var lastShoppingCart;
+            var lastShoppingCart,
+                restoredOrders;
 
             if (angular.isUndefined(shoppingCart)) {
                 lastShoppingCart = StorageService.load();
-                if(!angular.isObject(lastShoppingCart)){
+
+                if(angular.isObject(lastShoppingCart)){
+                    restoredOrders = restoreOrders(lastShoppingCart.orders);
+                    shoppingCart = new ShoppingCart(lastShoppingCart.customer, restoredOrders);
+                } else {
                     shoppingCart = new ShoppingCart();
                     this.saveShoppingCart();
-                } else {
-                    shoppingCart = new ShoppingCart(lastShoppingCart.customer, lastShoppingCart.orders);
                 }
             }
             return shoppingCart;
@@ -1840,12 +1840,6 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
         removeOrder: function (pOrderId) {
             shoppingCart.removeOrder(pOrderId);
             this.saveShoppingCart();
-        },
-        setActualOrder: function(pActualOrder){
-            actualOrder = pActualOrder;
-        },
-        getActualOrder: function(){
-            return actualOrder;
         }
     };
 }]);

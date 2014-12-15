@@ -2,14 +2,15 @@
  * Created by joseph on 29/11/2014.
  */
 models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', function (StorageService, ImageFactory) {
-    var shoppingCart,
-        actualOrder;
+    // ---
+    // PRIVATE ATTRIBUTES.
+    // ---
+    var shoppingCart;
 
+    // ---
+    // APPLICATION OBJECT MODELS
+    // ---
     function Order (pProductLine, pProduct, pItems){
-        // ---
-        // PRIVATE ATTRIBUTES.
-        // ---
-        var self = this;
         // ---
         // PRIVATE METHODS.
         // ---
@@ -23,11 +24,6 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             }
             return id;
         };
-        var restoreImages = function () {
-            for (var i = 0; i < pItems.length; i++) {
-                self.items.push(ImageFactory.restoreImage(pItems[i]));
-            }
-        };
 
         // ---
         // PUBLIC ATTRIBUTES.
@@ -35,8 +31,7 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
         this.id = makeId();
         this.productLine = pProductLine;
         this.product = pProduct;
-        this.items = [];
-        restoreImages(); // ensure that every object loaded has their correct instance
+        this.items = pItems;
 
         // ---
         // PUBLIC METHODS.
@@ -68,20 +63,6 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
 
     function ShoppingCart(pCustomer, pOrders) {
         // ---
-        // PRIVATE ATTRIBUTES.
-        // ---
-        var self = this;
-        // ---
-        // PRIVATE METHODS.
-        // ---
-        var restoreOrders = function () {
-            if(angular.isDefined(pOrders)){
-                for (var i = 0, j = pOrders.length; i < j; i++) {
-                    self.orders.push(new Order(pOrders[i].productLine, pOrders[i].product, pOrders[i].items));
-                }
-            }
-        }
-        // ---
         // PUBLIC ATTRIBUTES.
         // ---
         this.customer = (angular.isObject(pCustomer))? pCustomer : {
@@ -95,14 +76,14 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
                 district: ""
             }
         };
-        this.orders = [];
-        restoreOrders(); // ensure that every object loaded has their correct instance
+        this.orders = pOrders;
 
         // ---
         // PUBLIC METHODS.
         // ---
         this.addOrder = function(DummyOrder){
-            if((DummyOrder instanceof Order) === false) {return;}
+            if( (DummyOrder instanceof Order) === false ) {return;}
+
             this.orders.push(DummyOrder);
             return this.orders[this.orders.length-1];
         };
@@ -128,6 +109,35 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
         }
     }
 
+    // ---
+    // FACTORY HELPER METHODS.
+    // ---
+    var restoreImages = function (pImages2Restore) {
+        var restored = [];
+
+        for (var i = 0, j = pImages2Restore.length; i < j; i++) {
+            restored.push(ImageFactory.restoreImage(pImages2Restore[i]));
+        }
+
+        return restored;
+    };
+
+    var restoreOrders = function (pOrders2Restore) {
+        var restored = [];
+
+        for (var i = 0, j = pOrders2Restore.length; i < j; i++) {
+            restored.push(
+                new Order(
+                    pOrders2Restore[i].productLine,
+                    pOrders2Restore[i].product,
+                    restoreImages(pOrders2Restore[i].items)
+                )
+            );
+        }
+
+        return restored;
+    };
+
     return {
         saveShoppingCart: function(){
             return StorageService.save(shoppingCart);
@@ -136,18 +146,21 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             /*
             * Load any data stored
             * then check if some shopping cart was already created
-            * if not create a new one and save it or load the previews one
+            * if yes load it or create a new one and save it (for future usage)
             * and finally return the loaded/created shopping cart
             * */
-            var lastShoppingCart;
+            var lastShoppingCart,
+                restoredOrders;
 
             if (angular.isUndefined(shoppingCart)) {
                 lastShoppingCart = StorageService.load();
-                if(!angular.isObject(lastShoppingCart)){
+
+                if(angular.isObject(lastShoppingCart)){
+                    restoredOrders = restoreOrders(lastShoppingCart.orders);
+                    shoppingCart = new ShoppingCart(lastShoppingCart.customer, restoredOrders);
+                } else {
                     shoppingCart = new ShoppingCart();
                     this.saveShoppingCart();
-                } else {
-                    shoppingCart = new ShoppingCart(lastShoppingCart.customer, lastShoppingCart.orders);
                 }
             }
             return shoppingCart;
@@ -155,12 +168,6 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
         removeOrder: function (pOrderId) {
             shoppingCart.removeOrder(pOrderId);
             this.saveShoppingCart();
-        },
-        setActualOrder: function(pActualOrder){
-            actualOrder = pActualOrder;
-        },
-        getActualOrder: function(){
-            return actualOrder;
         }
     };
 }]);
