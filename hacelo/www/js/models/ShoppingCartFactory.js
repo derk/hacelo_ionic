@@ -76,7 +76,7 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
                 district: ""
             }
         };
-        this.orders = pOrders;
+        this.orders = pOrders || [];
 
         // ---
         // PUBLIC METHODS.
