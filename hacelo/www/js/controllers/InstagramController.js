@@ -93,6 +93,9 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
             if(havePreviousImages()){
                 canLoadMoreImages();
             } else {
+                if(InstagramService.hasUserMedia()) {
+                    InstagramService.cleanUserMedia();
+                }
                 getRecentMedia();
             }
         } else {

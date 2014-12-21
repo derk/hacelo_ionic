@@ -37,8 +37,12 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         getProduct: function(){
             return product;
         },
-        clearSelection: function () {
+        clearImages: function () {
+            selectedImages = null; // helping garbage collector
             selectedImages = [];
+        },
+        clearSelection: function () {
+            this.clearImages();
             productLine = {};
             product = {};
         }

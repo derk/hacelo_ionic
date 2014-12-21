@@ -1,8 +1,10 @@
 services.service('InstagramService', ['$http', '$window', '$q', function ($http, $window, $q) {
     var self = this,
-        user,
-        accessToken,
-        lastInstagramLoad,
+        vault = {
+            user: undefined,
+            userMedia: undefined,
+            accessToken: undefined
+        },
         config = {
             clientId: '70a2ae9262fc4805a5571e8036695a4d',
             redirectUri: 'http://www.wikipedia.org/',
@@ -11,25 +13,30 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
             scope: 'basic'
         };
 
+    this.hasAccessToken = function () {
+        return angular.isDefined(vault.accessToken);
+    };
+
     this.isAuthenticated = function () {
-        return angular.isDefined(accessToken);
+        return angular.isDefined(vault.user);
     };
 
     var fetch = function (url, options) {
-        var prms = {
+        var params = {
                 client_id: config.clientId,
                 callback: 'JSON_CALLBACK'
             };
-        if (self.isAuthenticated()) {
-            prms.access_token = accessToken;
+        if (self.hasAccessToken()) {
+            params.access_token = vault.accessToken;
         }
-        var cnfg = {
-                url: config.apiUrl + url,
-                method: 'jsonp',
-                responseType: 'json',
-                params: angular.extend({}, prms, options)
-            };
-        return $http(cnfg);
+
+        return $http({
+            cache: true,
+            method: 'jsonp',
+            params: angular.extend({}, params, options),
+            responseType: 'json',
+            url: config.apiUrl + url
+        });
     };
 
     var getUrlParameters = function (parameter, staticURL, decode) {
@@ -65,12 +72,15 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
         var deferred = $q.defer();
         authTab.addEventListener('loadstart', function(e) {
             if (e.url.search('access_token') !== -1) { // access granted
-                accessToken = e.url.substr(e.url.search('access_token')+'access_token='.length);
+                vault.accessToken = e.url.substr(e.url.search('access_token')+'access_token='.length);
                 authTab.close();
-                deferred.resolve({
-                    authorized: true
-                });
-            } else if (e.url.search('error') !== -1) { // The user denied access
+                fetch('users/self/').then(
+                    function(response){
+                        vault.user = response.data.data;
+                        deferred.resolve(response.data.data);
+                    }
+                );
+            } else if (e.url.search('error') !== -1) { // User denied access
                 authTab.close();
                 deferred.reject({
                     error: getUrlParameters('error',e.url,true),
@@ -80,6 +90,15 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
             }
         });
         return deferred.promise;
+    };
+
+    var addUserMedia = function (pMedia2add) {
+        if (angular.isUndefined(vault.userMedia)) {
+            vault.userMedia = pMedia2add;
+        } else {
+            vault.userMedia.pagination = pMedia2add.pagination;
+            vault.userMedia.data.push(pMedia2add.data);
+        }
     };
 
     this.auth = function() {
@@ -99,38 +118,41 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
         return bindAuthEvents($window.open(authUrl, '_blank', 'location=yes'));
     };
 
-    this.hasLastInstagramLoad = function(){
-        return angular.isDefined(lastInstagramLoad);
+    this.hasUserMedia = function(){
+        return angular.isDefined(vault.userMedia);
     };
 
+    this.cleanUserMedia = function () {
+        vault.userMedia = null; // helping garbage collector
+        vault.userMedia = undefined;
+    }
+
     this.canLoadMore = function(){
-        var can;
-        if(!self.hasLastInstagramLoad()){
-            can = true;
-        } else if (angular.isDefined(lastInstagramLoad.pagination)) {
-            if (angular.isDefined(lastInstagramLoad.pagination.next_url)){
-                can = true;
-            } else {
-                can = false;
+        var can = true;
+
+        if( self.hasUserMedia() ){
+            if (angular.isDefined(vault.userMedia.pagination)) {
+                if (angular.isUndefined(vault.userMedia.pagination.next_url)){
+                    can = false;
+                }
             }
-        } else {
-            can = false;
         }
+
         return can;
     };
 
     this.getRecentMedia = function() {
-        var prms = {},
+        var params = {},
             deferred = $q.defer();
 
-        if (self.hasLastInstagramLoad()) {
+        if (self.hasUserMedia()) {
             if(self.canLoadMore()) {
-                prms.max_id = lastInstagramLoad.pagination.next_max_id;
+                params.max_id = vault.userMedia.pagination.next_max_id;
             }
         }
-        fetch('users/self/media/recent', prms).then(
+        fetch('users/self/media/recent', params).then(
             function(response){
-                lastInstagramLoad = response.data;
+                addUserMedia(response.data);
                 deferred.resolve(response);
             },
             function(response){

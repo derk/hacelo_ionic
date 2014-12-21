@@ -3,31 +3,30 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-        <title></title>
-        <!-- compiled css output -->
+        <title>A title</title>
+        <!-- Platform related -->
         <link href="css/ionic.app.min.css" rel="stylesheet">
-
+        <!-- Plugins -->
         <link rel="stylesheet" type="text/css" href="lib/darkroom/css/darkroom.css">
         <link href="lib/slick/slick.css" rel="stylesheet">
-        <!--
-        Loading jQuery for some DOM work.
-        I want to load jQuery before Ionic bundle because I want to be able to use angular.element as a wrapper for the jQuery global object -->
-        <script src="lib/jquery/jquery.js"></script>
-        <!-- ionic/angularjs js -->
-        <script src="lib/ionic/js/ionic.bundle.js"></script>
-        <!-- cordova script (this will be a 404 during development) -->
-        <script src="cordova.js"></script>
-        <script src="lib/slick/slick.min.js"></script>
-        <script src="lib/slick/angular-slick.js"></script>
-        <!--
-            Loading all custom stuff
-            hacelo-digital.js is a generated file which contains all the other JS files
-        -->
-        <script src="js/hacelo-digital.js"></script>
-        <script type="text/javascript" src="lib/fabric/fabric.js"></script>
-        <script type="text/javascript" src="lib/darkroom/js/darkroom.min.js"></script>
     </head>
     <body ng-app="hacelo">
         <ion-nav-view></ion-nav-view>
+
+        <!-- use angular.element instead for jQuery or $ -->
+        <script src="lib/jquery/jquery.js"></script>
+        <!-- Platform related -->
+        <script src="lib/ionic/js/ionic.bundle.js"></script>
+        <script src="cordova.js"></script>
+        <!-- Plugins -->
+        <script src="lib/slick/slick.min.js"></script>
+        <script src="lib/slick/angular-slick.js"></script>
+        <script src="lib/fabric/fabric.js"></script>
+        <script src="lib/darkroom/js/darkroom.min.js"></script>
+        <!--
+            Loading custom scripts
+            hacelo-digital.js is a generated file which contains all the other JS files
+        -->
+        <script src="js/hacelo-digital.js"></script>
     </body>
 </html>
