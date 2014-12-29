@@ -25,217 +25,217 @@ angular.module('hacelo', [
 
 .config(function($stateProvider, $urlRouterProvider, $compileProvider) {
     $stateProvider
-        .state('app', {
-            url: "/app",
-            abstract: true,
-            templateUrl: "templates/index.html"
-        })
-        .state('app.landing', {
-            url: "/landing",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/landing.html",
-                    controller: "landingCtrl"
-                }
+    .state('app', {
+        url: "/app",
+        abstract: true,
+        templateUrl: "templates/index.html"
+    })
+    .state('app.landing', {
+        url: "/landing",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/landing.html",
+                controller: "landingCtrl"
             }
-        })
-        .state('app.products', {
-            url: "/products",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/product.html",
-                    controller: "productCrtl"
-                }
+        }
+    })
+    .state('app.products', {
+        url: "/products",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/product.html",
+                controller: "productCrtl"
             }
-        })
-        .state('app.category', {
-            url: "/category",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/category.html",
-                    controller: "categoryCrtl"
-                }
+        }
+    })
+    .state('app.category', {
+        url: "/category",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/category.html",
+                controller: "categoryCrtl"
             }
-        })
-        .state('app.info', {
-            url: "/info",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/info.html",
-                    controller: "infoCtrl"
-                }
+        }
+    })
+    .state('app.info', {
+        url: "/info",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/info.html",
+                controller: "infoCtrl"
             }
-        })
-        .state('app.photo', {
-            url: "/photo",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/photo.html",
-                    controller: "photoCrtl"
-                }
+        }
+    })
+    .state('app.photo', {
+        url: "/photo",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/photo.html",
+                controller: "photoCrtl"
             }
-        })
-        .state('app.choose', {
-            url: "/choose",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/choose.html",
-                    controller: 'PhotoSourceCtrl'
-                }
+        }
+    })
+    .state('app.choose', {
+        url: "/choose",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/choose.html",
+                controller: 'PhotoSourceCtrl'
             }
-        })
-        .state('app.check', {
-            url: "/check",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/check-photo.html",
-                    controller: 'checkCtrl'
-                }
+        }
+    })
+    .state('app.check', {
+        url: "/check",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/check-photo.html",
+                controller: 'checkCtrl'
             }
-        })
-        .state('app.photoEdit', {
-            url: "/edit/:id",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/edit-photo.html",
-                    controller: 'PhotoEditCtrl'
-                }
+        }
+    })
+    .state('app.photoEdit', {
+        url: "/edit/:id",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/edit-photo.html",
+                controller: 'PhotoEditCtrl'
             }
-        })
-        .state('app.confirm', {
-            url: "/confirm",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/confirm.html",
-                    controller: "confirmCtrl"
-                }
+        }
+    })
+    .state('app.confirm', {
+        url: "/confirm",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/confirm.html",
+                controller: "confirmCtrl"
             }
-        })
-        .state('app.added', {
-            url: "/added",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/added-cart.html",
-                    controller: "addedCtrl"
-                }
+        }
+    })
+    .state('app.added', {
+        url: "/added",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/added-cart.html",
+                controller: "addedCtrl"
             }
-        })
-        .state('app.cart', {
-            url: "/cart",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/cart.html",
-                    controller: 'cartCtrl'
-                }
+        }
+    })
+    .state('app.cart', {
+        url: "/cart",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/cart.html",
+                controller: 'cartCtrl'
             }
-        })
-        .state('app.cart-checkout', {
-            url: "/cart-checkout",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/cart-checkout.html"
-                    //controller: 'cartCheckoutCtrl'
-                }
+        }
+    })
+    .state('app.cart-checkout', {
+        url: "/cart-checkout",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/cart-checkout.html"
+                //controller: 'cartCheckoutCtrl'
             }
-        })
-        .state('app.cart-empty', {
-            url: "/cart-empty",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/cart-empty.html"
-                }
+        }
+    })
+    .state('app.cart-empty', {
+        url: "/cart-empty",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/cart-empty.html"
             }
-        })
-        .state('app.payment', {
-            url: "/payment",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/payment.html"
-                }
+        }
+    })
+    .state('app.payment', {
+        url: "/payment",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/payment.html"
             }
-        })
-        .state('app.confirm-order', {
-            url: "/confirm-order",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/confirm-order.html"
-                }
+        }
+    })
+    .state('app.confirm-order', {
+        url: "/confirm-order",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/confirm-order.html"
             }
-        })
-        .state('app.processing-order', {
-            url: "/processing-order",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/processing-order.html",
-                    controller: "processingCtrl"
-                }
+        }
+    })
+    .state('app.processing-order', {
+        url: "/processing-order",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/processing-order.html",
+                controller: "processingCtrl"
             }
-        })
-        .state('app.order-sent', {
-            url: "/order-sent",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/order-sent.html"
-                }
+        }
+    })
+    .state('app.order-sent', {
+        url: "/order-sent",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/order-sent.html"
             }
-        })
-        .state('app.show-love', {
-            url: "/show-love",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/show-love.html"
-                }
+        }
+    })
+    .state('app.show-love', {
+        url: "/show-love",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/show-love.html"
             }
-        })
-        .state('app.photobook', {
-            url: "/photobook",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/photobook.html"
-                }
+        }
+    })
+    .state('app.photobook', {
+        url: "/photobook",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/photobook.html"
             }
-        })
-        .state('app.share', {
-            url: "/share",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/share.html",
-                    controller: 'ShareCtrl'
-                }
+        }
+    })
+    .state('app.share', {
+        url: "/share",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/share.html",
+                controller: 'ShareCtrl'
             }
-        })
-        .state('app.instagram', {
-            url: "/instagram",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/instagram.html",
-                    controller: 'InstagramCrtl'
-                }
+        }
+    })
+    .state('app.instagram', {
+        url: "/instagram",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/instagram.html",
+                controller: 'InstagramCrtl'
             }
-        })
-        .state('app.congrats', {
-            url: "/congrats",
-            views: {
-                'haceloContent': {
-                    templateUrl: "templates/congrats.html",
-                    controller: 'congratsCtrl'
-                }
+        }
+    })
+    .state('app.congrats', {
+        url: "/congrats",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/congrats.html",
+                controller: 'congratsCtrl'
             }
-        });
+        }
+    });
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/app/landing');
     // Here we tel to angular that images with `content://` protocol are safe to load
     // more info at: http://goo.gl/8PfN8I
-    $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob|content):|data:image\//);
+    $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob|content):|data:image\//);    
 });
 var commons = angular.module('hacelo.config', []);
 var controllers = angular.module('hacelo.controllers', []);
-var models = angular.module('hacelo.models', []);
 /**
  * Created by joseph on 30/11/2014.
  */
 var directives = angular.module('hacelo.directives', []);
 
+var models = angular.module('hacelo.models', []);
 var services = angular.module('hacelo.services', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
@@ -280,7 +280,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/fotografias/6X4/6X4_Categoria/6X4_categoria.png",
                 },
                 {
                     "name": "5x7",
@@ -314,7 +315,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/fotografias/7X5/7X5_Categoria/7x5_categoria.png",
                 },
                 {
                     "name": "8x10",
@@ -348,7 +350,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/fotografias/10X8/10X8_Categoria/10X8_categoria.png",
                 }
             ],
             "coupons": [
@@ -397,7 +400,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/cuadradas/4X4/4X4_Categoria/4X4_categoria.png",
                 },
                 {
                     "name": "8x8",
@@ -431,7 +435,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/cuadradas/8X8/8X8_Categoria/8x8_categoria.png",
                 },
                 {
                     "name": "10x10",
@@ -465,7 +470,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
                 }
             ],
             "coupons": [
@@ -515,7 +521,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
                 },
                 {
                     "name": "12x9",
@@ -549,7 +556,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
                 }
             ],
             "coupons": [
@@ -598,41 +606,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
-                },
-                {
-                    "name": "8x8",
-                    "real_size": {
-                        // this measures NEEDS to be in inches.
-                        // Use dot for decimals like 9.5 X 12
-                        "width": 8,
-                        "height": 8
                     },
-                    "pixel_size": {
-                        // any measure inside here should to be in pixels
-                        "optimal": {
-                            "width": 600,
-                            "height": 600
-                        },
-                        "minimum": {
-                            "width": 600,
-                            "height": 600,
-                            "aspect": "square"
-                        }
-                    },
-                    "prices": {
-                        "first_items": {
-                            "quantity": 1,
-                            // use `.` for decimals
-                            // for example one dollar with fifty cents = 1.50
-                            // do not separate big numbers like 20,000.50
-                            // just use 20000.50
-                            "price": 19999
-                        },
-                        "additional": {
-                            "price": 1000
-                        }
-                    }
+                    "images": "img/marcos/4X4/4X4_Categoria/4X4_categoria.png",
                 },
                 {
                     "name": "11x17",
@@ -666,7 +641,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/marcos/11X17/11X17_Categoria/11X17_categoria.png",
                 },
                 {
                     "name": "14x20",
@@ -700,7 +676,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/marcos/14X20/14X20_Categoria/14X20_categoria.png",
                 },
                 {
                     "name": "20x29",
@@ -734,7 +711,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/marcos/20X29/20X29_Categoria/20X29_categoria.png",
                 }
             ],
             "coupons": [
@@ -783,7 +761,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/photostrips/Photostrips_Categoria/photostrips_categoria.png",
                 }
             ],
             "coupons": [
@@ -832,7 +811,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1575
                         }
-                    }
+                    },
+                    "images": "img/poster/Poster_Categoria/poster_categoria.png",
                 }
             ],
             "coupons": [
@@ -881,7 +861,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/gran_formato/11X17/11X17_Categoria/11X17_categoria.png",
                 },
                 {
                     "name": "14x20",
@@ -915,7 +896,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/gran_formato/14X20/14X20_Categoria/14X20_categoria.png",
                 },
                 {
                     "name": "20.1 x 29.1",
@@ -949,7 +931,8 @@ commons.constant('PhotoPrintConfig', {
                         "additional": {
                             "price": 1000
                         }
-                    }
+                    },
+                    "images": "img/gran_formato/20X29/20X29_Categoria/20X29_categoria.png",
                 }
 
             ],
@@ -964,6 +947,7 @@ commons.constant('PhotoPrintConfig', {
         }
     ]
 });
+
 controllers.controller('addedCtrl', ['$scope', '$stateParams', function ($scope, $stateParams) {
     $scope.productName = $stateParams.productName;
 }]);

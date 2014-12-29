@@ -42,7 +42,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/fotografias/6X4/6X4_Categoria/6X4_categoria.png",
+                    "images": "img/fotografias/6X4/6X4_Categoria/6X4_categoria.png",
                 },
                 {
                     "name": "5x7",
@@ -77,7 +77,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/fotografias/7X5/7X5_Categoria/7x5_categoria.png",
+                    "images": "img/fotografias/7X5/7X5_Categoria/7x5_categoria.png",
                 },
                 {
                     "name": "8x10",
@@ -112,7 +112,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/fotografias/10X8/10X8_Categoria/10X8_categoria.png",
+                    "images": "img/fotografias/10X8/10X8_Categoria/10X8_categoria.png",
                 }
             ],
             "coupons": [
@@ -162,7 +162,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/cuadradas/4X4/4X4_Categoria/4X4_categoria.png",
+                    "images": "img/cuadradas/4X4/4X4_Categoria/4X4_categoria.png",
                 },
                 {
                     "name": "8x8",
@@ -197,7 +197,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/cuadradas/8X8/8X8_Categoria/8x8_categoria.png",
+                    "images": "img/cuadradas/8X8/8X8_Categoria/8x8_categoria.png",
                 },
                 {
                     "name": "10x10",
@@ -232,7 +232,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
+                    "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
                 }
             ],
             "coupons": [
@@ -283,7 +283,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
+                    "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
                 },
                 {
                     "name": "12x9",
@@ -318,7 +318,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
+                    "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
                 }
             ],
             "coupons": [
@@ -368,7 +368,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/marcos/4X4/4X4_Categoria/4X4_categoria.png",
+                    "images": "img/marcos/4X4/4X4_Categoria/4X4_categoria.png",
                 },
                 {
                     "name": "11x17",
@@ -403,7 +403,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/marcos/11X17/11X17_Categoria/11X17_categoria.png",
+                    "images": "img/marcos/11X17/11X17_Categoria/11X17_categoria.png",
                 },
                 {
                     "name": "14x20",
@@ -438,7 +438,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/marcos/14X20/14X20_Categoria/14X20_categoria.png",
+                    "images": "img/marcos/14X20/14X20_Categoria/14X20_categoria.png",
                 },
                 {
                     "name": "20x29",
@@ -473,7 +473,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/marcos/20X29/20X29_Categoria/20X29_categoria.png",
+                    "images": "img/marcos/20X29/20X29_Categoria/20X29_categoria.png",
                 }
             ],
             "coupons": [
@@ -523,7 +523,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/photostrips/Photostrips_Categoria/photostrips_categoria.png",
+                    "images": "img/photostrips/Photostrips_Categoria/photostrips_categoria.png",
                 }
             ],
             "coupons": [
@@ -573,7 +573,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1575
                         }
                     },
-                    "image": "image/poster/Poster_Categoria/poster_categoria.png",
+                    "images": "img/poster/Poster_Categoria/poster_categoria.png",
                 }
             ],
             "coupons": [
@@ -623,7 +623,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/gran_formato/11X17/11X17_Categoria/11X17_categoria.png",
+                    "images": "img/gran_formato/11X17/11X17_Categoria/11X17_categoria.png",
                 },
                 {
                     "name": "14x20",
@@ -658,7 +658,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/gran_formato/14X20/14X20_Categoria/14X20_categoria.png",
+                    "images": "img/gran_formato/14X20/14X20_Categoria/14X20_categoria.png",
                 },
                 {
                     "name": "20.1 x 29.1",
@@ -693,7 +693,7 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "image": "image/gran_formato/20X29/20X29_Categoria/20X29_categoria.png",
+                    "images": "img/gran_formato/20X29/20X29_Categoria/20X29_categoria.png",
                 }
 
             ],
