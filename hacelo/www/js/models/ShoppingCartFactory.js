@@ -78,6 +78,23 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
         };
         this.orders = pOrders || [];
 
+        this.travel = {
+            direction :{
+                canton : "",
+                distrito : "",
+                provincia : "",
+                exacta: ""
+            }, 
+            price : 0
+        };
+
+        this.payment = {
+            card: "",
+            month: "",
+            year: "",
+            type: ""
+        };
+
         // ---
         // PUBLIC METHODS.
         // ---
@@ -100,13 +117,28 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             }
         };
 
+        this.getWeight = function(){
+            var weight = 0; 
+            for (var i = this.orders.length - 1; i >= 0; i--) {
+                weight = this.orders[i].product.weight + weight;
+            }
+
+            weight = weight/1000;
+
+            if(weight < 1){
+                weight = 1;
+            }
+
+            return weight;
+        };
+
         this.computeSubTotal = function () {
             var subTotal = 0;
             for (var i = this.orders.length - 1; i >= 0; i--) {
                 subTotal += this.orders[i].computeSubTotal();
             }
             return subTotal;
-        }
+        };
     }
 
     // ---
@@ -165,8 +197,31 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             }
             return shoppingCart;
         },
+
         removeOrder: function (pOrderId) {
             shoppingCart.removeOrder(pOrderId);
+            this.saveShoppingCart();
+        },
+
+        savePayment : function(card, month, year, type){
+            this.payment = {
+                card: card,
+                month: month,
+                year: year,
+                type: type
+            };
+        },
+
+        saveTravel : function(money, canton, distrito, provincia, exacta){
+            shoppingCart.travel = {
+                direction :{
+                    canton : 0,
+                    distrito : 0,
+                    provincia : 0,
+                    exacta: 0
+                }, 
+                price : money
+            };
             this.saveShoppingCart();
         }
     };

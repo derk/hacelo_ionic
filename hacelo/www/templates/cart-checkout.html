@@ -1,4 +1,4 @@
-<ion-view title="CARRITO(1)" class="cart-checkout-page" >
+<ion-view title="CARRITO" class="cart-checkout-page" >
 	<ion-nav-bar class="red bar-stable" animation="slide-left-right">  
       <ion-nav-back-button class="button-clear">
         <div class="arrow"> ATRAS </div>
@@ -33,36 +33,40 @@
 
 				<h3>Te enviamos tus fotos a: </h3>
 				<label class="item btn sucursales">
-			      <button ng-click="" class="button button-block button-positive" type="submit">Sucursales (gratis)</button>
+			      <button ng-click="changeSucursal(true);" class="button button-block button-positive" type="submit">Sucursales (gratis)</button>
 			    </label>
 			    <label class="item btn casa">
-			      <button ng-click="" class="button button-block" type="submit">Casa</button>
-			    </label>
-				<label class="item item-input">
-					<textarea name="comment" ng-model="address" rows="7" cols="5" placeholder="DIRECCIÓN">
-					</textarea>
-				</label>
-				<select>
-			      <option selected>San José</option>
-			      <option>Heredia</option>
-			      <option>Cartago</option>
-			    </select>
-			    <span class="advise">(Ej: San José)</span>
-			    <select>
-			      <option selected>Tibás</option>
-			      <option>Guadalupe</option>
-			    </select>
-			    <span class="advise">(Ej. Tibás)</span>
-			    <select>
-			      <option selected>Llorente</option>
-			      <option>Otro</option>
-			    </select>
-			    <span class="advise">(Ej. Llorente)</span>
-			    <label class="item input-checkbox">
-					<input type="checkbox">
-					<span>Recordar para la próxima compra</span>
-				</label>
-				<a href="#/app/processing-order" class="button button-balanced" >Pagar</a>
+				      <button ng-click="changeSucursal(false);" class="button button-block" type="submit">Casa</button>
+				    </label>
+			    <div ng-show="!sucursal">
+
+					<label class="item item-input">
+						<textarea name="comment" ng-model="address" rows="7" cols="5" placeholder="DIRECCIÓN">
+						</textarea>
+					</label>
+					<select>
+				      <option selected>San José</option>
+				      <option>Heredia</option>
+				      <option>Cartago</option>
+				    </select>
+				    <span class="advise">(Ej: San José)</span>
+				    <select>
+				      <option selected>Tibás</option>
+				      <option>Guadalupe</option>
+				    </select>
+				    <span class="advise">(Ej. Tibás)</span>
+				    <select>
+				      <option selected>Llorente</option>
+				      <option>Otro</option>
+				    </select>
+				    <span class="advise">(Ej. Llorente)</span>
+				    <label class="item input-checkbox">
+						<input type="checkbox">
+						<span>Recordar para la próxima compra</span>
+					</label>
+			    </div>
+			    
+				<a ng-click="calculatePrice()" class="button button-balanced" >Pagar</a>
 			</div>
     		
 		</div>

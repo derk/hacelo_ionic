@@ -43,6 +43,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/fotografias/6X4/6X4_Categoria/6X4_categoria.png",
+                    "weight": 120
                 },
                 {
                     "name": "5x7",
@@ -78,6 +79,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/fotografias/7X5/7X5_Categoria/7x5_categoria.png",
+                    "weight": 120
                 },
                 {
                     "name": "8x10",
@@ -113,6 +115,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/fotografias/10X8/10X8_Categoria/10X8_categoria.png",
+                    "weight": 120
                 }
             ],
             "coupons": [
@@ -163,6 +166,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/4X4/4X4_Categoria/4X4_categoria.png",
+                    "weight": 120
                 },
                 {
                     "name": "8x8",
@@ -198,6 +202,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/8X8/8X8_Categoria/8x8_categoria.png",
+                    "weight": 120
                 },
                 {
                     "name": "10x10",
@@ -233,6 +238,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
+                    "weight": 120
                 }
             ],
             "coupons": [
@@ -284,6 +290,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
+                    "weight": 120
                 },
                 {
                     "name": "12x9",
@@ -319,6 +326,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
+                    "weight": 120
                 }
             ],
             "coupons": [
@@ -369,6 +377,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/marcos/4X4/4X4_Categoria/4X4_categoria.png",
+                    "weight": 500
                 },
                 {
                     "name": "11x17",
@@ -404,6 +413,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/marcos/11X17/11X17_Categoria/11X17_categoria.png",
+                    "weight": 2000
                 },
                 {
                     "name": "14x20",
@@ -439,6 +449,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/marcos/14X20/14X20_Categoria/14X20_categoria.png",
+                    "weight": 2500
                 },
                 {
                     "name": "20x29",
@@ -474,6 +485,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/marcos/20X29/20X29_Categoria/20X29_categoria.png",
+                    "weight": 4200
                 }
             ],
             "coupons": [
@@ -524,6 +536,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/photostrips/Photostrips_Categoria/photostrips_categoria.png",
+                    "weight": 120
                 }
             ],
             "coupons": [
@@ -574,6 +587,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/poster/Poster_Categoria/poster_categoria.png",
+                    "weight": 120
                 }
             ],
             "coupons": [
@@ -624,6 +638,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/gran_formato/11X17/11X17_Categoria/11X17_categoria.png",
+                    "weight": 120
                 },
                 {
                     "name": "14x20",
@@ -659,6 +674,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/gran_formato/14X20/14X20_Categoria/14X20_categoria.png",
+                    "weight": 120
                 },
                 {
                     "name": "20.1 x 29.1",
@@ -694,6 +710,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/gran_formato/20X29/20X29_Categoria/20X29_categoria.png",
+                    "weight": 120
                 }
 
             ],

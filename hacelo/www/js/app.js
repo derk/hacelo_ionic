@@ -133,8 +133,17 @@ angular.module('hacelo', [
         url: "/cart-checkout",
         views: {
             'haceloContent': {
-                templateUrl: "templates/cart-checkout.html"
-                //controller: 'cartCheckoutCtrl'
+                templateUrl: "templates/cart-checkout.html",
+                controller: 'cartCheckoutCtrl'
+            }
+        }
+    })
+    .state('app.redeem', {
+        url: "/redeem",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/Redeem.html",
+                controller: "redeemCtrl"
             }
         }
     })

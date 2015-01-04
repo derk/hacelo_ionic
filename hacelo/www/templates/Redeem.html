@@ -1,0 +1,75 @@
+
+				<!--form name="myForm" novalidate>
+					<input type="text" name="user" placeholder="NUMERO DE TARJETA" required>
+					<span style="color:red" ng-show="pay.user.$dirty">Digite el numero de tarjeta</span-->
+
+					<!--div class="maininfo">
+				    	<label class="item item-input name">
+						<input class="" type="text" name="name" placeholder="DIA">
+						</label>
+						<label class="item item-input lastname">
+							<input class="" type="text" name="lastname" placeholder="MES">
+						</label>
+				    </div>
+					<input class="" type="text" name="name" placeholder="NUMERO DE TARJETA">
+
+					<select>
+				      <option selected>VISA</option>
+				      <option>MasterCard</option>
+				      <option>AMEX</option>
+				    </select-->
+
+					
+					<!--input type="submit" ng-click="submit()" ng-disabled="pay.user.$dirty " class="button button-balanced" value="Pagar">
+				</form-->
+<ion-view title="CARRITO" class="cart-checkout-page" >
+	<ion-nav-bar class="red bar-stable" animation="slide-left-right">  
+      <ion-nav-back-button class="button-clear">
+        <div class="arrow"> ATRAS </div>
+      </ion-nav-back-button>
+    </ion-nav-bar>
+  	<ion-content class="has-header">
+    	<div class="cart-checkout-container">
+			
+			<div class="list list-inset">
+				
+
+				<form  name="myForm" novalidate id="form-pay">
+					<p>Numero de tarjeta:<br>
+					<input type="number" name="card" ng-model="userData.card" required>
+					<span style="color:red" ng-show="myForm.card.$dirty && myForm.card.$invalid">
+					<span ng-show="myForm.card.$error.required">Digite el numero de tarjeta.</span>
+					</span>
+					</p>
+
+					<p>Fecha de expiracion:</p>
+
+					<div class="maininfo">
+						<select 
+					      ng-model="userData.month" 
+					      ng-options="month.name for month in months">
+					    </select>
+
+						<select 
+					      ng-model="userData.year" 
+					      ng-options="year.name for year in years">
+					    </select>
+
+				    </div>
+
+
+					<select 
+						ng-model="userData.emisor" 
+						ng-options="em.name for em in emisor">
+					</select>
+
+
+				    <input type="submit" ng-click="submit()" ng-disabled="myForm.card.$dirty && myForm.card.$invalid" class="button button-balanced" value="Pagar">
+
+
+				</form>
+			</div>
+    		
+		</div>
+  	</ion-content>
+</ion-view>

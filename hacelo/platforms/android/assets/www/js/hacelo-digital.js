@@ -133,8 +133,17 @@ angular.module('hacelo', [
         url: "/cart-checkout",
         views: {
             'haceloContent': {
-                templateUrl: "templates/cart-checkout.html"
-                //controller: 'cartCheckoutCtrl'
+                templateUrl: "templates/cart-checkout.html",
+                controller: 'cartCheckoutCtrl'
+            }
+        }
+    })
+    .state('app.redeem', {
+        url: "/redeem",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/Redeem.html",
+                controller: "redeemCtrl"
             }
         }
     })
@@ -282,6 +291,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/fotografias/6X4/6X4_Categoria/6X4_categoria.png",
+                    "weight": 120
                 },
                 {
                     "name": "5x7",
@@ -317,6 +327,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/fotografias/7X5/7X5_Categoria/7x5_categoria.png",
+                    "weight": 120
                 },
                 {
                     "name": "8x10",
@@ -352,6 +363,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/fotografias/10X8/10X8_Categoria/10X8_categoria.png",
+                    "weight": 120
                 }
             ],
             "coupons": [
@@ -402,6 +414,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/4X4/4X4_Categoria/4X4_categoria.png",
+                    "weight": 120
                 },
                 {
                     "name": "8x8",
@@ -437,6 +450,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/8X8/8X8_Categoria/8x8_categoria.png",
+                    "weight": 120
                 },
                 {
                     "name": "10x10",
@@ -472,6 +486,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
+                    "weight": 120
                 }
             ],
             "coupons": [
@@ -523,6 +538,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
+                    "weight": 120
                 },
                 {
                     "name": "12x9",
@@ -558,6 +574,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
+                    "weight": 120
                 }
             ],
             "coupons": [
@@ -608,6 +625,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/marcos/4X4/4X4_Categoria/4X4_categoria.png",
+                    "weight": 500
                 },
                 {
                     "name": "11x17",
@@ -643,6 +661,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/marcos/11X17/11X17_Categoria/11X17_categoria.png",
+                    "weight": 2000
                 },
                 {
                     "name": "14x20",
@@ -678,6 +697,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/marcos/14X20/14X20_Categoria/14X20_categoria.png",
+                    "weight": 2500
                 },
                 {
                     "name": "20x29",
@@ -713,6 +733,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/marcos/20X29/20X29_Categoria/20X29_categoria.png",
+                    "weight": 4200
                 }
             ],
             "coupons": [
@@ -763,6 +784,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/photostrips/Photostrips_Categoria/photostrips_categoria.png",
+                    "weight": 120
                 }
             ],
             "coupons": [
@@ -813,6 +835,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/poster/Poster_Categoria/poster_categoria.png",
+                    "weight": 120
                 }
             ],
             "coupons": [
@@ -863,6 +886,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/gran_formato/11X17/11X17_Categoria/11X17_categoria.png",
+                    "weight": 120
                 },
                 {
                     "name": "14x20",
@@ -898,6 +922,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/gran_formato/14X20/14X20_Categoria/14X20_categoria.png",
+                    "weight": 120
                 },
                 {
                     "name": "20.1 x 29.1",
@@ -933,6 +958,7 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/gran_formato/20X29/20X29_Categoria/20X29_categoria.png",
+                    "weight": 120
                 }
 
             ],
@@ -954,7 +980,7 @@ controllers.controller('addedCtrl', ['$scope', '$stateParams', function ($scope,
 /**
  * Created by joseph on 30/11/2014.
  */
-controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', function($scope, $ionicPopup, Messages, ShoppingCartFactory) {
+controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $ionicPopup, Messages, ShoppingCartFactory,Payment) {
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
 
     $scope.removeOrder = function (pOrderToRemove) {
@@ -967,6 +993,85 @@ controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', '
             }
         });
     };
+
+}]);
+
+
+/**
+ * Created by Raiam on 02/01/2015.
+ */
+controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $state, $ionicPopup, Messages, ShoppingCartFactory, Payment) {
+    
+    $scope.cart = ShoppingCartFactory.loadShoppingCart();
+    $scope.sucursal = true;
+
+    $scope.changeSucursal = function(s){
+       $scope.sucursal = s;
+    };
+
+    $scope.calculatePrice = function(){
+
+        if($scope.sucursal == true){
+            console.log("entrro");
+            ShoppingCartFactory.saveTravel(0);
+            $state.go("app.redeem");
+        } else {
+            console.log("entrro 2");
+            Payment.sendWeight($scope.cart.getWeight()).then(function(response){
+                ShoppingCartFactory.saveTravel(response.message.precio);
+                $state.go("app.redeem");
+            });
+        }
+        
+    };
+    
+}]);
+
+
+/**
+ * Created by Raiam on 02/01/2015.
+ */
+
+controllers.controller('redeemCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', function($scope, $ionicPopup, Messages, ShoppingCartFactory) {
+    
+    $scope.cart = ShoppingCartFactory.loadShoppingCart();
+    $scope.userData = {};
+    $scope.years = [];
+    $scope.months = [];
+    $scope.emisor = [
+        {
+            "name": "American Express", 
+            "value": "AMEX"
+        },
+        {
+            "name": "VISA", 
+            "value": "VISA"
+        },
+        {
+            "name": "Master Card", 
+            "value": "MasterCard"
+        }
+    ]
+
+    for(var el = 2015; el <= 2050; el++){
+        $scope.years.push({"name": el, "value": el});
+    }
+
+    for(var el = 1; el <= 12; el++){
+        $scope.months.push({"name": el, "value": el});
+    }
+
+
+    $scope.userData.year = $scope.years[0];
+    $scope.userData.month = $scope.months[0];
+    $scope.userData.emisor = $scope.emisor[0];
+
+    console.log($scope.cart);
+    window.el = $scope.cart;
+    $scope.submit = function(){
+        Payment.makePay(1, $scope.cart.customer.firstName, $scope.cart.customer.secondSurname, $scope.userData.emisor.value, $scope.userData.card, $scope.userData.month.value, $scope.userData.month.value, $scope.cart.computeSubTotal(), $scope.cart.travel.price);
+    };
+
 }]);
 controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "SelectedImagesFactory", "MessageService", "PreloaderFactory", function($scope, $state, $ionicPopup, SelectedImagesFactory, Messages, preloader) {
     $scope.images = SelectedImagesFactory.getToPrintOnes();
@@ -1758,6 +1863,16 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
         };
         this.orders = pOrders || [];
 
+        this.travel = {
+            direction :{
+                canton : "",
+                distrito : "",
+                provincia : "",
+                exacta: ""
+            }, 
+            price : 0
+        };
+
         // ---
         // PUBLIC METHODS.
         // ---
@@ -1780,13 +1895,28 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             }
         };
 
+        this.getWeight = function(){
+            var weight = 0; 
+            for (var i = this.orders.length - 1; i >= 0; i--) {
+                weight = this.orders[i].product.weight + weight;
+            }
+
+            weight = weight/1000;
+
+            if(weight < 1){
+                weight = 1;
+            }
+
+            return weight;
+        };
+
         this.computeSubTotal = function () {
             var subTotal = 0;
             for (var i = this.orders.length - 1; i >= 0; i--) {
                 subTotal += this.orders[i].computeSubTotal();
             }
             return subTotal;
-        }
+        };
     }
 
     // ---
@@ -1845,8 +1975,22 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             }
             return shoppingCart;
         },
+
         removeOrder: function (pOrderId) {
             shoppingCart.removeOrder(pOrderId);
+            this.saveShoppingCart();
+        },
+
+        saveTravel : function(money, canton, distrito, provincia, exacta){
+            shoppingCart.travel = {
+                direction :{
+                    canton : 0,
+                    distrito : 0,
+                    provincia : 0,
+                    exacta: 0
+                }, 
+                price : money
+            };
             this.saveShoppingCart();
         }
     };
@@ -2119,6 +2263,45 @@ services.service('MessageService', ['$http', function ($http) {
     };
     // Load the messages from JSON file
     initMessages();
+}]);
+/**
+ * Created by Raiam 
+ */
+services.service('Payment', ['$window', '$http', '$q', function ($window, $http, $q) {
+    
+    this.sendWeight = function(h){
+        var defer = $q.defer();
+
+        $.ajax({
+            url: "http://www.gn-digital.info/services/tarifario_courier/api/?method=t_paqueteporpeso&params[peso]="+h+"&params[is_gam]=0",
+            type: 'GET',
+            crossDomain: true,
+            dataType: 'jsonp',
+            jsonpCallback:'tarifario_callback',
+            success: function(response) { defer.resolve(response);},
+            error: function(error){defer.resolve(error);}
+        });
+
+        return defer.promise;
+    };
+
+    this.makePay = function(order_id, name, last, emisor, tarjeta, month, year, price, envio){
+         var defer = $q.defer();
+
+        $.ajax({
+            url: "http://www.gn-digital.com/pago_por_api/?sel=save&order_id=3619&ccname="+name+"%20"+last+"&ccnumber=12345&ccissuer="+emisor+"&ccmonth="+month+"&ccyear="+year+"&products[0][id]=2&products[0][name]=CobroFotos&products[0][price]="+price+"&products[0][qty]=1&products[1][id]=3&products[1][name]=Envio&products[1][price]="+envio+"&products[1][qty]=1&callback=jason",
+            type: 'GET',
+            crossDomain: true,
+            dataType: 'jsonp',
+            jsonpCallback:'tarifario_callback',
+            success: function(response) { defer.resolve(response);},
+            error: function(error){defer.resolve(error);}
+        });
+
+        return defer.promise;
+    };
+
+
 }]);
 /**
  * Created by joseph on 24/11/2014.

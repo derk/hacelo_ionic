@@ -273,6 +273,7 @@ C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\
 C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\hacelo\platforms\android\assets\www\js\services\LocationProvider.js \
 C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\hacelo\platforms\android\assets\www\js\services\MessageService.js \
 C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\hacelo\platforms\android\assets\www\js\services\module.js \
+C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\hacelo\platforms\android\assets\www\js\services\PaymentService.js \
 C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\hacelo\platforms\android\assets\www\js\services\PhotoSizeCheckerService.js \
 C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\hacelo\platforms\android\assets\www\js\services\StorageService.js \
 C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\hacelo\platforms\android\assets\www\lib\darkroom \
@@ -409,6 +410,7 @@ C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\
 C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\hacelo\platforms\android\assets\www\templates\photobook.html \
 C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\hacelo\platforms\android\assets\www\templates\processing-order.html \
 C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\hacelo\platforms\android\assets\www\templates\product.html \
+C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\hacelo\platforms\android\assets\www\templates\Redeem.html \
 C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\hacelo\platforms\android\assets\www\templates\share.html \
 C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\hacelo\platforms\android\assets\www\templates\show-love.html \
 C:\Users\Rai\Documents\Freelance\Printea\hacelo_ionic\hacelo-lates\hacelo_ionic\hacelo\platforms\android\ant-build\AndroidManifest.xml \
