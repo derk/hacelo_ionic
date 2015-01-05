@@ -99,7 +99,7 @@ controllers.controller('redeemCtrl', ['$scope', '$ionicPopup', 'MessageService',
     $scope.userData.emisor = $scope.emisor[0];
 
     $scope.submit = function(){
-        ShoppingCartFactory.savePayment($scope.userData.card, $scope.userData.month.value, $scope.userData.year.value,$scope.userData.emisor.value);
+        ShoppingCartFactory.savePayment($scope.userData.card, $scope.userData.month.value, $scope.userData.year.value,$scope.userData.emisor.value );card, month, year, type
         $state.go("app.processing-order");
         /*Payment.makePay(1, $scope.cart.customer.firstName, $scope.cart.customer.secondSurname, $scope.userData.emisor.value, $scope.userData.card, $scope.userData.month.value, $scope.userData.year.value, $scope.cart.computeSubTotal(), $scope.cart.travel.price).then(function(e){
             if(e.error != ""){

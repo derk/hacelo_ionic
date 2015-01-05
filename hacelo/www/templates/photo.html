@@ -6,8 +6,8 @@
     </ion-nav-bar>
     <ion-content class="has-header">
         <div class="photo-container">
-            <div class="photo-cover" style="background:url({{product.images}}) no-repeat top left/100% 100%;"> </div>
-            <div class="cover"><span>{{product.name}}</span></div>
+            <!--div class="photo-cover" style="background:url({{product.images}}) no-repeat top left/100% 100%; height:{{height}}px"> </div>
+            <div class="cover"><span>{{product.name}}</span></div-->
             <!--slick slides-to-show="1" slides-to-scroll="1" infinite="true" dots="true" arrows="false">
                 <div>
                     <img class="photo-cover" src="../www/img/bg-fotos.jpg" alt="">
@@ -18,6 +18,14 @@
                     <div class="cover"><span>{{product.name}}</span></div>
                 </div>
             </slick-->
+
+            <slick slides-to-show="1" slides-to-scroll="1" infinite="true" dots="true" arrows="false">
+               <div ng-repeat="s in product.slider">
+                    <img class="photo-cover"  style="height:{{height}}px"src="{{s.images}}" alt="">
+                </div>
+           </slick>
+            <div class="cover"><span>{{product.name}}</span></div>
+
             <div class="menu-content">
                 <p><span>{{product.prices.first_items.price | currency:"&#8353;"}}</span>
                     <ng-pluralize count="product.prices.first_items.quantity"

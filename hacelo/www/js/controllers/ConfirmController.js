@@ -34,4 +34,7 @@ controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'Messa
             $ionicPopup.alert(cache);
         }
     };
+
+    $scope.url =  $scope.actualOrder.product.slider[0].images;
+    $scope.height = screen.width;
 }]);

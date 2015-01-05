@@ -4,7 +4,6 @@ controllers.controller('landingCtrl', ['$scope', 'ShoppingCartFactory',function(
 
 controllers.controller('productCrtl', ['$scope', '$state', 'SelectedImagesFactory', 'PhotoPrintConfig', function($scope, $state, SelectedImagesFactory, PhotoPrintConfig) {
 	$scope.productLines = PhotoPrintConfig.products;
-
 	$scope.saveProductLine = function(pProductLine) {
 		SelectedImagesFactory.setProductLine(pProductLine);
 		$state.go("app.category");
@@ -38,13 +37,16 @@ controllers.controller('categoryCrtl', ['$scope', '$state', '$ionicPopup', 'Sele
 	lookForImages();
 }]);
 
-controllers.controller('photoCrtl', ['$scope', '$state', 'SelectedImagesFactory',function($scope, $state, SelectedImagesFactory) {
+controllers.controller('photoCrtl', ['$scope', '$state', '$timeout', '$window','SelectedImagesFactory',function($scope, $state, $timeout, $window, SelectedImagesFactory) {
 	$scope.product = SelectedImagesFactory.getProduct();
+	$scope.height = screen.width;
+
 }]);
 
 controllers.controller('processingCtrl', ['$scope', '$sce', 'StorageService',function($scope, $sce, StorageService) {
 	// TODO add this url into a configuration file, since it is globally, and depends on the ftp.
-	$scope.api = $sce.trustAsResourceUrl("https://grooveshark-c9-raiam1234.c9.io/workspace/public/nacion.php");
+	$scope.api = $sce.trus
+	tAsResourceUrl("https://grooveshark-c9-raiam1234.c9.io/workspace/public/nacion.php");
 	$scope.market = StorageService.load();
 
 	$scope.range = function(n) {
