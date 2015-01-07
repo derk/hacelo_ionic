@@ -221,7 +221,7 @@ $slick-opacity-not-active: .25 !default;
     margin-bottom: 30px;
 }
 .slick-dots {
-    position: absolute;
+    position: relative;
     bottom: -45px;
     list-style: none;
     display: block;
@@ -281,4 +281,8 @@ $slick-opacity-not-active: .25 !default;
             opacity: $slick-opacity-default;
         }
     }
+}
+
+.cover, .slick-dots {
+    bottom: 20px;
 }

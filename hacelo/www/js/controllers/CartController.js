@@ -21,10 +21,38 @@ controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', '
 /**
  * Created by Raiam on 02/01/2015.
  */
-controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading','$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $state, $ionicLoading, $ionicPopup, Messages, ShoppingCartFactory, Payment) {
+controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading','$ionicPopup', 'MessageService', 'ShoppingCartFactory','PlacesConfig','Payment', function($scope, $state, $ionicLoading, $ionicPopup, Messages, ShoppingCartFactory, PlacesConfig, Payment) {
     
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
     $scope.sucursal = true;
+    $scope.provinces = [];
+    $scope.cantones = [];
+    $scope.districts = [];
+    $scope.info = {};  
+
+    var places = PlacesConfig.places;
+
+    angular.forEach(Object.keys(places), function(v){
+        $scope.provinces.push({"name":v});
+    });
+
+
+    $scope.showCanton = function(){
+        $scope.cantones = [];
+        $scope.districts = [];
+
+         angular.forEach(Object.keys(places[$scope.info.province.name].Cantones), function(v){
+            $scope.cantones.push({"name":v});
+        });
+    };
+
+    $scope.showDistrict = function(){
+        $scope.districts = [];
+
+         angular.forEach(places[$scope.info.province.name].Cantones[$scope.info.canton.name], function(v){
+            $scope.districts.push({"name":v});
+        });
+    };
 
 
     $scope.show = function() {
@@ -39,6 +67,10 @@ controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading',
 
     $scope.changeSucursal = function(s){
        $scope.sucursal = s;
+    };
+
+    $scope.saveInformation = function(){
+        ShoppingCartFactory.saveCustomer($scope.info.name, $scope.info.last, $scope.info.phone,  $scope.info.email, $scope.info.province.name, $scope.info.canton.name, $scope.info.district.name, $scope.info.exact);
     };
 
     $scope.calculatePrice = function(){
@@ -64,7 +96,7 @@ controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading',
  * Created by Raiam on 02/01/2015.
  */
 
-controllers.controller('redeemCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', 'Payment', function($scope, $ionicPopup, Messages, ShoppingCartFactory, Payment) {
+controllers.controller('redeemCtrl', ['$scope', '$ionicPopup', '$state', 'MessageService', 'ShoppingCartFactory', 'Payment', function($scope, $ionicPopup, $state, Messages, ShoppingCartFactory, Payment) {
     
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
     $scope.userData = {};
@@ -99,8 +131,8 @@ controllers.controller('redeemCtrl', ['$scope', '$ionicPopup', 'MessageService',
     $scope.userData.emisor = $scope.emisor[0];
 
     $scope.submit = function(){
-        ShoppingCartFactory.savePayment($scope.userData.card, $scope.userData.month.value, $scope.userData.year.value,$scope.userData.emisor.value );card, month, year, type
-        $state.go("app.processing-order");
+        ShoppingCartFactory.savePayment($scope.userData.card, $scope.userData.month.value, $scope.userData.year.value,$scope.userData.emisor.value );
+        $state.go("app.confirm-order");
         /*Payment.makePay(1, $scope.cart.customer.firstName, $scope.cart.customer.secondSurname, $scope.userData.emisor.value, $scope.userData.card, $scope.userData.month.value, $scope.userData.year.value, $scope.cart.computeSubTotal(), $scope.cart.travel.price).then(function(e){
             if(e.error != ""){
                 $ionicPopup.alert({

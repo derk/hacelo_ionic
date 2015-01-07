@@ -70,10 +70,12 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             firstName: "",
             secondSurname: "",
             phone: "",
+            email: "",
             address: {
                 province: "",
                 canton: "",
-                district: ""
+                district: "",
+                exacta: ""
             }
         };
         this.orders = pOrders || [];
@@ -203,24 +205,38 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             this.saveShoppingCart();
         },
 
-        savePayment : function(card, month, year, type){
-            this.payment = {
-                card: card,
-                month: month,
-                year: year,
-                type: type
+        savePayment : function(pCard, pMonth, pYear, pType){
+            shoppingCart.payment = {
+                card: pCard,
+                month: pMonth,
+                year: pYear,
+                type: pType
             };
+
+            this.saveShoppingCart();
         },
 
         saveTravel : function(money, canton, distrito, provincia, exacta){
             shoppingCart.travel = {
-                direction :{
-                    canton : 0,
-                    distrito : 0,
-                    provincia : 0,
-                    exacta: 0
-                }, 
                 price : money
+            };
+  
+            this.saveShoppingCart();
+        },
+
+        saveCustomer : function(name, secondSurname, phone, email, province, canton, district, exacta){
+            shoppingCart.customer = {
+                name: name,
+                firstName: name,
+                secondSurname: secondSurname,
+                phone: phone,
+                email: email,
+                address: {
+                    province: province,
+                    canton: canton,
+                    district: district,
+                    exacta: exacta
+                }
             };
             this.saveShoppingCart();
         }

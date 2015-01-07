@@ -10,17 +10,17 @@
 				<div>
 					<span class="sendto">ENVIAR A:</span>
 					<p> 
-						<span>Pedro Abreu</span>
-						<span>400 mts Sur del Cruce Escazú, Santa Ana.</span>
-						<span>Escazú, San José, Costa Rica.</span> 
+						<span>{{cart.customer.firstName}} {{cart.customer.secondSurname}}</span>
+						<span>{{cart.customer.address.exacta}}</span>
+						<span>{{cart.customer.address.district}}, {{cart.customer.address.canton}}, {{cart.customer.address.province}}, Costa Rica.</span> 
 					</p>
 				</div>
 				<div>
 					<span class="contact">CONTACTO:</span>
 					<p>
-						<span>pabreu21@gmail.com</span>
-						<span>2228-9898</span>
-						<a class="edit" href="#">Editar</a>
+						<span>{{cart.customer.email}}</span>
+						<span>{{cart.customer.phone}}</span>
+						<!--a class="edit" href="#">Editar</a-->
 					</p>
 				</div>
 			</div>
@@ -33,6 +33,9 @@
   	<ion-footer-bar>
 	    <h3 class="photos">054 FOTOS</h3>
 		<h4 class="total">TOTAL = 9,000</h4>
+
+		<h3 class="photos">Transporte</h3>
+		<h4 class="total">TOTAL = {{cart.travel.price}}</h4>
 		<a class="button button-balanced" href="#">Realizar Pedido</a>
 	</ion-footer-bar>
 </ion-view>

@@ -167,7 +167,8 @@ angular.module('hacelo', [
         url: "/confirm-order",
         views: {
             'haceloContent': {
-                templateUrl: "templates/confirm-order.html"
+                templateUrl: "templates/confirm-order.html",
+                controller: "confirmOrderCtrl"
             }
         }
     })
@@ -239,12 +240,12 @@ angular.module('hacelo', [
 });
 var commons = angular.module('hacelo.config', []);
 var controllers = angular.module('hacelo.controllers', []);
+var models = angular.module('hacelo.models', []);
 /**
  * Created by joseph on 30/11/2014.
  */
 var directives = angular.module('hacelo.directives', []);
 
-var models = angular.module('hacelo.models', []);
 var services = angular.module('hacelo.services', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
@@ -1082,6 +1083,42 @@ commons.constant('PhotoPrintConfig', {
         }
     ]
 });
+commons.constant('PlacesConfig', {
+    "places":{
+        "San Jose":{
+            "Cantones":{
+                "San Jose":["San Jose", "Desamparados"]
+            }
+        },
+        "Heredia":{
+            "Cantones":{
+                "Heredia":["Santo Domingo", "San Pablo"]
+            }
+        },
+        "Cartago":{
+            "Cantones":{
+                "Taras":["Llorent"]
+            }
+        },
+        "Puntarenas":{
+            "Cantones":{
+                "Jaco":["Tarcoles"]
+            }
+        },
+        "Limon":{
+            "Cantones":{
+                "Cieneguita":["San Cieneguita23", "Cieneguita2312"],
+                "Cieneguita2":["Cieneguita23", "Cieneguita233"],
+                "Cieneguita3":["Cieneguita2312", "Cieneguita2352"]
+            }
+        },
+        "Guanacaste":{
+            "Cantones":{
+                "San Jose":["San Jose", "Desamparados"]
+            }
+        }
+    }
+});
 controllers.controller('addedCtrl', ['$scope', '$stateParams', function ($scope, $stateParams) {
     $scope.productName = $stateParams.productName;
 }]);
@@ -1108,10 +1145,38 @@ controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', '
 /**
  * Created by Raiam on 02/01/2015.
  */
-controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading','$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $state, $ionicLoading, $ionicPopup, Messages, ShoppingCartFactory, Payment) {
+controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading','$ionicPopup', 'MessageService', 'ShoppingCartFactory','PlacesConfig','Payment', function($scope, $state, $ionicLoading, $ionicPopup, Messages, ShoppingCartFactory, PlacesConfig, Payment) {
     
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
     $scope.sucursal = true;
+    $scope.provinces = [];
+    $scope.cantones = [];
+    $scope.districts = [];
+    $scope.info = {};  
+
+    var places = PlacesConfig.places;
+
+    angular.forEach(Object.keys(places), function(v){
+        $scope.provinces.push({"name":v});
+    });
+
+
+    $scope.showCanton = function(){
+        $scope.cantones = [];
+        $scope.districts = [];
+
+         angular.forEach(Object.keys(places[$scope.info.province.name].Cantones), function(v){
+            $scope.cantones.push({"name":v});
+        });
+    };
+
+    $scope.showDistrict = function(){
+        $scope.districts = [];
+
+         angular.forEach(places[$scope.info.province.name].Cantones[$scope.info.canton.name], function(v){
+            $scope.districts.push({"name":v});
+        });
+    };
 
 
     $scope.show = function() {
@@ -1126,6 +1191,10 @@ controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading',
 
     $scope.changeSucursal = function(s){
        $scope.sucursal = s;
+    };
+
+    $scope.saveInformation = function(){
+        ShoppingCartFactory.saveCustomer($scope.info.name, $scope.info.last, $scope.info.phone,  $scope.info.email, $scope.info.province.name, $scope.info.canton.name, $scope.info.district.name, $scope.info.exact);
     };
 
     $scope.calculatePrice = function(){
@@ -1151,7 +1220,7 @@ controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading',
  * Created by Raiam on 02/01/2015.
  */
 
-controllers.controller('redeemCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', 'Payment', function($scope, $ionicPopup, Messages, ShoppingCartFactory, Payment) {
+controllers.controller('redeemCtrl', ['$scope', '$ionicPopup', '$state', 'MessageService', 'ShoppingCartFactory', 'Payment', function($scope, $ionicPopup, $state, Messages, ShoppingCartFactory, Payment) {
     
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
     $scope.userData = {};
@@ -1186,8 +1255,8 @@ controllers.controller('redeemCtrl', ['$scope', '$ionicPopup', 'MessageService',
     $scope.userData.emisor = $scope.emisor[0];
 
     $scope.submit = function(){
-        ShoppingCartFactory.savePayment($scope.userData.card, $scope.userData.month.value, $scope.userData.year.value,$scope.userData.emisor.value );card, month, year, type
-        $state.go("app.processing-order");
+        ShoppingCartFactory.savePayment($scope.userData.card, $scope.userData.month.value, $scope.userData.year.value,$scope.userData.emisor.value );
+        $state.go("app.confirm-order");
         /*Payment.makePay(1, $scope.cart.customer.firstName, $scope.cart.customer.secondSurname, $scope.userData.emisor.value, $scope.userData.card, $scope.userData.month.value, $scope.userData.year.value, $scope.cart.computeSubTotal(), $scope.cart.travel.price).then(function(e){
             if(e.error != ""){
                 $ionicPopup.alert({
@@ -1309,6 +1378,12 @@ controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'Messa
 
     $scope.url =  $scope.actualOrder.product.slider[0].images;
     $scope.height = screen.width;
+}]);
+controllers.controller('confirmOrderCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $ionicPopup, Messages, ShoppingCartFactory,Payment) {
+    $scope.cart = ShoppingCartFactory.loadShoppingCart();
+
+   console.log($scope.cart);
+
 }]);
 /**
  * Created by joseph on 07/12/2014.
@@ -1988,10 +2063,12 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             firstName: "",
             secondSurname: "",
             phone: "",
+            email: "",
             address: {
                 province: "",
                 canton: "",
-                district: ""
+                district: "",
+                exacta: ""
             }
         };
         this.orders = pOrders || [];
@@ -2121,24 +2198,38 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             this.saveShoppingCart();
         },
 
-        savePayment : function(card, month, year, type){
-            this.payment = {
-                card: card,
-                month: month,
-                year: year,
-                type: type
+        savePayment : function(pCard, pMonth, pYear, pType){
+            shoppingCart.payment = {
+                card: pCard,
+                month: pMonth,
+                year: pYear,
+                type: pType
             };
+
+            this.saveShoppingCart();
         },
 
         saveTravel : function(money, canton, distrito, provincia, exacta){
             shoppingCart.travel = {
-                direction :{
-                    canton : 0,
-                    distrito : 0,
-                    provincia : 0,
-                    exacta: 0
-                }, 
                 price : money
+            };
+  
+            this.saveShoppingCart();
+        },
+
+        saveCustomer : function(name, secondSurname, phone, email, province, canton, district, exacta){
+            shoppingCart.customer = {
+                name: name,
+                firstName: name,
+                secondSurname: secondSurname,
+                phone: phone,
+                email: email,
+                address: {
+                    province: province,
+                    canton: canton,
+                    district: district,
+                    exacta: exacta
+                }
             };
             this.saveShoppingCart();
         }

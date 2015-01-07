@@ -215,10 +215,14 @@ body{
 
 .btn-container-short{
     text-align: center;
+    ion-item {
+        width: 100%;
+    }
     .btn-short{
         padding-left: 10px;
         padding-right: 10px;
         display: inline-block;
+        line-height: 47px;
     }
 }
 
@@ -302,10 +306,11 @@ body{
     .products-container {
         & > div {
             height: 33.3%;
-            width:100%;
-            border-bottom: 1px solid #000;
             background: #c2c2c2;
             position: relative;
+            box-sizing: border-box;
+            margin: 10px;
+            padding: 0;
             & > div{
                 height: 100%;
                 width: 100%;
@@ -317,11 +322,15 @@ body{
                 }
             }
         }
+        .button  {
+            display: inline;
+            padding: 15px 20px;
+        }
     }
     .category-container{
         .photo{
-            background: url('../img/bg-fotos.jpg') no-repeat center center;
-            height: 300px;
+            box-sizing: border-box;
+            margin: 10px;
             div {
                 height: 100%;
                 width: 100%;
@@ -365,7 +374,6 @@ body{
         .menu-content {
             height:30%;
             text-align: center;
-            padding-top: 5%;
             background: #FFF;
             box-shadow: none;
             p {
@@ -479,12 +487,14 @@ body{
                 line-height: 18px;
                 text-overflow: initial;
                 white-space: normal;
+                font-style: initial;
                 &.center{
                     text-align: center;
                 }
                 &.question{
                     color: $green;
                     font-size: 16pt;
+                    overflow:initial;
                 }
                 &.answer{
                     margin-bottom: 12%;
@@ -1284,6 +1294,7 @@ body{
         h1 {
             color: white;
             font-weight: bold;
+            padding-top: 40px;
         }
         .singeImage {
             text-align: center;
@@ -1393,4 +1404,23 @@ body{
   opacity: 0;
   top: -50px;
   height: 0px;
+}
+
+
+.slick-dots, .cover {
+    position: relative !important;
+    top: -20px !important;
+}
+
+.check-photo {
+    background: #80b846 !important;
+    height: 10%;
+    font-size: 1em !important;
+    top: 2px;
+    color: #FFFFFF;
+}
+
+.darkroom-button-group:nth-of-type(1),
+.darkroom-button-group:nth-of-type(2) {
+    display:none;
 }
