@@ -240,12 +240,12 @@ angular.module('hacelo', [
 });
 var commons = angular.module('hacelo.config', []);
 var controllers = angular.module('hacelo.controllers', []);
-var models = angular.module('hacelo.models', []);
 /**
  * Created by joseph on 30/11/2014.
  */
 var directives = angular.module('hacelo.directives', []);
 
+var models = angular.module('hacelo.models', []);
 var services = angular.module('hacelo.services', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
@@ -1379,10 +1379,39 @@ controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'Messa
     $scope.url =  $scope.actualOrder.product.slider[0].images;
     $scope.height = screen.width;
 }]);
-controllers.controller('confirmOrderCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $ionicPopup, Messages, ShoppingCartFactory,Payment) {
+controllers.controller('confirmOrderCtrl', ['$scope', '$state' ,'$ionicPopup','$ionicLoading', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $state, $ionicPopup, $ionicLoading, Messages, ShoppingCartFactory,Payment) {
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
 
    console.log($scope.cart);
+
+   window.el = $scope.cart;
+
+   $scope.show = function() {
+        $ionicLoading.show({
+          template: 'Realizando Pago...'
+        });
+    };
+
+    $scope.hide = function(){
+        $ionicLoading.hide();
+    };
+
+   
+   $scope.pay = function(){
+   		$scope.show();
+   		Payment.makePay(1, $scope.cart.customer.firstName, $scope.cart.customer.secondSurname, $scope.cart.payment.type, $scope.cart.payment.card, $scope.cart.payment.month, $scope.cart.payment.year, $scope.cart.computeSubTotal(), $scope.cart.travel.price).then(function(e){
+            $scope.hide();
+            if(e.error != ""){
+                $ionicPopup.alert({
+                    title: 'Error',
+                    template: 'Hubo un error al procesar tu pago, intntalo mas tarde.'
+                });
+            } else {
+            	 
+               $state.go("app.processing-order");
+            }
+        });
+   };
 
 }]);
 /**
@@ -1619,7 +1648,7 @@ controllers.controller('categoryCrtl', ['$scope', '$state', '$ionicPopup', 'Sele
 	};
 
 	var lookForImages = function () {
-		if(SelectedImagesFactory.getAll().length>0) {
+		if(SelectedImagesFactory.getAll().length>0) {oce
 			$ionicPopup
 				.confirm(MessageService.search("loss_of_selected_images"))
 					.then(function(res) {
@@ -1643,11 +1672,13 @@ controllers.controller('photoCrtl', ['$scope', '$state', '$timeout', '$window','
 
 }]);
 
-controllers.controller('processingCtrl', ['$scope', '$sce', 'StorageService',function($scope, $sce, StorageService) {
+controllers.controller('processingCtrl', ['$scope', '$sce', 'StorageService','ShoppingCartFactory',function($scope, $sce, StorageService, ShoppingCartFactory) {
 	// TODO add this url into a configuration file, since it is globally, and depends on the ftp.
-	$scope.api = $sce.trus
-	tAsResourceUrl("https://grooveshark-c9-raiam1234.c9.io/workspace/public/nacion.php");
+	$scope.api = $sce.trustAsResourceUrl("https://grooveshark-c9-raiam1234.c9.io/workspace/public/nacion.php");
 	$scope.market = StorageService.load();
+	$scope.cart = ShoppingCartFactory.loadShoppingCart();
+	window.cart = $scope.cart;
+	window.market = $scope.market;
 
 	$scope.range = function(n) {
 		return new Array(n);
@@ -1668,23 +1699,6 @@ controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ion
         window.plugins.socialsharing.shareViaEmail('Hacelo','Hacelo');
     };
 });
-/**
- * Created by joseph on 30/11/2014.
- */
-directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
-    var directiveName = "whenLoaded";
-    return {
-        restrict: 'A',
-        link: function (scope, iElement, iAttrs) {
-            iElement.load(function() {
-                var fns = $parse(iAttrs[directiveName])(scope);
-                for (var i = 0; i < fns.length; i++) {
-                    fns[i]();
-                }
-            });
-        }
-    };
-}]);
 models.factory('ImageFactory', ['$q', function ($q) {
     function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
         this.origin = pOrigin;
@@ -2134,6 +2148,21 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             }
             return subTotal;
         };
+
+        this.getTotal = function(){
+            var t = parseInt(this.computeSubTotal());
+            var p = parseInt(this.travel.price);
+
+            return t+p;
+        };
+
+        this.getTotalQuantity = function(){
+            var quantity = 0;
+            for (var i = this.orders.length - 1; i >= 0; i--) {
+                quantity += this.orders[i].getQuantity();
+            }
+            return quantity;
+        };
     }
 
     // ---
@@ -2232,6 +2261,23 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
                 }
             };
             this.saveShoppingCart();
+        }
+    };
+}]);
+/**
+ * Created by joseph on 30/11/2014.
+ */
+directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
+    var directiveName = "whenLoaded";
+    return {
+        restrict: 'A',
+        link: function (scope, iElement, iAttrs) {
+            iElement.load(function() {
+                var fns = $parse(iAttrs[directiveName])(scope);
+                for (var i = 0; i < fns.length; i++) {
+                    fns[i]();
+                }
+            });
         }
     };
 }]);

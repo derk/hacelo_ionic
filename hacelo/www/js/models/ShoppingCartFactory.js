@@ -141,6 +141,21 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             }
             return subTotal;
         };
+
+        this.getTotal = function(){
+            var t = parseInt(this.computeSubTotal());
+            var p = parseInt(this.travel.price);
+
+            return t+p;
+        };
+
+        this.getTotalQuantity = function(){
+            var quantity = 0;
+            for (var i = this.orders.length - 1; i >= 0; i--) {
+                quantity += this.orders[i].getQuantity();
+            }
+            return quantity;
+        };
     }
 
     // ---

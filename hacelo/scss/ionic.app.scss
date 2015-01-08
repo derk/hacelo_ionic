@@ -219,10 +219,9 @@ body{
         width: 100%;
     }
     .btn-short{
-        padding-left: 10px;
-        padding-right: 10px;
-        display: inline-block;
         line-height: 47px;
+        display: inline;
+        padding: 15px 20px;
     }
 }
 
@@ -1070,8 +1069,17 @@ body{
         padding: 4%;
         background: url('../img/bg-fotos.jpg') no-repeat center center;
         background-size: 100%;
+
+        .product-to-pay:nth-of-type(1){
+            float:left;
+        }
+
+        .product-to-pay {
+            width: 40%;
+            float: right;
+        }
+
         h3.photos{
-            width: 58%;
             background: #FFF;
             padding: 2% 6%;
             color: $green;
@@ -1079,13 +1087,18 @@ body{
         }
         h4.total{
             background: $red;
-            width: 42%;
             color: #FFF;
             padding: 2.2%;
             font-size: 1.1em;
             margin-bottom: 16%;
             font-weight: bold;
         }
+
+        h4.total-full {
+            float: left;
+            width: 100%;
+        }
+
         a.button{
             width: 91%;
             text-transform: uppercase;
@@ -1094,6 +1107,7 @@ body{
             bottom: 5%;
             font-size: 1.2em;
             line-height: 40px;
+            display: block;
         }
     }
 }

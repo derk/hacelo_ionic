@@ -31,11 +31,17 @@
 		</div>
   	</ion-content>
   	<ion-footer-bar>
-	    <h3 class="photos">054 FOTOS</h3>
-		<h4 class="total">TOTAL = 9,000</h4>
-
-		<h3 class="photos">Transporte</h3>
-		<h4 class="total">TOTAL = {{cart.travel.price}}</h4>
-		<a class="button button-balanced" href="#">Realizar Pedido</a>
+  		<div class="product-to-pay">
+  			<h3 class="photos">{{cart.getTotalQuantity()}} Fotos</h3>
+			<h4 class="total">TOTAL = {{cart.computeSubTotal()}}</h4>
+  		</div>
+	    
+	    <div class="product-to-pay">
+	    	<h3 class="photos">Transporte</h3>
+			<h4 class="total">TOTAL = {{cart.travel.price}}</h4>
+	    </div>	
+	    <h4 class="total total-full">TOTAL = {{cart.getTotal()}}</h4>
+		
+		<a class="button button-balanced" ng-click="pay()">Realizar Pedido</a>
 	</ion-footer-bar>
 </ion-view>

@@ -19,7 +19,7 @@ controllers.controller('categoryCrtl', ['$scope', '$state', '$ionicPopup', 'Sele
 	};
 
 	var lookForImages = function () {
-		if(SelectedImagesFactory.getAll().length>0) {
+		if(SelectedImagesFactory.getAll().length>0) {oce
 			$ionicPopup
 				.confirm(MessageService.search("loss_of_selected_images"))
 					.then(function(res) {
@@ -43,11 +43,14 @@ controllers.controller('photoCrtl', ['$scope', '$state', '$timeout', '$window','
 
 }]);
 
-controllers.controller('processingCtrl', ['$scope', '$sce', 'StorageService',function($scope, $sce, StorageService) {
+controllers.controller('processingCtrl', ['$scope', '$sce', 'StorageService','ShoppingCartFactory',function($scope, $sce, StorageService, ShoppingCartFactory) {
 	// TODO add this url into a configuration file, since it is globally, and depends on the ftp.
-	$scope.api = $sce.trus
-	tAsResourceUrl("https://grooveshark-c9-raiam1234.c9.io/workspace/public/nacion.php");
+	$scope.api = $sce.trustAsResourceUrl("https://grooveshark-c9-raiam1234.c9.io/workspace/public/nacion.php");
 	$scope.market = StorageService.load();
+	$scope.cart = ShoppingCartFactory.loadShoppingCart();
+	
+	window.cart = $scope.cart;
+	window.market = $scope.market;
 
 	$scope.range = function(n) {
 		return new Array(n);

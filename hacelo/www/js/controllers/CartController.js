@@ -57,7 +57,7 @@ controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading',
 
     $scope.show = function() {
         $ionicLoading.show({
-          template: 'Cargando...'
+          template: 'Calculando Transporte'
         });
     };
 
