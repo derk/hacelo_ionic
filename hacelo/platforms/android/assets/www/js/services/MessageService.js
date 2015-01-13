@@ -29,6 +29,10 @@ services.service('MessageService', ['$http', function ($http) {
         var resul = this.keyToValue(msjKey, messages);
         return resul;
     };
+
+    this.getMessages = function() {
+        return messages;
+    };
     // Load the messages from JSON file
     initMessages();
 }]);

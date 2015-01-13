@@ -167,7 +167,8 @@ angular.module('hacelo', [
         url: "/confirm-order",
         views: {
             'haceloContent': {
-                templateUrl: "templates/confirm-order.html"
+                templateUrl: "templates/confirm-order.html",
+                controller: "confirmOrderCtrl"
             }
         }
     })

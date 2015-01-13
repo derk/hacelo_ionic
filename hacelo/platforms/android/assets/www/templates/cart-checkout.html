@@ -16,18 +16,18 @@
 				
 			    <div class="maininfo">
 			    	<label class="item item-input name">
-					<input class="" type="text" name="name" placeholder="NOMBRE">
+					<input class="" ng-model="info.name" type="text" name="name" placeholder="NOMBRE">
 					</label>
 					<label class="item item-input lastname">
-						<input class="" type="text" name="lastname" placeholder="APELLIDO">
+						<input class="" ng-model="info.last" type="text" name="lastname" placeholder="APELLIDO">
 					</label>
 			    </div>
 				<label class="item item-input no-mg-bottom">
-					<input name="email" type="email" placeholder="CORREO">
+					<input name="email" ng-model="info.email" type="email" placeholder="CORREO">
 				</label>
 				<span class="advise">(Para enviarte la factura)</span>
 				<label class="item item-input no-mg-bottom">
-					<input name="tel" type="text" placeholder="TELÉFONO">
+					<input name="tel" ng-model="info.phone" type="text" placeholder="TELÉFONO">
 				</label>
 				<span class="advise">(Para llamarte por si algo sucedió durante la entrega)</span>
 
@@ -41,24 +41,26 @@
 			    <div ng-show="!sucursal">
 
 					<label class="item item-input">
-						<textarea name="comment" ng-model="address" rows="7" cols="5" placeholder="DIRECCIÓN">
+						<textarea name="comment" ng-model="info.exact" rows="7" cols="5" placeholder="DIRECCIÓN">
 						</textarea>
 					</label>
-					<select>
-				      <option selected>San José</option>
-				      <option>Heredia</option>
-				      <option>Cartago</option>
-				    </select>
+
+					<select 
+					      ng-model="info.province" 
+					      ng-options="province.name for province in provinces"
+					      ng-change= "showCanton()">
+					</select>
 				    <span class="advise">(Ej: San José)</span>
-				    <select>
-				      <option selected>Tibás</option>
-				      <option>Guadalupe</option>
-				    </select>
+				    <select 
+					      ng-model="info.canton" 
+					      ng-options="canton.name for canton in cantones"
+					      ng-change= "showDistrict()">
+					</select>
 				    <span class="advise">(Ej. Tibás)</span>
-				    <select>
-				      <option selected>Llorente</option>
-				      <option>Otro</option>
-				    </select>
+				    <select 
+					      ng-model="info.district" 
+					      ng-options="district.name for district in districts">
+					</select>
 				    <span class="advise">(Ej. Llorente)</span>
 				    <label class="item input-checkbox">
 						<input type="checkbox">
@@ -66,7 +68,7 @@
 					</label>
 			    </div>
 			    
-				<a ng-click="calculatePrice()" class="button button-balanced" >Pagar</a>
+				<a ng-click="saveInformation();calculatePrice();" class="button button-balanced" >Pagar</a>
 			</div>
     		
 		</div>

@@ -7,6 +7,7 @@ commons.constant('PhotoPrintConfig', {
         {
             id: "pictures",
             "name": "Fotografias",
+            "images": "img/fotografias/PORTADA_FOTOGRAFIAS/portada_fotografia.png",
             "products": [
                 {
                     "name": "4x6",
@@ -43,6 +44,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/fotografias/6X4/6X4_Categoria/6X4_categoria.png",
+                    "slider": [
+                        {   "images":"img/fotografias/6X4/4_4/1.png"},
+                        {   "images":"img/fotografias/6X4/4_4/2.png"},
+                        {   "images":"img/fotografias/6X4/4_4/3.png"},
+                        {   "images":"img/fotografias/6X4/4_4/4.png"}
+                    ],
                     "weight": 120
                 },
                 {
@@ -78,7 +85,13 @@ commons.constant('PhotoPrintConfig', {
                             "price": 1000
                         }
                     },
-                    "images": "img/fotografias/7X5/7X5_Categoria/7x5_categoria.png",
+                    "images": "img/fotografias/7X5/7X5_Categoria/7X5_categoria.png",
+                    "slider": [
+                        {   "images":"img/fotografias/7X5/4_4/1.png"},
+                        {   "images":"img/fotografias/7X5/4_4/2.png"},
+                        {   "images":"img/fotografias/7X5/4_4/3.png"},
+                        {   "images":"img/fotografias/7X5/4_4/4.png"}
+                    ],
                     "weight": 120
                 },
                 {
@@ -115,6 +128,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/fotografias/10X8/10X8_Categoria/10X8_categoria.png",
+                    "slider": [
+                        {   "images":"img/fotografias/10X8/4_4/1.png"},
+                        {   "images":"img/fotografias/10X8/4_4/2.png"},
+                        {   "images":"img/fotografias/10X8/4_4/3.png"},
+                        {   "images":"img/fotografias/10X8/4_4/4.png"}
+                    ],
                     "weight": 120
                 }
             ],
@@ -131,6 +150,7 @@ commons.constant('PhotoPrintConfig', {
         {
             id: "quadrate",
             "name": "Cuadradas",
+            "images": "img/cuadradas/PORTADA_CUADRADAS/portada_cuadradas.png",
             "products": [
                 {
                     "name": "4x4",
@@ -166,6 +186,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/4X4/4X4_Categoria/4X4_categoria.png",
+                    "slider": [
+                        {   "images":"img/cuadradas/4X4/4_4/1.png"},
+                        {   "images":"img/cuadradas/4X4/4_4/2.png"},
+                        {   "images":"img/cuadradas/4X4/4_4/3.png"},
+                        {   "images":"img/cuadradas/4X4/4_4/4.png"}
+                    ],
                     "weight": 120
                 },
                 {
@@ -202,6 +228,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/8X8/8X8_Categoria/8x8_categoria.png",
+                    "slider": [
+                        {   "images":"img/cuadradas/8X8/4_4/1.png"},
+                        {   "images":"img/cuadradas/8X8/4_4/2.png"},
+                        {   "images":"img/cuadradas/8X8/4_4/3.png"},
+                        {   "images":"img/cuadradas/8X8/4_4/4.png"}
+                    ],
                     "weight": 120
                 },
                 {
@@ -238,6 +270,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
+                    "slider": [
+                        {   "images":"img/cuadradas/10X10/4_4/1.png"},
+                        {   "images":"img/cuadradas/10X10/4_4/2.png"},
+                        {   "images":"img/cuadradas/10X10/4_4/3.png"},
+                        {   "images":"img/cuadradas/10X10/4_4/4.png"}
+                    ],
                     "weight": 120
                 }
             ],
@@ -254,6 +292,7 @@ commons.constant('PhotoPrintConfig', {
         {
             id: "photobook",
             "name": "Photobook",
+            "images": "img/cuadradas/PORTADA_CUADRADAS/portada_cuadradas.png",
             "products": [
                 {
                     "name": "8.5x11",
@@ -290,6 +329,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
+                    "slider": [
+                        {   "images":"img/cuadradas/10X10/4_4/1.png"},
+                        {   "images":"img/cuadradas/10X10/4_4/2.png"},
+                        {   "images":"img/cuadradas/10X10/4_4/3.png"},
+                        {   "images":"img/cuadradas/10X10/4_4/4.png"}
+                    ],
                     "weight": 120
                 },
                 {
@@ -326,6 +371,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/cuadradas/10X10/10X10_Categoria/10X10_categoria.png",
+                    "slider": [
+                        {   "images":"img/cuadradas/10X10/4_4/1.png"},
+                        {   "images":"img/cuadradas/10X10/4_4/2.png"},
+                        {   "images":"img/cuadradas/10X10/4_4/3.png"},
+                        {   "images":"img/cuadradas/10X10/4_4/4.png"}
+                    ],
                     "weight": 120
                 }
             ],
@@ -342,6 +393,7 @@ commons.constant('PhotoPrintConfig', {
         {
             id: "woodFrame",
             "name": "Marco de Madera",
+            "images": "img/marcos/14X20/14X20_Categoria/14X20_categoria.png",
             "products": [
                 {
                     "name": "4x4",
@@ -377,6 +429,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/marcos/4X4/4X4_Categoria/4X4_categoria.png",
+                    "slider": [
+                        {   "images":"img/marcos/4X4/4_4/1.png"},
+                        {   "images":"img/marcos/4X4/4_4/2.png"},
+                        {   "images":"img/marcos/4X4/4_4/3.png"},
+                        {   "images":"img/marcos/4X4/4_4/4.png"}
+                    ],
                     "weight": 500
                 },
                 {
@@ -413,6 +471,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/marcos/11X17/11X17_Categoria/11X17_categoria.png",
+                    "slider": [
+                        {   "images":"img/marcos/11X17/4_4/1.png"},
+                        {   "images":"img/marcos/11X17/4_4/2.png"},
+                        {   "images":"img/marcos/11X17/4_4/3.png"},
+                        {   "images":"img/marcos/11X17/4_4/4.png"}
+                    ],
                     "weight": 2000
                 },
                 {
@@ -449,6 +513,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/marcos/14X20/14X20_Categoria/14X20_categoria.png",
+                    "slider": [
+                        {   "images":"img/marcos/14X20/4_4/1.png"},
+                        {   "images":"img/marcos/14X20/4_4/2.png"},
+                        {   "images":"img/marcos/14X20/4_4/3.png"},
+                        {   "images":"img/marcos/14X20/4_4/4.png"}
+                    ],
                     "weight": 2500
                 },
                 {
@@ -485,6 +555,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/marcos/20X29/20X29_Categoria/20X29_categoria.png",
+                    "slider": [
+                        {   "images":"img/marcos/20X29/4_4/1.png"},
+                        {   "images":"img/marcos/20X29/4_4/2.png"},
+                        {   "images":"img/marcos/20X29/4_4/3.png"},
+                        {   "images":"img/marcos/20X29/4_4/4.png"}
+                    ],
                     "weight": 4200
                 }
             ],
@@ -501,6 +577,7 @@ commons.constant('PhotoPrintConfig', {
         {
             id: "photostrips",
             "name": "Photostrips",
+            "images": "img/photostrips/Photostrips_Categoria/photostrips_categoria.png",
             "products": [
                 {
                     "name": "4.25x17.78",
@@ -536,6 +613,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/photostrips/Photostrips_Categoria/photostrips_categoria.png",
+                    "slider": [
+                        {   "images":"img/photostrips/4_4/1.png"},
+                        {   "images":"img/photostrips/4_4/2.png"},
+                        {   "images":"img/photostrips/4_4/3.png"},
+                        {   "images":"img/photostrips/4_4/4.png"}
+                    ],
                     "weight": 120
                 }
             ],
@@ -552,6 +635,7 @@ commons.constant('PhotoPrintConfig', {
         {
             id: "poster",
             "name": "Poster",
+            "images": "img/poster/Poster_Categoria/poster_categoria.png",
             "products": [
                 {
                     "name": "20.1x29.1",
@@ -587,6 +671,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/poster/Poster_Categoria/poster_categoria.png",
+                    "slider": [
+                        {   "images":"img/poster/4_4/1.png"},
+                        {   "images":"img/poster/4_4/2.png"},
+                        {   "images":"img/poster/4_4/3.png"},
+                        {   "images":"img/poster/4_4/4.png"}
+                    ],
                     "weight": 120
                 }
             ],
@@ -603,6 +693,7 @@ commons.constant('PhotoPrintConfig', {
         {
             id: "largeFormat",
             "name": "Gran Formato",
+            "images": "img/gran_formato/20X29/20X29_Categoria/20X29_categoria.png",
             "products": [
                 {
                     "name": "11x17",
@@ -638,6 +729,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/gran_formato/11X17/11X17_Categoria/11X17_categoria.png",
+                    "slider": [
+                        {   "images":"img/gran_formato/11X17/4_4/1.png"},
+                        {   "images":"img/gran_formato/11X17/4_4/2.png"},
+                        {   "images":"img/gran_formato/11X17/4_4/3.png"},
+                        {   "images":"img/gran_formato/11X17/4_4/4.png"}
+                    ],
                     "weight": 120
                 },
                 {
@@ -674,6 +771,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/gran_formato/14X20/14X20_Categoria/14X20_categoria.png",
+                    "slider": [
+                        {   "images":"img/gran_formato/14X20/4_4/1.png"},
+                        {   "images":"img/gran_formato/14X20/4_4/2.png"},
+                        {   "images":"img/gran_formato/14X20/4_4/3.png"},
+                        {   "images":"img/gran_formato/14X20/4_4/4.png"}
+                    ],
                     "weight": 120
                 },
                 {
@@ -710,6 +813,12 @@ commons.constant('PhotoPrintConfig', {
                         }
                     },
                     "images": "img/gran_formato/20X29/20X29_Categoria/20X29_categoria.png",
+                    "slider": [
+                        {   "images":"img/gran_formato/20X29/4_4/1.png"},
+                        {   "images":"img/gran_formato/20X29/4_4/2.png"},
+                        {   "images":"img/gran_formato/20X29/4_4/3.png"},
+                        {   "images":"img/gran_formato/20X29/4_4/4.png"}
+                    ],
                     "weight": 120
                 }
 

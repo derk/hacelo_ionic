@@ -20,15 +20,21 @@
 				<form action="{{api}}" method="post" >
 					<input type="text" name="data" value="mobileTest"/>
 					<input type="submit" value="Submit">
-					<div ng-repeat="photo in market.market">
-						<div ng-repeat="single in photo.items">
-							<div ng-repeat="number in range(single.quantity)">
+					<div id="information" ng-repeat="photo in market.orders track by $index">
+
+						<div ng-repeat="single in photo.items track by $index">
+							<div ng-repeat="number in range(single.quantity) track by $index">
 								<input value="{{single.images.standard_resolution.url}}" type="text" name="images[]"/>
-								<input value="{{photo.category}}_{{photo.subCategory}}"	/>
+								<input value="{{photo.productLine.name}}_{{photo.product.name}}" name="category[]"	/>
 							</div>
 						</div>
+
+
 					</div>
 				</form>
+
+				<canvas id="canvas"></canvas>
+				<img id="imgToCanvas" src="{{customUrl}}">
 		</div>
   	</ion-content>
 </ion-view>

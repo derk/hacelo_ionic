@@ -3,7 +3,7 @@
  */
 controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $ionicPopup, Messages, ShoppingCartFactory,Payment) {
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
-
+    console.log($scope.cart);
     $scope.removeOrder = function (pOrderToRemove) {
         var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_order_delete"),
             confirmPopup = $ionicPopup.confirm(cache);
@@ -15,31 +15,78 @@ controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', '
         });
     };
 
+    $scope.minus = function(order){
+
+    };
+
 }]);
 
 
 /**
  * Created by Raiam on 02/01/2015.
  */
-controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $state, $ionicPopup, Messages, ShoppingCartFactory, Payment) {
+controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading','$ionicPopup', 'MessageService', 'ShoppingCartFactory','PlacesConfig','Payment', function($scope, $state, $ionicLoading, $ionicPopup, Messages, ShoppingCartFactory, PlacesConfig, Payment) {
     
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
     $scope.sucursal = true;
+    $scope.provinces = [];
+    $scope.cantones = [];
+    $scope.districts = [];
+    $scope.info = {};  
+
+    var places = PlacesConfig.places;
+
+    angular.forEach(Object.keys(places), function(v){
+        $scope.provinces.push({"name":v});
+    });
+
+
+    $scope.showCanton = function(){
+        $scope.cantones = [];
+        $scope.districts = [];
+
+         angular.forEach(Object.keys(places[$scope.info.province.name].Cantones), function(v){
+            $scope.cantones.push({"name":v});
+        });
+    };
+
+    $scope.showDistrict = function(){
+        $scope.districts = [];
+
+         angular.forEach(places[$scope.info.province.name].Cantones[$scope.info.canton.name], function(v){
+            $scope.districts.push({"name":v});
+        });
+    };
+
+
+    $scope.show = function() {
+        $ionicLoading.show({
+          template: 'Calculando Transporte'
+        });
+    };
+
+    $scope.hide = function(){
+        $ionicLoading.hide();
+    };
 
     $scope.changeSucursal = function(s){
        $scope.sucursal = s;
     };
 
+    $scope.saveInformation = function(){
+        ShoppingCartFactory.saveCustomer($scope.info.name, $scope.info.last, $scope.info.phone,  $scope.info.email, $scope.info.province.name, $scope.info.canton.name, $scope.info.district.name, $scope.info.exact);
+    };
+
     $scope.calculatePrice = function(){
 
         if($scope.sucursal == true){
-            console.log("entrro");
             ShoppingCartFactory.saveTravel(0);
             $state.go("app.redeem");
         } else {
-            console.log("entrro 2");
+            $scope.show();
             Payment.sendWeight($scope.cart.getWeight()).then(function(response){
                 ShoppingCartFactory.saveTravel(response.message.precio);
+                $scope.hide();
                 $state.go("app.redeem");
             });
         }
@@ -53,7 +100,7 @@ controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicPopup', '
  * Created by Raiam on 02/01/2015.
  */
 
-controllers.controller('redeemCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', function($scope, $ionicPopup, Messages, ShoppingCartFactory) {
+controllers.controller('redeemCtrl', ['$scope', '$ionicPopup', '$state', 'MessageService', 'ShoppingCartFactory', 'Payment', function($scope, $ionicPopup, $state, Messages, ShoppingCartFactory, Payment) {
     
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
     $scope.userData = {};
@@ -87,10 +134,19 @@ controllers.controller('redeemCtrl', ['$scope', '$ionicPopup', 'MessageService',
     $scope.userData.month = $scope.months[0];
     $scope.userData.emisor = $scope.emisor[0];
 
-    console.log($scope.cart);
-    window.el = $scope.cart;
     $scope.submit = function(){
-        Payment.makePay(1, $scope.cart.customer.firstName, $scope.cart.customer.secondSurname, $scope.userData.emisor.value, $scope.userData.card, $scope.userData.month.value, $scope.userData.month.value, $scope.cart.computeSubTotal(), $scope.cart.travel.price);
+        ShoppingCartFactory.savePayment($scope.userData.card, $scope.userData.month.value, $scope.userData.year.value,$scope.userData.emisor.value );
+        $state.go("app.confirm-order");
+        /*Payment.makePay(1, $scope.cart.customer.firstName, $scope.cart.customer.secondSurname, $scope.userData.emisor.value, $scope.userData.card, $scope.userData.month.value, $scope.userData.year.value, $scope.cart.computeSubTotal(), $scope.cart.travel.price).then(function(e){
+            if(e.error != ""){
+                $ionicPopup.alert({
+                    title: 'Error',
+                    template: 'Hubo un error al procesar tu pago, intntalo mas tarde.'
+                });
+            } else {
+                $state.go("app.processing-order");
+            }
+        });*/
     };
 
 }]);

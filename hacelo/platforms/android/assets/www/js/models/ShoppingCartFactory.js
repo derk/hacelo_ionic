@@ -70,10 +70,12 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             firstName: "",
             secondSurname: "",
             phone: "",
+            email: "",
             address: {
                 province: "",
                 canton: "",
-                district: ""
+                district: "",
+                exacta: ""
             }
         };
         this.orders = pOrders || [];
@@ -86,6 +88,13 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
                 exacta: ""
             }, 
             price : 0
+        };
+
+        this.payment = {
+            card: "",
+            month: "",
+            year: "",
+            type: ""
         };
 
         // ---
@@ -131,6 +140,21 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
                 subTotal += this.orders[i].computeSubTotal();
             }
             return subTotal;
+        };
+
+        this.getTotal = function(){
+            var t = parseInt(this.computeSubTotal());
+            var p = parseInt(this.travel.price);
+
+            return t+p;
+        };
+
+        this.getTotalQuantity = function(){
+            var quantity = 0;
+            for (var i = this.orders.length - 1; i >= 0; i--) {
+                quantity += this.orders[i].getQuantity();
+            }
+            return quantity;
         };
     }
 
@@ -196,15 +220,38 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
             this.saveShoppingCart();
         },
 
+        savePayment : function(pCard, pMonth, pYear, pType){
+            shoppingCart.payment = {
+                card: pCard,
+                month: pMonth,
+                year: pYear,
+                type: pType
+            };
+
+            this.saveShoppingCart();
+        },
+
         saveTravel : function(money, canton, distrito, provincia, exacta){
             shoppingCart.travel = {
-                direction :{
-                    canton : 0,
-                    distrito : 0,
-                    provincia : 0,
-                    exacta: 0
-                }, 
                 price : money
+            };
+  
+            this.saveShoppingCart();
+        },
+
+        saveCustomer : function(name, secondSurname, phone, email, province, canton, district, exacta){
+            shoppingCart.customer = {
+                name: name,
+                firstName: name,
+                secondSurname: secondSurname,
+                phone: phone,
+                email: email,
+                address: {
+                    province: province,
+                    canton: canton,
+                    district: district,
+                    exacta: exacta
+                }
             };
             this.saveShoppingCart();
         }

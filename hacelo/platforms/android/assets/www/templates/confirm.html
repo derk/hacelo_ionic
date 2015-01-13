@@ -7,9 +7,9 @@
 	
   	<ion-content class="has-header">
     	<div class="confirm-container">
-    		<div class="photo-cover"></div>
+    		<div class="photo-cover" style="background:url({{url}}) no-repeat top left/ 100% 100%; height:{{height}}px"></div>
 			<h2>{{actualOrder.productLine.name}}<br/>{{actualOrder.product.name}}</h2>
-			<p>Quieres ordenar</p>
+			<p>¿Quieres ordenar?</p>
 			<p>{{actualOrder.getQuantity()}} fotos <span>= {{actualOrder.computeSubTotal() | currency:"&#8353;"}}</span></p>
 			<a class="button button-balanced" ng-click="addToCart()">Añadir a Carrito</a>
 		</div>
