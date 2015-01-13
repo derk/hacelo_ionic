@@ -40,6 +40,7 @@ $red: #d6392c;
 $darkerRed: #b63223;
 $orange: #eb9e17;
 $darkerOrange: #c88812;
+$yellowCart: #FBEE3D;
 $grey: #4a4a4b;
 $text-grey: #666666;
 $lightGrey: #dadada;
@@ -710,8 +711,8 @@ body{
             .quantity-container {
                 position: absolute;
                 top: 12px;
-                width: 40%;
-                padding: 5% 0;
+                width: 32%;
+                padding: 3% 0;
                 background: #d73833;
                 right: 0;
 
@@ -746,7 +747,7 @@ body{
                     float: left;
                     display: inline-block;
                     padding: 10px;
-                    background: red;
+                    background: $darkerBlue;
                     color: white;
                     font-weight: 700;
                 }
@@ -865,7 +866,7 @@ body{
     }
     .bar-footer{
         height: 100px;
-        background: rgba(0,0,0,0.05);
+        background: rgba(255,255,255,0.5);
         .subtotal {
             width: 100%;
             height: 50px;
@@ -1170,28 +1171,36 @@ body{
         }
 
         .product-to-pay {
-            width: 40%;
-            float: right;
+            width: 65%;
+            float: left;
+            color: white;
         }
 
         h3.photos{
-            background: #FFF;
-            padding: 2% 6%;
-            color: $green;
-            font-weight: bold;
+            font-size: 1.2em;
+            float: left;
+            color: white;
+            display: inline-block;
         }
         h4.total{
-            background: $red;
-            color: #FFF;
-            padding: 2.2%;
-            font-size: 1.1em;
-            margin-bottom: 16%;
-            font-weight: bold;
+            font-size: 1.2em;
+            display: inline-block;
+            width: 48%;
+            float: right;
+            margin: 0 0 0 26px;
+            color: white;
         }
 
         h4.total-full {
             float: left;
-            width: 100%;
+            width: 60%;
+            padding: 5% 1%;
+            background: white;
+            margin: 0;
+            color: $yellowCart;
+            font-weight: 700;
+            text-align: center;
+            font-size: 1.5em;
         }
 
         a.button{

@@ -1,7 +1,7 @@
 /**
  * Created by joseph on 29/11/2014.
  */
-models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', function (StorageService, ImageFactory) {
+models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', function ($q, StorageService, ImageFactory) {
     // ---
     // PRIVATE ATTRIBUTES.
     // ---
@@ -191,6 +191,41 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
         saveShoppingCart: function(){
             return StorageService.save(shoppingCart);
         },
+
+
+        load : function(){
+           var defer = $q.defer();
+           var self = this;
+            /*
+            * Load any data stored
+            * then check if some shopping cart was already created
+            * if yes load it or create a new one and save it (for future usage)
+            * and finally return the loaded/created shopping cart
+            * */
+            var lastShoppingCart,
+                restoredOrders;
+
+            if (angular.isUndefined(shoppingCart)) {
+                StorageService.loadFile().then(function(e){
+                    lastShoppingCart = angular.fromJson(e);
+                    if(angular.isObject(lastShoppingCart)){
+                        restoredOrders = restoreOrders(lastShoppingCart.orders);
+                        shoppingCart = new ShoppingCart(lastShoppingCart.customer, restoredOrders);
+                        defer.resolve(shoppingCart);
+                    } else {
+                        shoppingCart = new ShoppingCart();
+                        defer.resolve(shoppingCart);
+                        self.saveShoppingCart();
+                    }
+
+                });
+            } else {
+                defer.resolve(shoppingCart);
+            }
+
+            return defer.promise;
+        },
+
         loadShoppingCart: function(){
             /*
             * Load any data stored
@@ -203,6 +238,7 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
 
             if (angular.isUndefined(shoppingCart)) {
                 lastShoppingCart = StorageService.load();
+                console.log("got it yeah");
 
                 if(angular.isObject(lastShoppingCart)){
                     restoredOrders = restoreOrders(lastShoppingCart.orders);

@@ -1,5 +1,15 @@
-controllers.controller('landingCtrl', ['$scope', 'ShoppingCartFactory',function($scope, ShoppingCartFactory) {
-	$scope.cart = ShoppingCartFactory.loadShoppingCart();
+controllers.controller('landingCtrl', ['$scope', '$ionicLoading','ShoppingCartFactory','MessageService',function($scope, $ionicLoading, ShoppingCartFactory, MessageService) {
+	$scope.cart = null;
+
+    $ionicLoading.show({
+	    template: 'Cargando... '
+    });
+
+	ShoppingCartFactory.load().then(function(e){
+		$scope.cart = e;
+		$ionicLoading.hide();
+	});
+	
 }]);
 
 controllers.controller('productCrtl', ['$scope', '$state', 'SelectedImagesFactory', 'PhotoPrintConfig', function($scope, $state, SelectedImagesFactory, PhotoPrintConfig) {

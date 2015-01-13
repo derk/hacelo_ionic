@@ -3,15 +3,16 @@
  */
 services.service('StorageService', ['$window','$q', function ($window, $q) {
     var storage = $window.localStorage,
-        prefix = "hacelo";
+        prefix = "hacelo",
+        cart = "";
 
     this.save = function(pCartData) {
         var saved = true;
-        try {
+        /*try {
             storage.setItem(prefix, angular.toJson(pCartData, false));
         } catch (e) {
             saved = false;
-        }
+        }*/
 
         try {
             this.saveToDisk(pCartData);
@@ -22,16 +23,28 @@ services.service('StorageService', ['$window','$q', function ($window, $q) {
         return saved;
     };
 
+
     this.load = function() {
-        var self = this;
+        console.log("cart");
+        return angular.fromJson(cart);
+    };
+
+
+    this.loadFile = function(){
+        var defer = $q.defer(),
+            self = this;
+        // This is to ensure device is ready
         document.addEventListener('deviceready', function(){
             self.getDataFromDisk().then(function(e){
-                window.el = e;
+                cart = e;
+                defer.resolve(e);
             });
         }, false);
-        
-        return angular.fromJson(storage.getItem(prefix));
+
+
+        return defer.promise;
     };
+
 
     this.clear = function() {
         this.save("");
@@ -46,11 +59,39 @@ services.service('StorageService', ['$window','$q', function ($window, $q) {
         b.write_file('Printea/','shopping.txt', angular.toJson(pCartData, false) ,Log('wrote sucessful!'));
     };
 
+
     this.getDataFromDisk = function(){
-        var defer = $q.defer();
-        var b = new FileManager(),
+        var defer = $q.defer(),
+            a = new DirManager(),
+            b = new FileManager(),
             c = "" ;
-        b.read_file('Printea/','shopping.txt',function(e){defer.resolve(e)},function(e){defer.resolve(e)});
+
+        this.existFolder().then(function(e){
+            if(!e){
+                b.write_file('Printea/','shopping.txt', null ,function(){
+                    b.read_file('Printea/','shopping.txt',function(e){defer.resolve(e)},function(e){defer.resolve(e)});
+                });
+            } else {
+                b.read_file('Printea/','shopping.txt',function(e){defer.resolve(e)},function(e){defer.resolve(e)});
+            }
+        });
+        
+        return defer.promise;
+    };
+
+
+    this.existFolder = function(){
+        var defer = $q.defer(),
+            a = new DirManager(),
+            c = "" ;
+
+        a.list('Printea/', function(e){
+            if(e.length > 0){
+                defer.resolve(true);
+            } else {
+                defer.resolve(false);
+            }
+        });
 
         return defer.promise;
     };

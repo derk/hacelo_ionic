@@ -238,15 +238,15 @@ angular.module('hacelo', [
     // more info at: http://goo.gl/8PfN8I
     $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob|content):|data:image\//);    
 });
-var controllers = angular.module('hacelo.controllers', []);
 /**
  * Created by joseph on 30/11/2014.
  */
 var directives = angular.module('hacelo.directives', []);
 
-var models = angular.module('hacelo.models', []);
 var commons = angular.module('hacelo.config', []);
+var controllers = angular.module('hacelo.controllers', []);
 var services = angular.module('hacelo.services', []);
+var models = angular.module('hacelo.models', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
         /*
@@ -1631,8 +1631,18 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$ionicPopup', 'SelectedIma
         });
     };
 }]);
-controllers.controller('landingCtrl', ['$scope', 'ShoppingCartFactory',function($scope, ShoppingCartFactory) {
-	$scope.cart = ShoppingCartFactory.loadShoppingCart();
+controllers.controller('landingCtrl', ['$scope', '$ionicLoading','ShoppingCartFactory','MessageService',function($scope, $ionicLoading, ShoppingCartFactory, MessageService) {
+	$scope.cart = null;
+
+    $ionicLoading.show({
+	    template: 'Cargando... '
+    });
+
+	ShoppingCartFactory.load().then(function(e){
+		$scope.cart = e;
+		$ionicLoading.hide();
+	});
+	
 }]);
 
 controllers.controller('productCrtl', ['$scope', '$state', 'SelectedImagesFactory', 'PhotoPrintConfig', function($scope, $state, SelectedImagesFactory, PhotoPrintConfig) {
@@ -1799,23 +1809,6 @@ controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ion
         window.plugins.socialsharing.shareViaEmail('Hacelo','Hacelo');
     };
 });
-/**
- * Created by joseph on 30/11/2014.
- */
-directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
-    var directiveName = "whenLoaded";
-    return {
-        restrict: 'A',
-        link: function (scope, iElement, iAttrs) {
-            iElement.load(function() {
-                var fns = $parse(iAttrs[directiveName])(scope);
-                for (var i = 0; i < fns.length; i++) {
-                    fns[i]();
-                }
-            });
-        }
-    };
-}]);
 models.factory('ImageFactory', ['$q', function ($q) {
     function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
         this.origin = pOrigin;
@@ -2125,7 +2118,7 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
 /**
  * Created by joseph on 29/11/2014.
  */
-models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', function (StorageService, ImageFactory) {
+models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', function ($q, StorageService, ImageFactory) {
     // ---
     // PRIVATE ATTRIBUTES.
     // ---
@@ -2315,6 +2308,41 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
         saveShoppingCart: function(){
             return StorageService.save(shoppingCart);
         },
+
+
+        load : function(){
+           var defer = $q.defer();
+           var self = this;
+            /*
+            * Load any data stored
+            * then check if some shopping cart was already created
+            * if yes load it or create a new one and save it (for future usage)
+            * and finally return the loaded/created shopping cart
+            * */
+            var lastShoppingCart,
+                restoredOrders;
+
+            if (angular.isUndefined(shoppingCart)) {
+                StorageService.load2().then(function(e){
+                    lastShoppingCart = angular.fromJson(e);
+                    if(angular.isObject(lastShoppingCart)){
+                        restoredOrders = restoreOrders(lastShoppingCart.orders);
+                        shoppingCart = new ShoppingCart(lastShoppingCart.customer, restoredOrders);
+                        defer.resolve(shoppingCart);
+                    } else {
+                        shoppingCart = new ShoppingCart();
+                        defer.resolve(shoppingCart);
+                        self.saveShoppingCart();
+                    }
+
+                });
+            } else {
+                defer.resolve(shoppingCart);
+            }
+
+            return defer.promise;
+        },
+
         loadShoppingCart: function(){
             /*
             * Load any data stored
@@ -2327,6 +2355,7 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
 
             if (angular.isUndefined(shoppingCart)) {
                 lastShoppingCart = StorageService.load();
+                console.log("got it yeah");
 
                 if(angular.isObject(lastShoppingCart)){
                     restoredOrders = restoreOrders(lastShoppingCart.orders);
@@ -2378,6 +2407,23 @@ models.factory('ShoppingCartFactory', ['StorageService', 'ImageFactory', functio
                 }
             };
             this.saveShoppingCart();
+        }
+    };
+}]);
+/**
+ * Created by joseph on 30/11/2014.
+ */
+directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
+    var directiveName = "whenLoaded";
+    return {
+        restrict: 'A',
+        link: function (scope, iElement, iAttrs) {
+            iElement.load(function() {
+                var fns = $parse(iAttrs[directiveName])(scope);
+                for (var i = 0; i < fns.length; i++) {
+                    fns[i]();
+                }
+            });
         }
     };
 }]);
@@ -2746,32 +2792,53 @@ services.service('PhotoSizeChecker', [function () {
  */
 services.service('StorageService', ['$window','$q', function ($window, $q) {
     var storage = $window.localStorage,
-        prefix = "hacelo";
+        prefix = "hacelo",
+        cart = "";
 
     this.save = function(pCartData) {
         var saved = true;
-        try {
+        /*try {
             storage.setItem(prefix, angular.toJson(pCartData, false));
         } catch (e) {
             saved = false;
+        }*/
+
+        try {
+            this.saveToDisk(pCartData);
+        } catch (e) {
+            saved = false;
         }
-        this.saveToDisk(pCartData);
+        
         return saved;
     };
 
-    this.load = function() {
-        var self = this;
-        document.addEventListener('deviceready', function(){
 
-            console.log(self.getDataFromDisk());
-        }, false);
-        
-        return angular.fromJson(storage.getItem(prefix));
+    this.load = function() {
+        console.log("cart");
+        return angular.fromJson(cart);
     };
+
+
+    this.load2 = function(){
+        var defer = $q.defer(),
+            self = this;
+        // This is to ensure device is ready
+        document.addEventListener('deviceready', function(){
+            self.getDataFromDisk().then(function(e){
+                cart = e;
+                defer.resolve(e);
+            });
+        }, false);
+
+
+        return defer.promise;
+    };
+
 
     this.clear = function() {
         this.save("");
     };
+
 
     this.saveToDisk = function(pCartData){
         var b = new FileManager(),
@@ -2781,14 +2848,43 @@ services.service('StorageService', ['$window','$q', function ($window, $q) {
         b.write_file('Printea/','shopping.txt', angular.toJson(pCartData, false) ,Log('wrote sucessful!'));
     };
 
-    this.getDataFromDisk = function(){
-        var defer = $q.defer();
-        var b = new FileManager(),
-            c = "" ;
-        b.read_file('Printea/','shopping.txt',function(e){c = e;},function(e){defer.resolve(e)});
 
-        return c;
+    this.getDataFromDisk = function(){
+        var defer = $q.defer(),
+            a = new DirManager(),
+            b = new FileManager(),
+            c = "" ;
+
+        this.existFolder().then(function(e){
+            if(!e){
+                b.write_file('Printea/','shopping.txt', null ,function(){
+                    b.read_file('Printea/','shopping.txt',function(e){defer.resolve(e)},function(e){defer.resolve(e)});
+                });
+            } else {
+                b.read_file('Printea/','shopping.txt',function(e){defer.resolve(e)},function(e){defer.resolve(e)});
+            }
+        });
+        
+        return defer.promise;
     };
+
+
+    this.existFolder = function(){
+        var defer = $q.defer(),
+            a = new DirManager(),
+            c = "" ;
+
+        a.list('Printea/', function(e){
+            if(e.length > 0){
+                defer.resolve(true);
+            } else {
+                defer.resolve(false);
+            }
+        });
+
+        return defer.promise;
+    };
+
 }]);
 services.service('Utils', ['$q', '$timeout', function ($q, $timeout) {
     /**
