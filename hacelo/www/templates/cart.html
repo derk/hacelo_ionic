@@ -10,15 +10,28 @@
 
                 <h3 class="no-cart-items-title">PARECE QUE NO TIENES NADA EN TU CARRITO</h3>
             </div>
-            <div ng-switch-default="">
-                <div class="photo-cover"></div>
-                <h3 class="subtotal">Ordenes</h3>
+            <div ng-switch-default="" class="container-orders">
 
-                <p ng-repeat="order in cart.orders" ng-animate="'animate'" class="animate-repeat">
-                    {{order.getQuantity()}} items
-                    <span>= {{order.computeSubTotal() | currency:"&#8353;"}}</span>
+                <div ng-repeat="order in cart.orders" ng-animate="'animate'" class="animate-repeat orders" style="background:url({{order.product.images}}) no-repeat top left/100% 100%;">
+                    <div class="quantity-container">
+                        <button class="minus"
+                                        ng-disabled="order.getQuantity()==1"
+                                        ng-click="minus(order)">-</button>
+                                &times;{{order.getQuantity()}}
+                                <button class="add"
+                                        ng-click="">+</button></div>
+
                     <span ng-click="removeOrder(order)" class="delete">-</span>
-                </p>
+                    <div class="left-column">
+                        <span class="product-line">{{order.productLine.name}}</span>
+                        <span class="items" >{{order.getQuantity()}} items</span>
+                    </div>
+
+                    <div class="right-column">
+                        <span>= {{order.computeSubTotal() | currency:"&#8353;"}}</span>
+                    </div>
+                    
+                </div>
 
                 <!--span class="input-label">Cupón de Descuento</span>
                 <label class="item item-input">
@@ -29,10 +42,11 @@
                 <button ng-click="" class="button button-block button-positive" type="submit">Validar Descuento</button>
                 </label-->
             </div>
-            <p class="subtotal">Subtotal<span>= {{cart.computeSubTotal() | currency:"&#8353;"}}</span></p>
+            
         </div>
     </ion-content>
     <ion-footer-bar>
+        <p class="subtotal">Subtotal<span>={{cart.computeSubTotal() | currency:"&#8353;"}}</span></p>
         <a class="button button-balanced" href="#/app/cart-checkout" ng-class="{'disabled':cart.orders.length===0}">Pagar
             Ahora</a>
     </ion-footer-bar>

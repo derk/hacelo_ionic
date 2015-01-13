@@ -32,6 +32,9 @@
         "loss_of_selected_images" : {
             "title" : "¿Estas segur@ de continuar?",
             "template" : "Si cambias de categoría perderás las imágenes que tienes seleccionadas hasta el momento."
+        },
+        "processing":{
+            "template": "Estamos preparando las fotos...<\/span><i class='icon ion-looping'><\/i>"
         }
     }
 }

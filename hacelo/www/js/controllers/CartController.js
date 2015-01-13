@@ -3,7 +3,7 @@
  */
 controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $ionicPopup, Messages, ShoppingCartFactory,Payment) {
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
-
+    console.log($scope.cart);
     $scope.removeOrder = function (pOrderToRemove) {
         var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_order_delete"),
             confirmPopup = $ionicPopup.confirm(cache);
@@ -13,6 +13,10 @@ controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', '
                 ShoppingCartFactory.removeOrder(pOrderToRemove.id);
             }
         });
+    };
+
+    $scope.minus = function(order){
+
     };
 
 }]);
