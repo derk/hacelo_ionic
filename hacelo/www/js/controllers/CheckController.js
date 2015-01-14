@@ -56,14 +56,33 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
      * */
     $scope.addToCart = function () {
         var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_check_screen"),
-            confirmPopup = $ionicPopup.confirm(cache);
+            cacheConfirm = { 
+                "title" : "Estas segur@?",
+                "template" : "Escogiste "+$scope.images.length+" imagen(es), pero podés escoger hasta "+SelectedImagesFactory.getProduct().prices.first_items.quantity+ " por el mismo precio.",
+                "cancelText" : "Cancelar",
+                "okText" : "Aceptar"
+            };
 
-        confirmPopup.then(function (res) {
-            if (res) {
-                $state.go("app.confirm");
-            }
-        });
+        if(SelectedImagesFactory.getProduct().prices.first_items.quantity   >  $scope.images.length){
+            $ionicPopup.confirm(cacheConfirm).then(function(res){
+                if(res){
+                    $ionicPopup.confirm(cache).then(function (res) {
+                        if (res) {
+                            $state.go("app.confirm");
+                        }
+                    });                    
+                }
+            });    
+        } else {
+            $ionicPopup.confirm(cache).then(function (res) {
+                if (res) {
+                    $state.go("app.confirm");
+                }
+            });
+
+        }
     };
 
     init();
+
 }]);

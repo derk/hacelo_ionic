@@ -238,15 +238,15 @@ angular.module('hacelo', [
     // more info at: http://goo.gl/8PfN8I
     $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob|content):|data:image\//);    
 });
+var commons = angular.module('hacelo.config', []);
+var controllers = angular.module('hacelo.controllers', []);
 /**
  * Created by joseph on 30/11/2014.
  */
 var directives = angular.module('hacelo.directives', []);
 
-var commons = angular.module('hacelo.config', []);
-var controllers = angular.module('hacelo.controllers', []);
-var services = angular.module('hacelo.services', []);
 var models = angular.module('hacelo.models', []);
+var services = angular.module('hacelo.services', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
         /*
@@ -542,6 +542,7 @@ commons.constant('PhotoPrintConfig', {
             id: "photobook",
             "name": "Photobook",
             "images": "img/cuadradas/PORTADA_CUADRADAS/portada_cuadradas.png",
+            "mandatory":true,
             "products": [
                 {
                     "name": "8.5x11",
@@ -1332,16 +1333,35 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
      * */
     $scope.addToCart = function () {
         var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_check_screen"),
-            confirmPopup = $ionicPopup.confirm(cache);
+            cacheConfirm = { 
+                "title" : "Estas segur@?",
+                "template" : "Escogiste "+$scope.images.length+" imagen(es), pero podés escoger hasta "+SelectedImagesFactory.getProduct().prices.first_items.quantity+ " por el mismo precio.",
+                "cancelText" : "Cancelar",
+                "okText" : "Aceptar"
+            };
 
-        confirmPopup.then(function (res) {
-            if (res) {
-                $state.go("app.confirm");
-            }
-        });
+        if(SelectedImagesFactory.getProduct().prices.first_items.quantity   >  $scope.images.length){
+            $ionicPopup.confirm(cacheConfirm).then(function(res){
+                if(res){
+                    $ionicPopup.confirm(cache).then(function (res) {
+                        if (res) {
+                            $state.go("app.confirm");
+                        }
+                    });                    
+                }
+            });    
+        } else {
+            $ionicPopup.confirm(cache).then(function (res) {
+                if (res) {
+                    $state.go("app.confirm");
+                }
+            });
+
+        }
     };
 
     init();
+
 }]);
 /**
  * Created by joseph on 30/11/2014.
@@ -1662,7 +1682,7 @@ controllers.controller('categoryCrtl', ['$scope', '$state', '$ionicPopup', 'Sele
 	};
 
 	var lookForImages = function () {
-		if(SelectedImagesFactory.getAll().length>0) {oce
+		if(SelectedImagesFactory.getAll().length>0) {
 			$ionicPopup
 				.confirm(MessageService.search("loss_of_selected_images"))
 					.then(function(res) {
@@ -1680,9 +1700,20 @@ controllers.controller('categoryCrtl', ['$scope', '$state', '$ionicPopup', 'Sele
 	lookForImages();
 }]);
 
-controllers.controller('photoCrtl', ['$scope', '$state', '$timeout', '$window','SelectedImagesFactory',function($scope, $state, $timeout, $window, SelectedImagesFactory) {
+controllers.controller('photoCrtl', ['$scope', '$state', '$ionicPopup', '$timeout', '$window', 'MessageService','SelectedImagesFactory',function($scope, $state, $ionicPopup, $timeout, $window, Messages, SelectedImagesFactory) {
+	var cache = angular.isDefined(cache) ? cache: Messages.search("photobook_alert");
+
 	$scope.product = SelectedImagesFactory.getProduct();
 	$scope.height = screen.width;
+
+	if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
+		$ionicPopup.alert(cache);
+		$timeout(function () {
+			angular.element(".popup").addClass("photobook-popup");
+		},1000);
+		console.log("get");
+	}
+
 
 }]);
 
@@ -1809,6 +1840,543 @@ controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ion
         window.plugins.socialsharing.shareViaEmail('Hacelo','Hacelo');
     };
 });
+/**
+ * Created by joseph on 30/11/2014.
+ */
+directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
+    var directiveName = "whenLoaded";
+    return {
+        restrict: 'A',
+        link: function (scope, iElement, iAttrs) {
+            iElement.load(function() {
+                var fns = $parse(iAttrs[directiveName])(scope);
+                for (var i = 0; i < fns.length; i++) {
+                    fns[i]();
+                }
+            });
+        }
+    };
+}]);
+services.service('CordovaCameraService', ['$window','$q', function ($window,$q) {
+    var cam,
+        cameraOptions,
+        init = function() {
+            cam = $window.navigator.camera;
+            cameraOptions = {
+                quality : 100,
+                destinationType : cam.DestinationType.FILE_URI,
+                sourceType : cam.PictureSourceType.PHOTOLIBRARY,
+                /*allowEdit : true,
+                encodingType: Camera.EncodingType.JPEG,
+                targetWidth: 100,
+                targetHeight: 100,
+                popoverOptions: CameraPopoverOptions,
+                saveToPhotoAlbum: false*/
+            };
+        };
+
+    this.getImage = function() {
+        var q = $q.defer();
+        cam.getPicture(function(result) {
+            q.resolve(result);
+        }, function(result) {
+            q.reject(result);
+        }, cameraOptions);
+
+        return q.promise;
+    };
+
+    // wait until the device is ready to setup everything
+    ionic.Platform.ready(init);
+}]);
+
+services.service('InstagramService', ['$http', '$window', '$q', function ($http, $window, $q) {
+    var self = this,
+        vault = {
+            user: undefined,
+            userMedia: undefined,
+            accessToken: undefined
+        },
+        config = {
+            clientId: '70a2ae9262fc4805a5571e8036695a4d',
+            redirectUri: 'http://www.wikipedia.org/',
+            apiUrl: 'https://api.instagram.com/v1/',
+            oauthUrl: 'https://instagram.com/oauth/authorize/?',
+            scope: 'basic'
+        };
+
+    this.hasAccessToken = function () {
+        return angular.isDefined(vault.accessToken);
+    };
+
+    this.isAuthenticated = function () {
+        return angular.isDefined(vault.user);
+    };
+
+    var fetch = function (url, options) {
+        var params = {
+                client_id: config.clientId,
+                callback: 'JSON_CALLBACK'
+            };
+        if (self.hasAccessToken()) {
+            params.access_token = vault.accessToken;
+        }
+
+        return $http({
+            cache: true,
+            method: 'jsonp',
+            params: angular.extend({}, params, options),
+            responseType: 'json',
+            url: config.apiUrl + url
+        });
+    };
+
+    var getUrlParameters = function (parameter, staticURL, decode) {
+        /*
+        Function: getUrlParameters
+        Description: Get the value of URL parameters either from 
+                     current URL or static URL
+        Author: Tirumal
+        URL: www.code-tricks.com
+       */
+       var currLocation = (staticURL.length)? staticURL : window.location.search,
+           parArr = currLocation.split('?')[1].split('&'),
+           returnBool = true,
+           parr;
+       
+       for (var i = 0; i < parArr.length; i++){
+            parr = parArr[i].split('=');
+            if(parr[0] == parameter){
+                return (decode) ? decodeURIComponent(parr[1]) : parr[1];
+                returnBool = true;
+            }else{
+                returnBool = false;            
+            }
+       }
+       
+       if(!returnBool) return false;
+    };
+
+    var bindAuthEvents = function(authTab) {
+        // This function bind the evens to the instagram autentication screen
+        // If every thing goes good then store the token
+        // Also handle how the app respond to an authentication error
+        var deferred = $q.defer();
+        authTab.addEventListener('loadstart', function(e) {
+            if (e.url.search('access_token') !== -1) { // access granted
+                vault.accessToken = e.url.substr(e.url.search('access_token')+'access_token='.length);
+                authTab.close();
+                fetch('users/self/').then(
+                    function(response){
+                        vault.user = response.data.data;
+                        deferred.resolve(response.data.data);
+                    }
+                );
+            } else if (e.url.search('error') !== -1) { // User denied access
+                authTab.close();
+                deferred.reject({
+                    error: getUrlParameters('error',e.url,true),
+                    errorReason: getUrlParameters('error_reason',e.url,true),
+                    errorDescription: getUrlParameters('error_description',e.url,true)
+                });
+            }
+        });
+        return deferred.promise;
+    };
+
+    var addUserMedia = function (pMedia2add) {
+        if (angular.isUndefined(vault.userMedia)) {
+            vault.userMedia = pMedia2add;
+        } else {
+            vault.userMedia.pagination = pMedia2add.pagination;
+            vault.userMedia.data.push(pMedia2add.data);
+        }
+    };
+
+    this.auth = function() {
+        var options = {
+                client_id:      config.clientId,
+                redirect_uri:   config.redirectUri,
+                scope:          config.scope,
+                response_type:  'token'
+            },
+            authParams = '';
+
+        angular.forEach(options, function(value, key) {
+            return authParams += key + '=' + value + '&';
+        });
+        var authUrl = config.oauthUrl + authParams;
+
+        return bindAuthEvents($window.open(authUrl, '_blank', 'location=yes'));
+    };
+
+    this.hasUserMedia = function(){
+        return angular.isDefined(vault.userMedia);
+    };
+
+    this.cleanUserMedia = function () {
+        vault.userMedia = null; // helping garbage collector
+        vault.userMedia = undefined;
+    }
+
+    this.canLoadMore = function(){
+        var can = true;
+
+        if( self.hasUserMedia() ){
+            if (angular.isDefined(vault.userMedia.pagination)) {
+                if (angular.isUndefined(vault.userMedia.pagination.next_url)){
+                    can = false;
+                }
+            }
+        }
+
+        return can;
+    };
+
+    this.getRecentMedia = function() {
+        var params = {},
+            deferred = $q.defer();
+
+        if (self.hasUserMedia()) {
+            if(self.canLoadMore()) {
+                params.max_id = vault.userMedia.pagination.next_max_id;
+            }
+        }
+        fetch('users/self/media/recent', params).then(
+            function(response){
+                addUserMedia(response.data);
+                deferred.resolve(response);
+            },
+            function(response){
+                deferred.reject(response);
+            }
+        );
+        return deferred.promise;
+    };
+}]);
+services.service('LocationPrvdr', ['$http', function ($http) {
+	var costaRica;
+
+	var init = function() {
+		$http.get('js/common/costa-rica.json').
+			success(function(data, status, headers, config) {
+				costaRica = angular.fromJson(data);
+			}).
+			error(function(data, status, headers, config) {
+				console.log("Costa Rica JSON not found");
+			});
+	};
+
+	var iterate = function(obj) {
+		result = [];
+		angular.forEach(obj, function(value, key, obj) {
+			result.push({
+				id: key,
+				name: value.title
+			});
+		});
+		return result;
+	};
+
+	this.getProvinces = function() {
+		return iterate(costaRica.provincias);
+	};
+
+	this.getCantons = function(provinceID) {
+		return iterate(costaRica.provincias[provinceID].cantones);
+	};
+
+	this.getDistricts = function(provinceID, cantonID) {
+		return iterate(costaRica.provincias[provinceID].cantones[cantonID].distritos);
+	};
+
+	init();
+}])
+services.service('MessageService', ['$http', function ($http) {
+    // Private stuff
+    var messages =          null,
+        messageDBlocation = "js/common/messagesDB.json",
+        self =              this,
+        callbackResult =    function(data, status, headers, config) {
+            messages = data ? angular.fromJson(data) : {};
+        },
+        initMessages =      function() {
+            $http.get(messageDBlocation)
+                .success(callbackResult)
+                .error(callbackResult);
+        };
+    this.keyToValue =   function(searchCriteria, obj) {
+        var resul;
+        if (angular.isDefined(obj[searchCriteria])) {
+            return obj[searchCriteria];
+        }
+        for(var key in obj) {
+            if( angular.isObject(obj[key]) ){
+                var resul = this.keyToValue(searchCriteria, obj[key]);
+            }
+            if (angular.isDefined(resul)) break;
+        }
+        return resul;
+    };
+    // Public stuff
+    this.search = function(msjKey) {
+        var resul = this.keyToValue(msjKey, messages);
+        return resul;
+    };
+
+    this.getMessages = function() {
+        return messages;
+    };
+    // Load the messages from JSON file
+    initMessages();
+}]);
+/**
+ * Created by Raiam 
+ */
+services.service('Payment', ['$window', '$http', '$q', function ($window, $http, $q) {
+    
+    this.sendWeight = function(h){
+        var defer = $q.defer();
+
+        $.ajax({
+            url: "http://www.gn-digital.info/services/tarifario_courier/api/?method=t_paqueteporpeso&params[peso]="+h+"&params[is_gam]=0",
+            type: 'GET',
+            crossDomain: true,
+            dataType: 'jsonp',
+            jsonpCallback:'tarifario_callback',
+            success: function(response) { defer.resolve(response);},
+            error: function(error){defer.resolve(error);}
+        });
+
+        return defer.promise;
+    };
+
+    this.makePay = function(order_id, name, last, emisor, tarjeta, month, year, price, envio){
+         var defer = $q.defer();
+         console.log("http://www.gn-digital.com/pago_por_api/?sel=save&order_id=3619&ccname="+name+"%20"+last+"&ccnumber=12345&ccissuer="+emisor+"&ccmonth="+month+"&ccyear="+year+"&products[0][id]=2&products[0][name]=CobroFotos&products[0][price]="+price+"&products[0][qty]=1&products[1][id]=3&products[1][name]=Envio&products[1][price]="+envio+"&products[1][qty]=1&callback=jason");
+        
+        $.ajax({
+            url: "http://www.gn-digital.com/pago_por_api/?sel=save&order_id=3619&ccname="+name+"%20"+last+"&ccnumber="+tarjeta+"&ccissuer="+emisor+"&ccmonth="+month+"&ccyear="+year+"&products[0][id]=2&products[0][name]=CobroFotos&products[0][price]="+price+"&products[0][qty]=1&products[1][id]=3&products[1][name]=Envio&products[1][price]="+envio+"&products[1][qty]=1&callback=jason",
+            type: 'GET',
+            crossDomain: true,
+            dataType: 'jsonp',
+            jsonpCallback:'gnpaymentcallback',
+            success: function(response) { defer.resolve(response);},
+            error: function(error){defer.resolve(error);}
+        });
+
+        return defer.promise;
+    };
+
+
+}]);
+/**
+ * Created by joseph on 24/11/2014.
+ */
+services.service('PhotoSizeChecker', [function () {
+    var self = this,
+        minimumSize,
+        imageDimensions;
+
+    var meetsOrientation = function(){
+        var expectedOrientation = self.getOrientation(minimumSize.width, minimumSize.height),
+            imageOrientation = self.getOrientation(imageDimensions.width, imageDimensions.height);
+        return (expectedOrientation === imageOrientation);
+    };
+
+    var meetsArea = function(){
+        var minimumArea = self.computeArea(minimumSize.width, minimumSize.height),
+            imageArea = self.computeArea(imageDimensions.width, imageDimensions.height);
+
+        return (imageArea >= minimumArea);
+    };
+
+    this.getExpectedSize = function(){
+        return minimumSize.width+"px x "+ minimumSize.height+"px";
+    };
+
+    this.computeArea = function(w, h){
+        return ( w*h );
+    };
+
+    this.getOrientation = function(width, height){
+        var orientation = "square";
+        if(width > height) {
+            orientation = "landscape";
+        } else if(width < height) {
+            orientation = "portrait";
+        }
+        return orientation;
+    };
+
+    this.meetsMinimumRequirements = function(ImageWrapper, pSelectedProduct){
+        // update local helper variables
+        minimumSize  = pSelectedProduct.pixel_size.minimum;
+        imageDimensions = ImageWrapper.images.standard_resolution;
+        // then decide if the provided image meets the minimum requirements
+        return ( meetsArea() );
+    };
+}]);
+/**
+ * Created by joseph on 30/11/2014.
+ */
+services.service('StorageService', ['$window','$q', function ($window, $q) {
+    var storage = $window.localStorage,
+        prefix = "hacelo",
+        cart = "";
+
+    this.save = function(pCartData) {
+        var saved = true;
+        /*try {
+            storage.setItem(prefix, angular.toJson(pCartData, false));
+        } catch (e) {
+            saved = false;
+        }*/
+
+        try {
+            this.saveToDisk(pCartData);
+        } catch (e) {
+            saved = false;
+        }
+        
+        return saved;
+    };
+
+
+    this.load = function() {
+        console.log("cart");
+        return angular.fromJson(cart);
+    };
+
+
+    this.loadFile = function(){
+        var defer = $q.defer(),
+            self = this;
+        // This is to ensure device is ready
+        document.addEventListener('deviceready', function(){
+            self.getDataFromDisk().then(function(e){
+                cart = e;
+                defer.resolve(e);
+            });
+        }, false);
+
+
+        return defer.promise;
+    };
+
+
+    this.clear = function() {
+        this.save("");
+    };
+
+
+    this.saveToDisk = function(pCartData){
+        var b = new FileManager(),
+            a = new DirManager();
+
+        a.create_r('Printea',Log('created successfully'));
+        b.write_file('Printea/','shopping.txt', angular.toJson(pCartData, false) ,Log('wrote sucessful!'));
+    };
+
+
+    this.getDataFromDisk = function(){
+        var defer = $q.defer(),
+            a = new DirManager(),
+            b = new FileManager(),
+            c = "" ;
+
+        this.existFolder().then(function(e){
+            if(!e){
+                b.write_file('Printea/','shopping.txt', null ,function(){
+                    b.read_file('Printea/','shopping.txt',function(e){defer.resolve(e)},function(e){defer.resolve(e)});
+                });
+            } else {
+                b.read_file('Printea/','shopping.txt',function(e){defer.resolve(e)},function(e){defer.resolve(e)});
+            }
+        });
+        
+        return defer.promise;
+    };
+
+
+    this.existFolder = function(){
+        var defer = $q.defer(),
+            a = new DirManager(),
+            c = "" ;
+
+        a.list('Printea/', function(e){
+            if(e.length > 0){
+                defer.resolve(true);
+            } else {
+                defer.resolve(false);
+            }
+        });
+
+        return defer.promise;
+    };
+
+}]);
+services.service('Utils', ['$q', '$timeout', function ($q, $timeout) {
+    /**
+ * Converts image URLs to dataURL schema using Javascript only.
+ *
+ * @param {String} url Location of the image file
+ * @param {Function} success Callback function that will handle successful responses. This function should take one parameter
+ *                            <code>dataURL</code> which will be a type of <code>String</code>.
+ * @param {Function} error Error handler.
+ *
+ * @example
+ * var onSuccess = function(e){
+ *  document.body.appendChild(e.image);
+ *  alert(e.data);
+ * };
+ *
+ * var onError = function(e){
+ *  alert(e.message);
+ * };
+ *
+ * getImageDataURL('myimage.png', onSuccess, onError);
+ *
+ */
+this.getImageDataURL = function(url, x, y) {
+    
+    var defer = $q.defer();
+        var data, canvas, ctx;
+        var img = new Image();
+        img.onload = function(){
+            // Create the canvas element.
+            canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            // Get '2d' context and draw the image.
+            ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            // Get canvas data URL
+            try{
+                console.log("got it");
+                data = canvas.toDataURL();
+                defer.resolve({image:img, data:data, x:x, y:y});
+            }catch(e){
+                console.log("broke");
+                defer.reject(e);
+            }
+        }
+        // Load image URL.
+        try{
+            img.src = url;
+        }catch(e){
+            console.log("broke this shit");
+            defer.reject(e);
+        }
+
+    
+    return defer.promise;
+
+}
+
+
+}]);
+
 models.factory('ImageFactory', ['$q', function ($q) {
     function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
         this.origin = pOrigin;
@@ -2323,7 +2891,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
                 restoredOrders;
 
             if (angular.isUndefined(shoppingCart)) {
-                StorageService.load2().then(function(e){
+                StorageService.loadFile().then(function(e){
                     lastShoppingCart = angular.fromJson(e);
                     if(angular.isObject(lastShoppingCart)){
                         restoredOrders = restoreOrders(lastShoppingCart.orders);
@@ -2355,7 +2923,6 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
 
             if (angular.isUndefined(shoppingCart)) {
                 lastShoppingCart = StorageService.load();
-                console.log("got it yeah");
 
                 if(angular.isObject(lastShoppingCart)){
                     restoredOrders = restoreOrders(lastShoppingCart.orders);
@@ -2409,540 +2976,4 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             this.saveShoppingCart();
         }
     };
-}]);
-/**
- * Created by joseph on 30/11/2014.
- */
-directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
-    var directiveName = "whenLoaded";
-    return {
-        restrict: 'A',
-        link: function (scope, iElement, iAttrs) {
-            iElement.load(function() {
-                var fns = $parse(iAttrs[directiveName])(scope);
-                for (var i = 0; i < fns.length; i++) {
-                    fns[i]();
-                }
-            });
-        }
-    };
-}]);
-services.service('CordovaCameraService', ['$window','$q', function ($window,$q) {
-    var cam,
-        cameraOptions,
-        init = function() {
-            cam = $window.navigator.camera;
-            cameraOptions = {
-                quality : 100,
-                destinationType : cam.DestinationType.FILE_URI,
-                sourceType : cam.PictureSourceType.PHOTOLIBRARY,
-                /*allowEdit : true,
-                encodingType: Camera.EncodingType.JPEG,
-                targetWidth: 100,
-                targetHeight: 100,
-                popoverOptions: CameraPopoverOptions,
-                saveToPhotoAlbum: false*/
-            };
-        };
-
-    this.getImage = function() {
-        var q = $q.defer();
-        cam.getPicture(function(result) {
-            q.resolve(result);
-        }, function(result) {
-            q.reject(result);
-        }, cameraOptions);
-
-        return q.promise;
-    };
-
-    // wait until the device is ready to setup everything
-    ionic.Platform.ready(init);
-}]);
-
-services.service('InstagramService', ['$http', '$window', '$q', function ($http, $window, $q) {
-    var self = this,
-        vault = {
-            user: undefined,
-            userMedia: undefined,
-            accessToken: undefined
-        },
-        config = {
-            clientId: '70a2ae9262fc4805a5571e8036695a4d',
-            redirectUri: 'http://www.wikipedia.org/',
-            apiUrl: 'https://api.instagram.com/v1/',
-            oauthUrl: 'https://instagram.com/oauth/authorize/?',
-            scope: 'basic'
-        };
-
-    this.hasAccessToken = function () {
-        return angular.isDefined(vault.accessToken);
-    };
-
-    this.isAuthenticated = function () {
-        return angular.isDefined(vault.user);
-    };
-
-    var fetch = function (url, options) {
-        var params = {
-                client_id: config.clientId,
-                callback: 'JSON_CALLBACK'
-            };
-        if (self.hasAccessToken()) {
-            params.access_token = vault.accessToken;
-        }
-
-        return $http({
-            cache: true,
-            method: 'jsonp',
-            params: angular.extend({}, params, options),
-            responseType: 'json',
-            url: config.apiUrl + url
-        });
-    };
-
-    var getUrlParameters = function (parameter, staticURL, decode) {
-        /*
-        Function: getUrlParameters
-        Description: Get the value of URL parameters either from 
-                     current URL or static URL
-        Author: Tirumal
-        URL: www.code-tricks.com
-       */
-       var currLocation = (staticURL.length)? staticURL : window.location.search,
-           parArr = currLocation.split('?')[1].split('&'),
-           returnBool = true,
-           parr;
-       
-       for (var i = 0; i < parArr.length; i++){
-            parr = parArr[i].split('=');
-            if(parr[0] == parameter){
-                return (decode) ? decodeURIComponent(parr[1]) : parr[1];
-                returnBool = true;
-            }else{
-                returnBool = false;            
-            }
-       }
-       
-       if(!returnBool) return false;
-    };
-
-    var bindAuthEvents = function(authTab) {
-        // This function bind the evens to the instagram autentication screen
-        // If every thing goes good then store the token
-        // Also handle how the app respond to an authentication error
-        var deferred = $q.defer();
-        authTab.addEventListener('loadstart', function(e) {
-            if (e.url.search('access_token') !== -1) { // access granted
-                vault.accessToken = e.url.substr(e.url.search('access_token')+'access_token='.length);
-                authTab.close();
-                fetch('users/self/').then(
-                    function(response){
-                        vault.user = response.data.data;
-                        deferred.resolve(response.data.data);
-                    }
-                );
-            } else if (e.url.search('error') !== -1) { // User denied access
-                authTab.close();
-                deferred.reject({
-                    error: getUrlParameters('error',e.url,true),
-                    errorReason: getUrlParameters('error_reason',e.url,true),
-                    errorDescription: getUrlParameters('error_description',e.url,true)
-                });
-            }
-        });
-        return deferred.promise;
-    };
-
-    var addUserMedia = function (pMedia2add) {
-        if (angular.isUndefined(vault.userMedia)) {
-            vault.userMedia = pMedia2add;
-        } else {
-            vault.userMedia.pagination = pMedia2add.pagination;
-            vault.userMedia.data.push(pMedia2add.data);
-        }
-    };
-
-    this.auth = function() {
-        var options = {
-                client_id:      config.clientId,
-                redirect_uri:   config.redirectUri,
-                scope:          config.scope,
-                response_type:  'token'
-            },
-            authParams = '';
-
-        angular.forEach(options, function(value, key) {
-            return authParams += key + '=' + value + '&';
-        });
-        var authUrl = config.oauthUrl + authParams;
-
-        return bindAuthEvents($window.open(authUrl, '_blank', 'location=yes'));
-    };
-
-    this.hasUserMedia = function(){
-        return angular.isDefined(vault.userMedia);
-    };
-
-    this.cleanUserMedia = function () {
-        vault.userMedia = null; // helping garbage collector
-        vault.userMedia = undefined;
-    }
-
-    this.canLoadMore = function(){
-        var can = true;
-
-        if( self.hasUserMedia() ){
-            if (angular.isDefined(vault.userMedia.pagination)) {
-                if (angular.isUndefined(vault.userMedia.pagination.next_url)){
-                    can = false;
-                }
-            }
-        }
-
-        return can;
-    };
-
-    this.getRecentMedia = function() {
-        var params = {},
-            deferred = $q.defer();
-
-        if (self.hasUserMedia()) {
-            if(self.canLoadMore()) {
-                params.max_id = vault.userMedia.pagination.next_max_id;
-            }
-        }
-        fetch('users/self/media/recent', params).then(
-            function(response){
-                addUserMedia(response.data);
-                deferred.resolve(response);
-            },
-            function(response){
-                deferred.reject(response);
-            }
-        );
-        return deferred.promise;
-    };
-}]);
-services.service('LocationPrvdr', ['$http', function ($http) {
-	var costaRica;
-
-	var init = function() {
-		$http.get('js/common/costa-rica.json').
-			success(function(data, status, headers, config) {
-				costaRica = angular.fromJson(data);
-			}).
-			error(function(data, status, headers, config) {
-				console.log("Costa Rica JSON not found");
-			});
-	};
-
-	var iterate = function(obj) {
-		result = [];
-		angular.forEach(obj, function(value, key, obj) {
-			result.push({
-				id: key,
-				name: value.title
-			});
-		});
-		return result;
-	};
-
-	this.getProvinces = function() {
-		return iterate(costaRica.provincias);
-	};
-
-	this.getCantons = function(provinceID) {
-		return iterate(costaRica.provincias[provinceID].cantones);
-	};
-
-	this.getDistricts = function(provinceID, cantonID) {
-		return iterate(costaRica.provincias[provinceID].cantones[cantonID].distritos);
-	};
-
-	init();
-}])
-services.service('MessageService', ['$http', function ($http) {
-    // Private stuff
-    var messages =          null,
-        messageDBlocation = "js/common/messagesDB.json",
-        self =              this,
-        callbackResult =    function(data, status, headers, config) {
-            messages = data ? angular.fromJson(data) : {};
-        },
-        initMessages =      function() {
-            $http.get(messageDBlocation)
-                .success(callbackResult)
-                .error(callbackResult);
-        };
-    this.keyToValue =   function(searchCriteria, obj) {
-        var resul;
-        if (angular.isDefined(obj[searchCriteria])) {
-            return obj[searchCriteria];
-        }
-        for(var key in obj) {
-            if( angular.isObject(obj[key]) ){
-                var resul = this.keyToValue(searchCriteria, obj[key]);
-            }
-            if (angular.isDefined(resul)) break;
-        }
-        return resul;
-    };
-    // Public stuff
-    this.search = function(msjKey) {
-        var resul = this.keyToValue(msjKey, messages);
-        return resul;
-    };
-
-    this.getMessages = function() {
-        return messages;
-    };
-    // Load the messages from JSON file
-    initMessages();
-}]);
-/**
- * Created by Raiam 
- */
-services.service('Payment', ['$window', '$http', '$q', function ($window, $http, $q) {
-    
-    this.sendWeight = function(h){
-        var defer = $q.defer();
-
-        $.ajax({
-            url: "http://www.gn-digital.info/services/tarifario_courier/api/?method=t_paqueteporpeso&params[peso]="+h+"&params[is_gam]=0",
-            type: 'GET',
-            crossDomain: true,
-            dataType: 'jsonp',
-            jsonpCallback:'tarifario_callback',
-            success: function(response) { defer.resolve(response);},
-            error: function(error){defer.resolve(error);}
-        });
-
-        return defer.promise;
-    };
-
-    this.makePay = function(order_id, name, last, emisor, tarjeta, month, year, price, envio){
-         var defer = $q.defer();
-         console.log("http://www.gn-digital.com/pago_por_api/?sel=save&order_id=3619&ccname="+name+"%20"+last+"&ccnumber=12345&ccissuer="+emisor+"&ccmonth="+month+"&ccyear="+year+"&products[0][id]=2&products[0][name]=CobroFotos&products[0][price]="+price+"&products[0][qty]=1&products[1][id]=3&products[1][name]=Envio&products[1][price]="+envio+"&products[1][qty]=1&callback=jason");
-        
-        $.ajax({
-            url: "http://www.gn-digital.com/pago_por_api/?sel=save&order_id=3619&ccname="+name+"%20"+last+"&ccnumber="+tarjeta+"&ccissuer="+emisor+"&ccmonth="+month+"&ccyear="+year+"&products[0][id]=2&products[0][name]=CobroFotos&products[0][price]="+price+"&products[0][qty]=1&products[1][id]=3&products[1][name]=Envio&products[1][price]="+envio+"&products[1][qty]=1&callback=jason",
-            type: 'GET',
-            crossDomain: true,
-            dataType: 'jsonp',
-            jsonpCallback:'gnpaymentcallback',
-            success: function(response) { defer.resolve(response);},
-            error: function(error){defer.resolve(error);}
-        });
-
-        return defer.promise;
-    };
-
-
-}]);
-/**
- * Created by joseph on 24/11/2014.
- */
-services.service('PhotoSizeChecker', [function () {
-    var self = this,
-        minimumSize,
-        imageDimensions;
-
-    var meetsOrientation = function(){
-        var expectedOrientation = self.getOrientation(minimumSize.width, minimumSize.height),
-            imageOrientation = self.getOrientation(imageDimensions.width, imageDimensions.height);
-        return (expectedOrientation === imageOrientation);
-    };
-
-    var meetsArea = function(){
-        var minimumArea = self.computeArea(minimumSize.width, minimumSize.height),
-            imageArea = self.computeArea(imageDimensions.width, imageDimensions.height);
-
-        return (imageArea >= minimumArea);
-    };
-
-    this.getExpectedSize = function(){
-        return minimumSize.width+"px x "+ minimumSize.height+"px";
-    };
-
-    this.computeArea = function(w, h){
-        return ( w*h );
-    };
-
-    this.getOrientation = function(width, height){
-        var orientation = "square";
-        if(width > height) {
-            orientation = "landscape";
-        } else if(width < height) {
-            orientation = "portrait";
-        }
-        return orientation;
-    };
-
-    this.meetsMinimumRequirements = function(ImageWrapper, pSelectedProduct){
-        // update local helper variables
-        minimumSize  = pSelectedProduct.pixel_size.minimum;
-        imageDimensions = ImageWrapper.images.standard_resolution;
-        // then decide if the provided image meets the minimum requirements
-        return ( meetsArea() );
-    };
-}]);
-/**
- * Created by joseph on 30/11/2014.
- */
-services.service('StorageService', ['$window','$q', function ($window, $q) {
-    var storage = $window.localStorage,
-        prefix = "hacelo",
-        cart = "";
-
-    this.save = function(pCartData) {
-        var saved = true;
-        /*try {
-            storage.setItem(prefix, angular.toJson(pCartData, false));
-        } catch (e) {
-            saved = false;
-        }*/
-
-        try {
-            this.saveToDisk(pCartData);
-        } catch (e) {
-            saved = false;
-        }
-        
-        return saved;
-    };
-
-
-    this.load = function() {
-        console.log("cart");
-        return angular.fromJson(cart);
-    };
-
-
-    this.load2 = function(){
-        var defer = $q.defer(),
-            self = this;
-        // This is to ensure device is ready
-        document.addEventListener('deviceready', function(){
-            self.getDataFromDisk().then(function(e){
-                cart = e;
-                defer.resolve(e);
-            });
-        }, false);
-
-
-        return defer.promise;
-    };
-
-
-    this.clear = function() {
-        this.save("");
-    };
-
-
-    this.saveToDisk = function(pCartData){
-        var b = new FileManager(),
-            a = new DirManager();
-
-        a.create_r('Printea',Log('created successfully'));
-        b.write_file('Printea/','shopping.txt', angular.toJson(pCartData, false) ,Log('wrote sucessful!'));
-    };
-
-
-    this.getDataFromDisk = function(){
-        var defer = $q.defer(),
-            a = new DirManager(),
-            b = new FileManager(),
-            c = "" ;
-
-        this.existFolder().then(function(e){
-            if(!e){
-                b.write_file('Printea/','shopping.txt', null ,function(){
-                    b.read_file('Printea/','shopping.txt',function(e){defer.resolve(e)},function(e){defer.resolve(e)});
-                });
-            } else {
-                b.read_file('Printea/','shopping.txt',function(e){defer.resolve(e)},function(e){defer.resolve(e)});
-            }
-        });
-        
-        return defer.promise;
-    };
-
-
-    this.existFolder = function(){
-        var defer = $q.defer(),
-            a = new DirManager(),
-            c = "" ;
-
-        a.list('Printea/', function(e){
-            if(e.length > 0){
-                defer.resolve(true);
-            } else {
-                defer.resolve(false);
-            }
-        });
-
-        return defer.promise;
-    };
-
-}]);
-services.service('Utils', ['$q', '$timeout', function ($q, $timeout) {
-    /**
- * Converts image URLs to dataURL schema using Javascript only.
- *
- * @param {String} url Location of the image file
- * @param {Function} success Callback function that will handle successful responses. This function should take one parameter
- *                            <code>dataURL</code> which will be a type of <code>String</code>.
- * @param {Function} error Error handler.
- *
- * @example
- * var onSuccess = function(e){
- *  document.body.appendChild(e.image);
- *  alert(e.data);
- * };
- *
- * var onError = function(e){
- *  alert(e.message);
- * };
- *
- * getImageDataURL('myimage.png', onSuccess, onError);
- *
- */
-this.getImageDataURL = function(url, x, y) {
-    
-    var defer = $q.defer();
-        var data, canvas, ctx;
-        var img = new Image();
-        img.onload = function(){
-            // Create the canvas element.
-            canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            // Get '2d' context and draw the image.
-            ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0);
-            // Get canvas data URL
-            try{
-                console.log("got it");
-                data = canvas.toDataURL();
-                defer.resolve({image:img, data:data, x:x, y:y});
-            }catch(e){
-                console.log("broke");
-                defer.reject(e);
-            }
-        }
-        // Load image URL.
-        try{
-            img.src = url;
-        }catch(e){
-            console.log("broke this shit");
-            defer.reject(e);
-        }
-
-    
-    return defer.promise;
-
-}
-
-
 }]);

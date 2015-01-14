@@ -238,7 +238,6 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
 
             if (angular.isUndefined(shoppingCart)) {
                 lastShoppingCart = StorageService.load();
-                console.log("got it yeah");
 
                 if(angular.isObject(lastShoppingCart)){
                     restoredOrders = restoreOrders(lastShoppingCart.orders);

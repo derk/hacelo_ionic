@@ -29,7 +29,7 @@ controllers.controller('categoryCrtl', ['$scope', '$state', '$ionicPopup', 'Sele
 	};
 
 	var lookForImages = function () {
-		if(SelectedImagesFactory.getAll().length>0) {oce
+		if(SelectedImagesFactory.getAll().length>0) {
 			$ionicPopup
 				.confirm(MessageService.search("loss_of_selected_images"))
 					.then(function(res) {
@@ -47,9 +47,20 @@ controllers.controller('categoryCrtl', ['$scope', '$state', '$ionicPopup', 'Sele
 	lookForImages();
 }]);
 
-controllers.controller('photoCrtl', ['$scope', '$state', '$timeout', '$window','SelectedImagesFactory',function($scope, $state, $timeout, $window, SelectedImagesFactory) {
+controllers.controller('photoCrtl', ['$scope', '$state', '$ionicPopup', '$timeout', '$window', 'MessageService','SelectedImagesFactory',function($scope, $state, $ionicPopup, $timeout, $window, Messages, SelectedImagesFactory) {
+	var cache = angular.isDefined(cache) ? cache: Messages.search("photobook_alert");
+
 	$scope.product = SelectedImagesFactory.getProduct();
 	$scope.height = screen.width;
+
+	if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
+		$ionicPopup.alert(cache);
+		$timeout(function () {
+			angular.element(".popup").addClass("photobook-popup");
+		},1000);
+		console.log("get");
+	}
+
 
 }]);
 

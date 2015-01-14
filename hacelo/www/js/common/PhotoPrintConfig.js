@@ -293,6 +293,7 @@ commons.constant('PhotoPrintConfig', {
             id: "photobook",
             "name": "Photobook",
             "images": "img/cuadradas/PORTADA_CUADRADAS/portada_cuadradas.png",
+            "mandatory":true,
             "products": [
                 {
                     "name": "8.5x11",

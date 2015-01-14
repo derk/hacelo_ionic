@@ -1494,6 +1494,19 @@ body{
     }
 }
 
+.popup-container {
+
+    .popup-body {
+        text-align: center;        
+    } 
+    .popup-buttons {
+        .button.button-positive {
+            background: grey;
+        }
+    }
+}
+
+
 
 
 /*ANIMATION*/
@@ -1545,4 +1558,27 @@ body{
 
 #information {
     display: none;
+}
+
+
+
+
+
+.popup.photobook-popup {
+    border: 6px solid $blue;
+
+    .popup-head {
+        background: #0E619A;
+        padding: 5px 10px;
+
+        .popup-title {
+            font-size: 2em;
+            color: white;
+        }
+    }
+
+    .button.button-positive {
+        background: rgba(255,255,255,0);
+        color: $blue;
+    }
 }
