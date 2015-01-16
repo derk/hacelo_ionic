@@ -1,5 +1,5 @@
 /**
- * Created by joseph on 30/11/2014.
+ * Created   on 30/11/2014.
  */
 directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
     var directiveName = "whenLoaded";

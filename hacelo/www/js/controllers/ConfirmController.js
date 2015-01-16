@@ -1,5 +1,5 @@
 /**
- * Created by joseph on 30/11/2014.
+ * Created   on 30/11/2014.
  */
 controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', 'SelectedImagesFactory', function ($scope, $state, $ionicPopup, Messages, ShoppingCartFactory, SelectedImagesFactory) {
     var cart = ShoppingCartFactory.loadShoppingCart();

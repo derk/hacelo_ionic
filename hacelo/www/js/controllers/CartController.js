@@ -1,5 +1,5 @@
 /**
- * Created by joseph on 30/11/2014.
+ * Created   on 30/11/2014.
  */
 controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $ionicPopup, Messages, ShoppingCartFactory,Payment) {
     $scope.cart = ShoppingCartFactory.loadShoppingCart();

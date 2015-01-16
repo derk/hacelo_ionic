@@ -1,5 +1,5 @@
 /**
- * Created by joseph on 24/11/2014.
+ * Created   on 24/11/2014.
  */
 services.service('PhotoSizeChecker', [function () {
     var self = this,

@@ -1,5 +1,5 @@
 /**
- * Created by joseph on 29/11/2014.
+ * Created   on 29/11/2014.
  */
 models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', function ($q, StorageService, ImageFactory) {
     // ---

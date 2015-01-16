@@ -241,7 +241,7 @@ angular.module('hacelo', [
 var commons = angular.module('hacelo.config', []);
 var controllers = angular.module('hacelo.controllers', []);
 /**
- * Created by joseph on 30/11/2014.
+ * Created   on 30/11/2014.
  */
 var directives = angular.module('hacelo.directives', []);
 
@@ -1124,7 +1124,7 @@ controllers.controller('addedCtrl', ['$scope', '$stateParams', function ($scope,
     $scope.productName = $stateParams.productName;
 }]);
 /**
- * Created by joseph on 30/11/2014.
+ * Created   on 30/11/2014.
  */
 controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $ionicPopup, Messages, ShoppingCartFactory,Payment) {
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
@@ -1364,7 +1364,7 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
 
 }]);
 /**
- * Created by joseph on 30/11/2014.
+ * Created   on 30/11/2014.
  */
 controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', 'SelectedImagesFactory', function ($scope, $state, $ionicPopup, Messages, ShoppingCartFactory, SelectedImagesFactory) {
     var cart = ShoppingCartFactory.loadShoppingCart();
@@ -1439,7 +1439,7 @@ controllers.controller('confirmOrderCtrl', ['$scope', '$state' ,'$ionicPopup','$
 
 }]);
 /**
- * Created by joseph on 07/12/2014.
+ * Created   on 07/12/2014.
  */
 controllers.controller('congratsCtrl', ['clearSelection', function (clearSelection) {
     clearSelection.clearSelection();
@@ -1590,7 +1590,7 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
     init();
 }]);
 /**
- * Created by joseph on 30/11/2014.
+ * Created   on 30/11/2014.
  */
 controllers.controller('PhotoEditCtrl', ['$scope', '$stateParams', '$state', 'SelectedImagesFactory', function ($scope, $stateParams, $state, SelectedImagesFactory) {
     $scope.image = SelectedImagesFactory.getOne($stateParams.id);
@@ -1841,7 +1841,7 @@ controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ion
     };
 });
 /**
- * Created by joseph on 30/11/2014.
+ * Created   on 30/11/2014.
  */
 directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
     var directiveName = "whenLoaded";
@@ -2171,7 +2171,7 @@ services.service('Payment', ['$window', '$http', '$q', function ($window, $http,
 
 }]);
 /**
- * Created by joseph on 24/11/2014.
+ * Created   on 24/11/2014.
  */
 services.service('PhotoSizeChecker', [function () {
     var self = this,
@@ -2218,7 +2218,7 @@ services.service('PhotoSizeChecker', [function () {
     };
 }]);
 /**
- * Created by joseph on 30/11/2014.
+ * Created   on 30/11/2014.
  */
 services.service('StorageService', ['$window','$q', function ($window, $q) {
     var storage = $window.localStorage,
@@ -2684,7 +2684,7 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
 }]);
 
 /**
- * Created by joseph on 29/11/2014.
+ * Created   on 29/11/2014.
  */
 models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', function ($q, StorageService, ImageFactory) {
     // ---

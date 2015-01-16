@@ -1,5 +1,5 @@
 /**
- * Created by joseph on 30/11/2014.
+ * Created   on 30/11/2014.
  */
 services.service('StorageService', ['$window','$q', function ($window, $q) {
     var storage = $window.localStorage,
