@@ -1396,6 +1396,43 @@ body{
         padding: 1.8%;
     }
 }
+/*
+ ================ Check Photobook page =================
+*/
+
+.check-photobook {
+
+    .check-container {
+        padding-bottom: 15px;
+    }
+    
+    h1  {
+        font-size: 1.5em;
+    }
+
+    button {
+        width: 80%;
+        padding: 10px 0;
+        background: $red;
+        outline: none;
+        border: none;
+        color: white;
+        font-size: 1.2em;
+        font-weight: 700;
+    }
+    .paper {
+        width: 80%;
+        margin: 0 auto;
+        background: url('http://pngimg.com/upload/book_PNG2122.png') repeat 0 0/100% 100%;
+        img {
+            width: 48%;
+        }
+    }
+
+    .wood-container {
+        background: url('http://www.wallpaperhd.website/wp-content/uploads/2013/09/wood-background.png') repeat-y top left/ 100% auto;
+    }
+}
 
 
 /*
