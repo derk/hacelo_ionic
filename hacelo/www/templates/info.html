@@ -25,9 +25,9 @@
 					<p class="question center">Cancelaciones y reembolsos</p>
 					<p class="answer">Para poder entregarte nuestros productos con la velocidad que prometemos, la mayoría de nuestro sistema es completamente automatizado y comienza justo cuando vos confirmas tu orden. Debido a esto solo permitimos cancelaciones una hora después de haber solicitado tu orden y solo de lunes a viernes de 8 a.m. a 6 p.m.  En todas las otras circunstancias no podremos cancelar tu orden.</p>
 
-					<p class="answer">Nosotros confiamos en que nuestros productos son de excelente calidad y que las impresiones son fieles a la imagen que vos nos enviaste. Pero si por alguna razón no estás contento con la calidad de nuestros productos, escribenos y buscaremos una solución.
+					<p class="answer">Nosotros confiamos en que nuestros productos son de excelente calidad y que las impresiones son fieles a la imagen que vos nos enviaste. Pero si por alguna razón no estás contento con la calidad de nuestros productos, escribenos y buscaremos una solución.</p>
 					<p class="question center">Impresiones de Gran Formato</p>
-					Hemos diseñado nuestra aplicación para asegurarnos que todas las impresiones vengan con la mejor resolución. Cualquier foto que te permitamos seleccionar debería de imprimir bien y sin pixelarse, pero obviamente entre más alta la resolución, mejor la calidad. Es importante tomar nota de nuestros mínimos.</p>
+					<p class="answer">Hemos diseñado nuestra aplicación para asegurarnos que todas las impresiones vengan con la mejor resolución. Cualquier foto que te permitamos seleccionar debería de imprimir bien y sin pixelarse, pero obviamente entre más alta la resolución, mejor la calidad. Es importante tomar nota de nuestros mínimos.</p>
 					<ul class="list">
 						<li>4x4 - 400 x 400 pixeles</li>
 						<li>4x6  - 400 x 600 pixeles</li>
@@ -177,27 +177,27 @@
 				Comparte
 				</ion-item>
 				<div class="item-accordion item social-btns" ng-show="isGroupShown('share')">
-					<a href="#" class="share fb"></a>
-					<a href="#" class="share twitter"></a>
+					<a href="https://www.facebook.com/pages/Printea/726483530762215?ref=hl" class="share fb"></a>
+					<a href="http://www.twitter.com/printeaApp" class="share twitter"></a>
+					<a href="http://www.instagram.com/printeaApp" class="share instagram"></a>
+					<a href="http://www.pinterest.com/printea2193" class="share pinterest"></a>
 					<a href="3" class="share email"></a>
 				</div>
-				<div class="btn-container-short">
-					<ion-item ng-model="contacto" class="item-stable btn-short contact-item-info" ng-click="toggleGroup('contacto')" ng-class="{active: isGroupShown('contacto')}">
+				<ion-item ng-model="contacto" class="item-stable" ng-click="toggleGroup('contacto')" ng-class="{active: isGroupShown('contacto')}">
 					Contactenos
-					</ion-item>
-				</div>
+				</ion-item>
 				<div class="item-accordion item" ng-show="isGroupShown('contacto')">
 					<label class="item item-input">
-						<input class="name" type="text" placeholder="nombre">
+						<input class="name" type="text" placeholder="Nombre">
 					</label>
 					<label class="item item-input">
-						<input class="lastname" type="text" placeholder="apellido">
+						<input class="lastname" type="text" placeholder="Apellido">
 					</label>
 					<label class="item item-input">
-						<input class="email" type="email" placeholder="correo electrónico">
+						<input class="email" type="email" placeholder="Correo electrónico">
 					</label>
 					<label class="item item-input">
-					    <textarea placeholder="consulta..." rows="8" cols="10"></textarea>
+					    <textarea placeholder="Consulta..." rows="8" cols="10"></textarea>
 					</label>
 					<button class="button button-block">Enviar</button>
 				</div>
