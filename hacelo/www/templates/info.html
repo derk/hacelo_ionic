@@ -26,14 +26,78 @@
 					<p class="answer">Para poder entregarte nuestros productos con la velocidad que prometemos, la mayoría de nuestro sistema es completamente automatizado y comienza justo cuando vos confirmas tu orden. Debido a esto solo permitimos cancelaciones una hora después de haber solicitado tu orden y solo de lunes a viernes de 8 a.m. a 6 p.m.  En todas las otras circunstancias no podremos cancelar tu orden.</p>
 
 					<p class="answer">Nosotros confiamos en que nuestros productos son de excelente calidad y que las impresiones son fieles a la imagen que vos nos enviaste. Pero si por alguna razón no estás contento con la calidad de nuestros productos, escribenos y buscaremos una solución.
-					Impresiones de Gran Formato
+					<p class="question center">Impresiones de Gran Formato</p>
 					Hemos diseñado nuestra aplicación para asegurarnos que todas las impresiones vengan con la mejor resolución. Cualquier foto que te permitamos seleccionar debería de imprimir bien y sin pixelarse, pero obviamente entre más alta la resolución, mejor la calidad. Es importante tomar nota de nuestros mínimos.</p>
+					<ul class="list">
+						<li>4x4 - 400 x 400 pixeles</li>
+						<li>4x6  - 400 x 600 pixeles</li>
+						<li>5x5  - 500 x 500 pixeles</li>
+						<li>5x7  - 500 x 700 pixeles</li>
+						<li>8x8 - 800 x 800 pixeles</li>
+						<li>8x10  - 800 x 1000 pixeles</li>
+						<li>10x10  - 1000 x 1000 pixeles</li>
+						<li>11x17  - 1200 x 1800 pixeles</li>
+						<li>14x20  - 1500 x 2100 pixeles</li>
+						<li>20x29  - 2100 x 3000 pixeles</li>
+					</ul>
 				</div>
 				<ion-item ng-model="price" class="item-stable" ng-click="toggleGroup('price')" ng-class="{active: isGroupShown('price')}">
-				precio
+				Precio
 				</ion-item>
 				<div class="item-accordion item" ng-show="isGroupShown('price')">
-					<p>Descripción Precio</p>
+					<p class="question center">Fotografías</p>
+					<p class="answer">
+						<ul class="list">
+							<li>4x6 ✓ - ¢4.999 IVI</li>
+							<li>5x7 ✓ - ¢5.499 IVI</li>
+							<li>8x10 ✓ - ¢6.499 IVI</li>
+						</ul>
+					</p>
+					<p class="question center">Cuadradas</p>
+					<p class="answer">
+						<ul class="list">
+							<li>4x4 ✓ - ¢4.999 IVI</li>
+							<li>5x5 ✓ - ¢5.499 IVI</li>
+							<li>8x8 ✓- ¢5.999 IVI </li>
+							<li>10x10 ✓ - ¢6.999 IVI</li>
+						</ul>
+					</p>
+					<p class="question center">Marco de Madera</p>
+					<p class="answer">
+						<ul class="list">
+							<li>4x4 ✓- ¢14.999 IVI</li>
+							<li>11x17 ✓ - ¢31.999 IVI </li>
+							<li>14x20 ✓ - ¢38.999 IVI </li>
+							<li>20x29 ✓ - ¢58.999 IVI</li>
+						</ul>
+					</p>
+					<p class="question center">Photobook</p>
+					<p class="answer">
+						<ul class="list">
+							<li>8.5 x 11 - 38 páginas - ¢17.499 IVI</li>
+							<li>12 x 9 - 38 páginas - ¢19.999 IVI </li>
+						</ul>
+					</p>
+					<p class="question center">Photostrips</p>
+					<p class="answer">
+						<ul class="list">
+							<li>4.45 x 17.78 cm - ¢4.999 IVI</li>
+						</ul>
+					</p>
+					<p class="question center">Poster</p>
+					<p class="answer">
+						<ul class="list">
+							<li>20.1 x 29.1 ✓ - ¢12.999 IVI </li>
+						</ul>
+					</p>
+					<p class="question center">Gran Formato</p>
+					<p class="answer">
+						<ul class="list">
+							<li>11x17 ✓ - ¢12.999 IVI</li>
+							<li>14x20 ✓ - ¢13.999 IVI</li>
+							<li>20.1 x 29.1 ✓ - ¢14.999 IVI</li>
+						</ul>
+					</p>
 				</div>
 				<ion-item ng-model="envio" class="item-stable" ng-click="toggleGroup('envio')" ng-class="{active: isGroupShown('envio')}">
 				Envio
@@ -49,18 +113,31 @@
 						<li>Recibirás un e-mail automatizado cuando tu orden salga para entrega.</li>
 						<li>No hay servicio de entrega en áreas peligrosas del país.</li>
 					</ul>
-					<div class="btn-container-short">
-						<ion-item class="item-stable btn-short envio">Sucursal Curridabat</ion-item>
-					</div>
-					<div class="btn-container-short">
-						<ion-item class="item-stable btn-short envio">Sucursal Desamparados</ion-item>
-					</div>
-					<div class="btn-container-short">
-						<ion-item class="item-stable btn-short envio">Sucursal Guadalupe</ion-item>
-					</div>
-					<div class="btn-container-short">
-						<ion-item class="item-stable btn-short envio">Sucursal Llorente</ion-item>
-					</div>
+					
+					<p class="center question">Sucursal Desamparados</p>
+					<p>
+						Centro Comercial Desamparados, frente al Colegio Monseñor Rubén Odio. Local Nº 14<br>
+						Horario:<br>
+						De Lunes a Viernes de 8am a 6pm y Sábados de 8am a 1pm.<br>
+						Teléfono: (506) 2247-5660<br>
+						Fax: (506) 2250-4307<br>
+					</p>
+					<p class="center question">Sucursal Guadalupe</p>
+					<p>
+						Centro Comercial Novacentro Locales 34 y 35. Guadalupe, del cruce a Moravia, 100 norte<br>
+						Horario:<br>
+						De Lunes a Viernes de 8am a 6pm y Sábados de 8am a 1pm.<br>
+						Teléfono: (506) 2247-5960<br>
+						Fax: (506) 2224-8772<br>
+					</p>
+					<p class="center question">Sucursal Llorente</p>
+					<p>
+						400 m este del Cruce Llorente Tibás<br>
+						Horario:<br>
+						De Lunes a Viernes de 8am a 6pm y Sábados de 8am a 12md.<br>
+						Teléfono: (506) 2247-5760<br>
+						Fax: (506) 2247-4442<br>
+					</p>
 					
 					<p class="center question">Sucursal San José</p>
 					<p>
@@ -78,6 +155,22 @@
 						Horario:<br>
 						De Lunes a Viernes de 8am a 6pm y Sábados
 						de 8am a 1pm.
+					</p>
+					<p class="center question">Sucursal Alajuela</p>
+					<p>
+						Alajuela, de la bomba la Tropicana 100 mts al este en centro comercial Plaza Real Alajuela locales # 30-31-32<br>
+						Horario:<br>
+						De Lunes a Viernes de 8am a 6pm y Sábados de 8am a 1pm.<br>
+						Teléfono: (506) 2247-5990<br>
+						Fax: (506) 2442-3303<br>
+					</p>
+					<p class="center question">Sucursal Cartago</p>
+					<p>
+						Barrio El Molino, de las oficinas administrativas de la CCSS, 50 metros norte, edificio El Nogal.<br>
+						Horario:<br>
+						De Lunes a Viernes de 8am a 1:30pm y de 2pm a 5pm y Sábados de 8am a 12pm.<br>
+						Teléfono: (506) 2247-5970<br>
+						Fax: (506) 2591-1991<br>
 					</p>
 				</div>
 				<ion-item ng-model="share" class="item-stable" ng-click="toggleGroup('share')" ng-class="{active: isGroupShown('share')}">
