@@ -29,6 +29,13 @@
             "template" : "Parece que tu carrito de compras esta completamente lleno. \n Intenta quitar algunos fotos o completar el proceso de compra de las que ya tienes seleccionadas.",
             "okText" : "Aceptar"
         },
+
+        "photobook_few" :{
+           "title" : "Houston, tenemos un problema",
+            "template" : "El photobook solo permite 38 fotos, tienes menos de esa cantidad.",
+            "okText" : "Aceptar" 
+        },
+
         "loss_of_selected_images" : {
             "title" : "¿Estas segur@ de continuar?",
             "template" : "Si cambias de categoría perderás las imágenes que tienes seleccionadas hasta el momento."

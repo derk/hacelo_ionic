@@ -1,5 +1,6 @@
-controllers.controller('PhotoSourceCtrl', ['$scope', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', function ($scope, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker) {
+controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker) {
     $scope.imageStack = SelectedImagesFactory.getAll();
+
 
     $scope.phoneImageLoad = function () {
         CordovaCameraService.getImage().then(function (result) {
@@ -18,4 +19,18 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$ionicPopup', 'SelectedIma
             });
         });
     };
+
+
+
+
+    $scope.gotoConfirm = function () {
+
+        if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
+            $state.go('app.photobook-check');
+        } else {
+            $state.go('app.check');
+        }
+        
+    };
+
 }]);

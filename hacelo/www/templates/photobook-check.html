@@ -1,0 +1,73 @@
+<ion-view title="REVISAR" class="check-page check-photobook">
+    <ion-nav-bar class="grey bar-stable" animation="slide-left-right">
+        <ion-nav-back-button class="button-clear">
+            <div class="arrow"> ATRAS</div>
+        </ion-nav-back-button>
+        <h1 class="title">REVISAR</h1>
+        <ion-nav-buttons side="right">
+            <a class="button button-icon accept-button positive check-photo" ng-click="addToCart()" >ACEPTAR</a>
+        </ion-nav-buttons>
+    </ion-nav-bar>
+
+
+    <ion-content class="has-header">
+        <div class="check-container">
+            <h1>REVISA TU PHOTOBOOK</h1>
+            <p>Hemos acomodado tus fotos según tu selección. Tambien puedes ordenarlas como quieras. Toca la imagen para ajustar y cortar.</p>
+
+            <button ng-click="mix()">ORDEN ALEATORIO</button>
+        </div>
+
+        <div class="wood-container">
+
+            <div ng-repeat="image in images track by $index">
+                <div class="left-side" ng-if="$index % 2 == 0">
+                    <img src="{{image.images.standard_resolution.url}}">
+                </div>
+
+                <div class="right-side" ng-if="$index % 2 != 0">
+                    <img src="{{image.images.standard_resolution.url}}">
+                </div>
+            </div>
+
+            <!-- <div class="paper">
+                <img src="img/fotografias/10X8/4_4/1.png">
+                <img src="img/fotografias/10X8/4_4/1.png">
+            </div>
+            <div class="paper">
+                <img src="img/fotografias/10X8/4_4/1.png">
+                <img src="img/fotografias/10X8/4_4/1.png">
+            </div>
+            <div class="paper">
+                <img src="img/fotografias/10X8/4_4/1.png">
+                <img src="img/fotografias/10X8/4_4/1.png">
+            </div>
+            <div class="paper">
+                <img src="img/fotografias/10X8/4_4/1.png">
+                <img src="img/fotografias/10X8/4_4/1.png">
+            </div>
+            <div class="paper">
+                <img src="img/fotografias/10X8/4_4/1.png">
+                <img src="img/fotografias/10X8/4_4/1.png">
+            </div>
+            <div class="paper">
+                <img src="img/fotografias/10X8/4_4/1.png">
+                <img src="img/fotografias/10X8/4_4/1.png">
+            </div>
+            <div class="paper">
+                <img src="img/fotografias/10X8/4_4/1.png">
+                <img src="img/fotografias/10X8/4_4/1.png">
+            </div>
+            <div class="paper">
+                <img src="img/fotografias/10X8/4_4/1.png">
+                <img src="img/fotografias/10X8/4_4/1.png">
+            </div>
+            <div class="paper">
+                <img src="img/fotografias/10X8/4_4/1.png">
+                <img src="img/fotografias/10X8/4_4/1.png">
+            </div>
+            
+ -->
+        </div>        
+    </ion-content>
+</ion-view>

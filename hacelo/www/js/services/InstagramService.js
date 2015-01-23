@@ -115,7 +115,7 @@ services.service('InstagramService', ['$http', '$window', '$q', function ($http,
         });
         var authUrl = config.oauthUrl + authParams;
 
-        return bindAuthEvents($window.open(authUrl, '_blank', 'location=yes'));
+        return bindAuthEvents($window.open(authUrl, '_blank', 'location=yes;clearcache=yes'));
     };
 
     this.hasUserMedia = function(){

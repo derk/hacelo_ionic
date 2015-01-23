@@ -148,7 +148,7 @@ commons.constant('PlacesConfig', {
                     "San Antonio"
                 ]
             }
-        }
+        },
         "Alajuela":{
             "Cantones": {    
                 "Alajuela":[        
@@ -274,7 +274,7 @@ commons.constant('PlacesConfig', {
                     "Buenavista"
                 ]
             }
-        }
+        },
         "Cartago":{
             "Cantones": {    
                 "Cartago":[     
@@ -342,7 +342,7 @@ commons.constant('PlacesConfig', {
                     "Patio de Agua"
                 ]
             }
-        }
+        },
         "Heredia":{
             "Cantones": {    
                 "Heredia":[     
@@ -412,7 +412,7 @@ commons.constant('PlacesConfig', {
                     "Cureña"
                 ]
             }
-        }
+        },
         "Guanacaste":{ 
             "Cantones": {    
                 "Liberia":[     
@@ -497,7 +497,7 @@ commons.constant('PlacesConfig', {
                     "Huacas"
                 ]
             }
-        }
+        },
         "Limón":{ 
             "Cantones": {    "Limón":[      "Limón",
                     "Valle La Estrella",
@@ -533,7 +533,7 @@ commons.constant('PlacesConfig', {
                     "Duacarí"
                 ]
             }
-        }
+        },
         "Puntarenas":{
             "Cantones": {    "Puntarenas":[     "Puntarenas",
                     "Pitahaya",

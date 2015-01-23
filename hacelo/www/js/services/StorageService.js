@@ -25,7 +25,6 @@ services.service('StorageService', ['$window','$q', function ($window, $q) {
 
 
     this.load = function() {
-        console.log("cart");
         return angular.fromJson(cart);
     };
 

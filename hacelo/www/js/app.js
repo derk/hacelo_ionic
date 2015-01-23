@@ -205,6 +205,15 @@ angular.module('hacelo', [
             }
         }
     })
+    .state('app.photobook-check', {
+        url: "/photobook-check",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/photobook-check.html",
+                controller: "photobookCheckCtrl"
+            }
+        }
+    })
     .state('app.share', {
         url: "/share",
         views: {

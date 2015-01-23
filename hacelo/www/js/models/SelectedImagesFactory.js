@@ -19,6 +19,11 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         getToPrintOnes: function() {
             return $filter('filter')(selectedImages, {toPrint:true});
         },
+        clearAndAdd : function(items){
+            var notPrint = $filter('filter')(selectedImages, {toPrint:false});; 
+            var print = notPrint.concat(items);
+            selectedImages = print;
+        },
         getAll: function() {
             return selectedImages;
         },
