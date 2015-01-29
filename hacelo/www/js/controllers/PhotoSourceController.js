@@ -1,6 +1,6 @@
-controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker) {
+controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader) {
     $scope.imageStack = SelectedImagesFactory.getAll();
-
+    $scope.gallery = SelectedImagesFactory.getGallery();
 
     $scope.phoneImageLoad = function () {
         CordovaCameraService.getImage().then(function (result) {
@@ -20,9 +20,6 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'S
         });
     };
 
-
-
-
     $scope.gotoConfirm = function () {
 
         if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
@@ -32,5 +29,19 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'S
         }
         
     };
+
+    $scope.init = function () {
+        FileReader.getFileSystem().then(function(e){
+            console.log(e);
+            FileReader.hasImage(e[8]).then(function(result){
+                window.r = result;
+                console.log(result);
+            });
+        });
+    };
+
+    if($scope.gallery.length == 0){
+        $scope.init();
+    }
 
 }]);
