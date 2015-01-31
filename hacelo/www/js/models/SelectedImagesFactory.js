@@ -4,6 +4,7 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
      * Also store the selected product with his parent product line
      */
     var selectedImages = [],
+        imageGallery = [],
         productLine = {},
         product = {};
 
@@ -38,6 +39,12 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         },
         setProduct: function(pProduct){
             product = pProduct;
+        },
+        setGallery: function(gallery){
+            imageGallery = gallery;
+        },
+        getGallery: function(){
+            return imageGallery;
         },
         getProduct: function(){
             return product;

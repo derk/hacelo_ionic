@@ -16,6 +16,13 @@
         </div>
         <div class="photos">
             <div class="images-container">
+
+                <div class="image"
+                     ng-repeat=" album in gallery">
+                     <span>album.name</span>
+                    
+                </div>
+
                 <div class="image"
                      ng-repeat="image in imageStack | filter:{origin:'phone'}"
                      ng-init="mini = image.images.thumbnail"
