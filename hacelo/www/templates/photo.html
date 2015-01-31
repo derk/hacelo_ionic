@@ -27,13 +27,13 @@
             <div class="cover"><span>{{product.name}}</span></div>
 
             <div class="menu-content">
-                <p><span>{{product.prices.first_items.price | currency:"&#8353;"}}</span>
+                <p><span>{{product.prices.first_items.price | noFractionCurrency}}</span>
                     <ng-pluralize count="product.prices.first_items.quantity"
                                   when="{'one': '1 impresión.',
                                         'other': 'Primeras {} impresiones'}">
                     </ng-pluralize>
                 </p>
-                <p><span>{{product.prices.additional.price | currency:"&#8353;"}}</span> Cada impresión adicional</p>
+                <p><span>{{product.prices.additional.price | noFractionCurrency}}</span> Cada impresión adicional</p>
             </div>
             <a href="#/app/choose" class="button button-arrow">SELECCIONAR</a>
         </div>
