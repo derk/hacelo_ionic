@@ -1,4 +1,4 @@
-services.service('Utils', ['$q', '$timeout', function ($q, $timeout) {
+services.service('Utils', ['$q', '$timeout', '$filter', function ($q, $timeout, $filter) {
     /**
  * Converts image URLs to dataURL schema using Javascript only.
  *
@@ -6,16 +6,6 @@ services.service('Utils', ['$q', '$timeout', function ($q, $timeout) {
  * @param {Function} success Callback function that will handle successful responses. This function should take one parameter
  *                            <code>dataURL</code> which will be a type of <code>String</code>.
  * @param {Function} error Error handler.
- *
- * @example
- * var onSuccess = function(e){
- *  document.body.appendChild(e.image);
- *  alert(e.data);
- * };
- *
- * var onError = function(e){
- *  alert(e.message);
- * };
  *
  * getImageDataURL('myimage.png', onSuccess, onError);
  *
@@ -73,6 +63,18 @@ this.shuffle = function(array) {
   }
 
   return array;
+};
+
+this.compareArray = function(a, b) {
+    var a = a.sort(),
+        b = b.sort();
+        
+    var i = a.length;
+    if (i != b.length) return false;
+    while (i--) {
+        if (a[i] !== b[i]) return false;
+    }
+    return true;
 };
 
 }]);

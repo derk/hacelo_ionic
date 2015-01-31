@@ -18,8 +18,9 @@
             <div class="images-container">
 
                 <div class="image"
-                     ng-repeat=" album in gallery">
-                     <span>album.name</span>
+                     ng-repeat=" album in gallery" ng-if="album.photos.length > 0">
+                     <div style="background: url('{{album.photos[0].url}}') no-repeat top left / 100% auto; width: 100px;height: 100px;"></div>
+                     <span>{{album.name}}</span>
                     
                 </div>
 

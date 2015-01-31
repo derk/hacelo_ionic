@@ -32,11 +32,36 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'S
 
     $scope.init = function () {
         FileReader.getFileSystem().then(function(e){
-            console.log(e);
-            FileReader.hasImage(e[8]).then(function(result){
+            window.entries = e;
+            angular.forEach(e, function(v){
+                FileReader.hasImage(v).then(function(result){
+                    $scope.gallery.push(result);
+                    window.r = $scope.gallery;
+                });  
+            });
+                // FileReader.hasImage(e[16]).then(function(result){
+                //     $scope.gallery.push(result);
+                //     window.r = $scope.gallery;
+                // });  
+
+
+            /*FileReader.hasImage(e[59]).then(function(result){
+                $scope.gallery.push(result);
                 window.r = result;
                 console.log(result);
-            });
+            });*/
+
+            // FileReader.hasImage(e[8]).then(function(result){
+            //     $scope.gallery.push(result);
+            //     window.r1 = result;
+            //     console.log(result);
+            // });
+
+  /*          FileReader.hasImage(e[1]).then(function(result){
+                $scope.gallery.push(result);
+                window.r2 = result;
+                console.log(result);
+            });*/
         });
     };
 
