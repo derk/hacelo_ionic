@@ -38,7 +38,7 @@ $blue: #0e619a;
 $darkerBlue: #0f5587;
 $red: #d6392c;
 $darkerRed: #b63223;
-$orange: #eb9e17;
+$orange: #eb9e17; /* no lo mandaron para la seccion de info */
 $darkerOrange: #c88812;
 $yellowCart: #FBEE3D;
 $grey: #4a4a4b;
@@ -47,6 +47,12 @@ $lightGrey: #dadada;
 $market: #cccccc;
 $darkerGrey: #353535;
 $borderColor: #747474;
+
+$turquoise: #45AD9B;
+$lightGreen: #B0C77E;
+$lightOrange: #FFB366;/* Este lo mandaron mal */
+$lightPurple: #AB2B58;
+$white: #FFFFFF;
 
 
 @mixin center-element($position){
@@ -76,14 +82,14 @@ body{
 }
 
 .button{
-    text-transform: uppercase;
+    text-transform: capitalize;
     font-family: Arial;
     font-weight: bold;
 }
 
 .button.button-balanced{
     border: none;
-    background-color: $green;
+    background-color: $lightOrange;
     font-weight: bold;
     border-radius: 0;
 }
@@ -92,12 +98,12 @@ body{
     border: none;
     font-weight: bold;
     border-radius: 0;
-    color: $green;
+    color: $lightOrange;
 }
 
 .button.button-positive{
     border: none;
-    background-color: $darkerBlue;
+    background-color: $lightGreen;
     font-weight: bold;
     border-radius: 0;
 }
@@ -110,7 +116,7 @@ body{
     display: inline-block;
     padding: 3% 0;
     margin-bottom: 0.5%;
-    text-transform: uppercase;
+    text-transform: capitalize;
     letter-spacing: 2px;
 }
 
@@ -139,7 +145,8 @@ body{
     }
     &.grey{
         height: 48px;
-        background-color: $grey;
+        background-color: black;
+        opacity: 0.3;
         .back-button{
             color: #fff;
             font-size: 0.9em;
@@ -183,9 +190,9 @@ body{
             color: #FFF;
         }
     }
-    &.green{
+    &.lightOrange{
         height: 44px;
-        background-color: $green;
+        background-color: $lightOrange;
         &.bar-stable .title{
             color: #FFF;
         }
@@ -203,10 +210,10 @@ body{
                 display: block;
                 top: 12px;
                 left: 20px;
-                color: $green;
+                color: $lightOrange;
             }
             .title{
-                color: $green;
+                color: $lightOrange;
                 font-weight: bold;   
             }
             
@@ -252,6 +259,7 @@ body{
         height: 120px;
         display: block;
         background: none;
+        z-index: 99;
         .options-index {
             width: 100%;
             position: relative;
@@ -263,20 +271,20 @@ body{
                 width: 90%;
                 display: inline-block;
                 margin: 3% 5%;
-                text-transform: uppercase;
+                text-transform: capitalize;
                 float: left;
                 text-align: center;
                 font-weight: bold;
                 &.button-positive{
-                    color: $green;
+                    color: $white;
                     margin-bottom: 3%;
 
                     &:hover{
-                        color: $green;
+                        color: $lightOrange;
                     }
                 }
                 &.info{
-                    color: $blue;
+                    color: $lightOrange;
                 }
             }
             .info-buttons{
@@ -462,14 +470,14 @@ body{
 
     .list .item{
         &.item-stable{
-            background: $green;
+            background: $lightOrange;
             color: #FFF;
             border: 2px solid #FFF;
             font-size: 1.2em;
             font-weight: bold;
             
             &.activated, &.active{
-                background: $darkerGreen;
+                background: $orange;
             }
         }
         &.item-accordion{
@@ -492,9 +500,10 @@ body{
                     text-align: center;
                 }
                 &.question{
-                    color: $green;
-                    font-size: 16pt;
+                    color: $lightOrange;
+                    font-size: 14pt;
                     overflow:initial;
+                    font-style: italic;
                 }
                 &.answer{
                     margin-bottom: 12%;
@@ -569,22 +578,22 @@ body{
                 margin-top: 5%;
                 margin-bottom: 8%;
                 display: block;
-                border-color: $green;
+                border-color: $lightOrange;
                 font-style: italic;
                 input, textarea{
-                   color: $green;
+                   color: $lightOrange;
                    font-style: italic; 
                 }
                 input-placeholder, textarea-placeholder{
-                    color: $green;
+                    color: $lightOrange;
                     font-style: italic; 
                 }
                 ::-webkit-input-placeholder {
-                    color: $green; 
+                    color: $lightOrange; 
                 }
             }
             button{
-                background: $green;
+                background: $lightOrange;
                 text-transform: uppercase;
                 color: #FFF;
                 font-weight: bold;
@@ -747,7 +756,7 @@ body{
                     float: left;
                     display: inline-block;
                     padding: 10px;
-                    background: $darkerBlue;
+                    background: $lightGreen;
                     color: white;
                     font-weight: 700;
                 }
@@ -945,7 +954,7 @@ body{
                 display: block;
                 margin: 0;
                 text-align: center;
-                color: $darkerBlue;
+                color: $lightGreen;
             }
             label {
                 margin: 5% 0;
@@ -998,7 +1007,7 @@ body{
             }// end label
             h3{
                 font-size: 1.5em;
-                color: $darkerBlue;
+                color: $lightGreen;
             }
 
         }// end list
@@ -1264,7 +1273,7 @@ body{
         font-family: verdana;
         margin-top: 5%;
         h2{ 
-            color: $green;
+            color: $lightOrange;
             text-align: center;
             font-weight: bold;
             font-size: 1.5em;
@@ -1368,7 +1377,7 @@ body{
    =============  congrats page  ============= 
 */
  .congrats-page {
-    background: $green;
+    background: $lightOrange;
     text-transform: uppercase;
     h2 {
         margin-top: 10%;
@@ -1536,7 +1545,7 @@ body{
 */
 
 .photobook-page{
-    background: $green;
+    background: $lightOrange;
     text-transform: uppercase;
     color: #FFF;
     h3{
@@ -1557,7 +1566,7 @@ body{
         line-height: 27px;
     }
 
-    background: $green;
+    background: $lightOrange;
     margin-bottom: 6%;
     a.button{
         width: 90%;

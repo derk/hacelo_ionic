@@ -246,4 +246,18 @@ angular.module('hacelo', [
     // Here we tel to angular that images with `content://` protocol are safe to load
     // more info at: http://goo.gl/8PfN8I
     $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob|content):|data:image\//);    
-});
+})
+.filter('noFractionCurrency',
+    [ '$filter', '$locale', function(filter, locale) {
+      var currencyFilter = filter('currency');
+      var formats = locale.NUMBER_FORMATS;
+      return function(amount, currencySymbol) {
+        var value = currencyFilter(amount, '₡');
+        var sep = value.indexOf(formats.DECIMAL_SEP);
+        console.log(amount, value);
+        if(amount >= 0) { 
+          return value.substring(0, sep);
+        }
+        return value.substring(0, sep) + ')';
+      };
+    } ]);

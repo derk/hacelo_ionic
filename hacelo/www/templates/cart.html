@@ -28,25 +28,25 @@
                     </div>
 
                     <div class="right-column">
-                        <span>= {{order.computeSubTotal() | currency:"&#8353;"}}</span>
+                        <span>= {{order.computeSubTotal() | noFractionCurrency}}</span>
                     </div>
                     
                 </div>
 
-                <!--span class="input-label">Cupón de Descuento</span>
+                <span class="input-label">Cupón de Descuento</span>
                 <label class="item item-input">
                 <input type="text" ng-model="">
                 <span ng-class="" class="img valid"></span>
                 </label>
                 <label class="item validate">
                 <button ng-click="" class="button button-block button-positive" type="submit">Validar Descuento</button>
-                </label-->
+                </label>
             </div>
             
         </div>
     </ion-content>
     <ion-footer-bar>
-        <p class="subtotal">Subtotal<span>={{cart.computeSubTotal() | currency:"&#8353;"}}</span></p>
+        <p class="subtotal">Subtotal<span>={{cart.computeSubTotal() | noFractionCurrency}}</span></p>
         <a class="button button-balanced" href="#/app/cart-checkout" ng-class="{'disabled':cart.orders.length===0}">Pagar
             Ahora</a>
     </ion-footer-bar>
