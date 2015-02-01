@@ -20,6 +20,20 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         getToPrintOnes: function() {
             return $filter('filter')(selectedImages, {toPrint:true});
         },
+        getPrintItemsCount: function () {
+            /**
+             * Return how many items the user want to print
+             * This is because .length does not return the correct value
+             * */
+            var aux = this.getToPrintOnes(),
+                count = 0;
+
+            for (var i = aux.length - 1; i >= 0; i--) {
+                count += aux[i].quantity;
+            }
+
+            return count;
+        },
         clearAndAdd : function(items){
             var notPrint = $filter('filter')(selectedImages, {toPrint:false});; 
             var print = notPrint.concat(items);

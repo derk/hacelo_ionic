@@ -56,30 +56,28 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
      * */
     $scope.addToCart = function () {
         var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_check_screen"),
-            cacheConfirm = { 
+            numOfItems2Print = SelectedImagesFactory.getPrintItemsCount(),
+            numberOfPicksConfirm = {
                 "title" : "Estas segur@?",
-                "template" : "Escogiste "+$scope.images.length+" imagen(es), pero podés escoger hasta "+SelectedImagesFactory.getProduct().prices.first_items.quantity+ " por el mismo precio.",
+                "template" : "Escogiste "+numOfItems2Print+" imagen(es), pero podés escoger hasta "+SelectedImagesFactory.getProduct().prices.first_items.quantity+ " por el mismo precio.",
                 "cancelText" : "Cancelar",
                 "okText" : "Aceptar"
-            };
-
-        if(SelectedImagesFactory.getProduct().prices.first_items.quantity   >  $scope.images.length){
-            $ionicPopup.confirm(cacheConfirm).then(function(res){
-                if(res){
-                    $ionicPopup.confirm(cache).then(function (res) {
-                        if (res) {
-                            $state.go("app.confirm");
-                        }
-                    });                    
-                }
-            });    
-        } else {
-            $ionicPopup.confirm(cache).then(function (res) {
+            },
+            go2Confirm = function (res) {
                 if (res) {
                     $state.go("app.confirm");
                 }
-            });
+            };
 
+        if(numOfItems2Print >= SelectedImagesFactory.getProduct().prices.first_items.quantity){
+            $ionicPopup.confirm(cache).then(go2Confirm);
+
+        } else {
+            $ionicPopup.confirm(numberOfPicksConfirm).then(function(res){
+                if(res){
+                    $ionicPopup.confirm(cache).then(go2Confirm);
+                }
+            });
         }
     };
 

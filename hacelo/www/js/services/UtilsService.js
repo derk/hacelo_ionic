@@ -1,16 +1,16 @@
 services.service('Utils', ['$q', '$timeout', '$filter', function ($q, $timeout, $filter) {
     /**
- * Converts image URLs to dataURL schema using Javascript only.
- *
- * @param {String} url Location of the image file
- * @param {Function} success Callback function that will handle successful responses. This function should take one parameter
- *                            <code>dataURL</code> which will be a type of <code>String</code>.
- * @param {Function} error Error handler.
- *
- * getImageDataURL('myimage.png', onSuccess, onError);
- *
- */
-this.getImageDataURL = function(url, x, y) {
+     * Converts image URLs to dataURL schema using Javascript only.
+     *
+     * @param {String} url Location of the image file
+     * @param {Function} success Callback function that will handle successful responses. This function should take one parameter
+     *                            <code>dataURL</code> which will be a type of <code>String</code>.
+     * @param {Function} error Error handler.
+     *
+     * getImageDataURL('myimage.png', onSuccess, onError);
+     *
+     */
+    this.getImageDataURL = function(url, x, y) {
     
     var defer = $q.defer();
         var data, canvas, ctx;

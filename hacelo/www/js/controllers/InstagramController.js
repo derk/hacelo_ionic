@@ -113,7 +113,7 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
                 image.toPrint = true;
             } else {
                 $ionicPopup.alert({
-                    title: 'La imagen es muy pequenna',
+                    title: 'La imagen es muy pequeña',
                     template: 'Lo sentimos :( la foto tiene que ser'+
                     'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
                     'una impresión de la más alta calidad.'
