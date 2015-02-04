@@ -111,7 +111,7 @@ body{
 .button-picker{
     color: #FFF;
     width: 100%;
-    background: $red;
+    background: $lightGreen;
     text-align: center;
     display: inline-block;
     padding: 3% 0;
@@ -319,6 +319,10 @@ body{
             box-sizing: border-box;
             margin: 10px;
             padding: 0;
+            &.activated {
+                opacity: 0.5;
+            }
+
             & > div{
                 height: 100%;
                 width: 100%;
@@ -339,6 +343,9 @@ body{
         .photo{
             box-sizing: border-box;
             margin: 10px;
+            &.activated {
+                opacity: 0.5;
+            }
             div {
                 height: 100%;
                 width: 100%;
