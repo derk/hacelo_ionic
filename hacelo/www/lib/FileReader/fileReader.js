@@ -105,7 +105,7 @@ var DirManager = function() {
 				);
 			}
 		);
-	}
+	};
 
 	this.create = function(path, callback, fail) {
 		fail = (typeof fail == 'undefined') ? Log('DirManager', 'crete fail') : fail;
@@ -145,7 +145,7 @@ var DirManager = function() {
 				entry.removeRecursively(success, fail);
 			}
 		);
-	}
+	};
 };
 
 

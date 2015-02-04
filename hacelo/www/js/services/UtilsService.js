@@ -25,11 +25,11 @@ services.service('Utils', ['$q', '$timeout', '$filter', function ($q, $timeout, 
             ctx.drawImage(img, 0, 0);
             // Get canvas data URL
             try{
-                console.log("got it");
+                // console.log("got it");
                 data = canvas.toDataURL();
                 defer.resolve({image:img, data:data, x:x, y:y});
             }catch(e){
-                console.log("broke");
+                // console.log("broke");
                 defer.reject(e);
             }
         }
@@ -37,7 +37,7 @@ services.service('Utils', ['$q', '$timeout', '$filter', function ($q, $timeout, 
         try{
             img.src = url;
         }catch(e){
-            console.log("broke this shit");
+            // console.log("broke this shit");
             defer.reject(e);
         }
 

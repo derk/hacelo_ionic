@@ -37,19 +37,19 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'S
                 FileReader.hasImage(v).then(function(result){
                     $scope.gallery.push(result);
                     window.r = $scope.gallery;
-                });  
+                });
             });
-                // FileReader.hasImage(e[16]).then(function(result){
-                //     $scope.gallery.push(result);
-                //     window.r = $scope.gallery;
-                // });  
+            // FileReader.hasImage(e[16]).then(function(result){
+            //     $scope.gallery.push(result);
+            //     window.r = $scope.gallery;
+            // });
 
 
             /*FileReader.hasImage(e[59]).then(function(result){
-                $scope.gallery.push(result);
-                window.r = result;
-                console.log(result);
-            });*/
+             $scope.gallery.push(result);
+             window.r = result;
+             console.log(result);
+             });*/
 
             // FileReader.hasImage(e[8]).then(function(result){
             //     $scope.gallery.push(result);
@@ -57,12 +57,14 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'S
             //     console.log(result);
             // });
 
-  /*          FileReader.hasImage(e[1]).then(function(result){
-                $scope.gallery.push(result);
-                window.r2 = result;
-                console.log(result);
-            });*/
+            /*          FileReader.hasImage(e[1]).then(function(result){
+             $scope.gallery.push(result);
+             window.r2 = result;
+             console.log(result);
+             });*/
         });
+
+        FileReader.test();
     };
 
     if($scope.gallery.length == 0){

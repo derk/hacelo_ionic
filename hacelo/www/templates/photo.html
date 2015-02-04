@@ -21,7 +21,7 @@
 
             <slick slides-to-show="1" slides-to-scroll="1" infinite="true" dots="true" arrows="false">
                <div ng-repeat="s in product.slider">
-                    <img class="photo-cover"  style="height:{{height}}px"src="{{s.images}}" alt="">
+                    <img class="photo-cover"  style="height:{{height}}px" ng-src="{{s.images}}" alt="">
                 </div>
            </slick>
             <div class="cover"><span>{{product.name}}</span></div>
