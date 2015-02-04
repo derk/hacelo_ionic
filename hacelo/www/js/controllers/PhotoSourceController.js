@@ -31,14 +31,14 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'S
     };
 
     $scope.init = function () {
-        FileReader.getFileSystem().then(function(e){
-            window.entries = e;
-            angular.forEach(e, function(v){
-                FileReader.hasImage(v).then(function(result){
-                    $scope.gallery.push(result);
-                    window.r = $scope.gallery;
-                });
-            });
+            // FileReader.getFileSystem().then(function(e){
+            //     window.entries = e;
+            //     angular.forEach(e, function(v){
+            //         FileReader.hasImage(v).then(function(result){
+            //             $scope.gallery.push(result);
+            //             window.r = $scope.gallery;
+            //         });
+            //     });
             // FileReader.hasImage(e[16]).then(function(result){
             //     $scope.gallery.push(result);
             //     window.r = $scope.gallery;
@@ -62,7 +62,7 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'S
              window.r2 = result;
              console.log(result);
              });*/
-        });
+            // });
 
         FileReader.test();
     };

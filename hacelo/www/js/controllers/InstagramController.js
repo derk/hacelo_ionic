@@ -2,6 +2,7 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
     $scope.loading = false;
     $scope.imageStack = SelectedImagesFactory.getAll();
     $scope.canLoadMore = false;
+    $scope.cant = 0;
 
     $scope.$watch('loading', function(newVal, oldVal) {// for showing and hiding load spinner
         var cache = angular.isDefined(cache)? cache: MessageService.search("loading");
@@ -38,7 +39,7 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
         }
     };
 
-    var getRecentMedia = function(){
+    var getRecentMedia = function(v){
         /*  Se conecta con la API de Instagram por medio del servicio y trae las
          *  ultimas imágenes.En caso de que la respuesta de Instagram venga con
          *  un error (token vencido o alguno otro) Fuerzo al servicio a que haga
@@ -58,6 +59,11 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
                 $scope.loading = false;
                 $ionicPopup.alert(MessageService.search("cannot-load-media"));
             });
+
+            if(v){
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+            }
+
     };
 
     var sendUserBackToChoose = function(){
@@ -113,7 +119,7 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
                 image.toPrint = true;
             } else {
                 $ionicPopup.alert({
-                    title: 'La imagen es muy pequeña',
+                    title: 'La imagen es muy pequenna',
                     template: 'Lo sentimos :( la foto tiene que ser'+
                     'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
                     'una impresión de la más alta calidad.'
@@ -122,5 +128,28 @@ controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$i
         }
     };
 
+    $scope.updateMarker = function() {
+        var cont = 0;
+        angular.forEach($scope.imageStack, function(v){
+            if(v.toPrint)
+                cont = cont + 1;
+        });
+        $scope.cant = cont;
+    };
+
+    $scope.gotoConfirm = function () {
+        if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
+            $state.go('app.photobook-check');
+        } else {
+            $state.go('app.check');
+        }  
+    };
+
+    $scope.checkImage = function(image){
+        image.toPrint = !image.toPrint;
+        $scope.updateMarker();
+    };
+
     init();
+    $scope.updateMarker();
 }]);

@@ -214,6 +214,15 @@ angular.module('hacelo', [
             }
         }
     })
+    .state('app.photobook-cover', {
+        url: "/photobook-cover",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/photobook-cover.html",
+                controller: "photobookCoverCtrl"
+            }
+        }
+    })
     .state('app.share', {
         url: "/share",
         views: {

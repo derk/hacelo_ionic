@@ -1,21 +1,22 @@
-<ion-view title="SELECCIONAR" class="photo-pick-page" >
+<ion-view class="photo-pick-page" >
 	<ion-nav-bar class="grey bar-stable" animation="slide-left-right">
 		<ion-nav-back-button class="button-clear">
 			<div class="arrow">ATRAS</div>
 		</ion-nav-back-button>
-		<h1 class="title">FOTOS</h1>
+		<h1 class="title">{{cant}} FOTOS</h1>
 		<ion-nav-buttons side="right">
-			<a class="button button-icon icon check-button" href="#/app/check" ng-show="imageStack.length>0" ng-hide="imageStack.length===0">REVISAR</a>
+			<a class="button button-icon icon check-button" ng-click="gotoConfirm()" ng-show="imageStack.length>0" ng-hide="imageStack.length===0">REVISAR</a>
 		</ion-nav-buttons>
 	</ion-nav-bar>
 	<ion-content class="has-header">
-		<div class="photos">
+	<ion-list>
+  		<div class="photos">
 			<div class="images-container">
 				<div class="image"
 					 ng-repeat="image in imageStack | filter:{origin:'instagram'}"
 					 ng-init="mini = image.images.thumbnail"
 					 ng-class="{selected: image.toPrint}">
-					<a ng-click="image.toPrint = !image.toPrint">
+					<a ng-click="checkImage(image)">
 						<i class="icon ion-checkmark-circled"></i>
 						<img ng-src="{{mini.url}}"
 							 width="{{mini.width}}"
@@ -26,7 +27,14 @@
 			</div>
 		</div>
 		<div class="load-more">
-			<button ng-show="canLoadMore" ng-click="loadMore()">Cargar Mas</button>
+			<button ng-show="canLoadMore" ng-click="loadMore(true)">Cargar Mas</button>
 		</div>
+  	</ion-list>
+	<ion-infinite-scroll
+	    on-infinite="loadMore(true)"
+	    distance = "1%"
+	    ng-if="canLoadMore">	
+	 </ion-infinite-scroll>
+		
 	</ion-content>
 </ion-view>
