@@ -135,9 +135,11 @@ body{
 
 .bar-header{
     &.landing{
-        height: 80px;
+        height: 110px;
+        z-index: 99;
+        background-color: transparent;
         img.img-logo{
-            width: 80px;
+            width: 200px;
             height: auto;
             display: block;
             margin: auto;
@@ -200,6 +202,7 @@ body{
     &.info{
         background-color: #fff;
         height: 44px;
+        border-style:none;
         &.bar-stable {
             .exit{
                 font-size: 2.1em;
@@ -247,7 +250,7 @@ body{
     background-size: 100%;
     .has-header{
         height: 100%;
-        top: 80px;
+        top: 0px;
        .slick-list{
             height: 100%;
             .slick-track{
@@ -285,6 +288,7 @@ body{
                 }
                 &.info{
                     color: $lightOrange;
+                    border-style:none;
                 }
             }
             .info-buttons{
