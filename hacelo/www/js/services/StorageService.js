@@ -67,20 +67,20 @@ services.service('StorageService', ['$window','$q', function ($window, $q) {
             c = "" ;
 
         this.existFolder().then(function(e){
-            console.log(e);
+            //console.log(e);
             if(!e){
                 b.write_file('Printea/','shopping.txt', null ,function(){
 
                     b.read_file('Printea/','shopping.txt',function(e){
-                        console.log(e);
+                        //console.log(e);
                         defer.resolve(e);
                     },function(e){
-                        console.log(e);
+                        //console.log(e);
                         defer.resolve(e);
                     });
                 });
             } else {
-                b.read_file('Printea/','shopping.txt',function(e){console.log(e);defer.resolve(e);},function(e){console.log(e);defer.resolve(e)});
+                b.read_file('Printea/','shopping.txt',function(e){defer.resolve(e);},function(e){console.log(e);defer.resolve(e)});
             }
         });
         
@@ -94,7 +94,7 @@ services.service('StorageService', ['$window','$q', function ($window, $q) {
             c = "" ;
 
         a.list('Printea/', function(e){
-            console.log(e);
+            //console.log(e);
             if(e.length > 0){
                 defer.resolve(true);
             } else {
