@@ -1,7 +1,7 @@
 services.service('FileReader', ['$window', '$q', 'ImageFactory', function ($window, $q, ImageFactory){
     var processFolder;
     var galleries = [];
-
+    var cont = 1;
     /**
      * Helper of processFolder
      * Filter the given entries list.
@@ -27,6 +27,43 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', function ($wind
 
                 // remove any folder named `Android`. This is because this folder holds many cache images
                 if (list2Clean[i].name === 'Android') {valid = !1;}
+
+            }
+            // both files and directory validations
+
+            // Remove any item that is hidden.
+            if ( list2Clean[i].name.charAt(0) === '.' ) {valid = !1;}
+
+            //==================== End entry validations ====================
+
+            if(valid) {
+                clean.push(list2Clean[i]);
+            }
+        }
+        list2Clean = null; // garbage collector help
+        return clean;
+    };
+
+    var firstItems = function (list2Clean) {
+        var clean = [],
+            len = list2Clean.length;
+
+        for (var i=0; i < len; i++) {
+            var valid = !0; // flag that indicate if this entry is valid
+
+            //==================== Start entry validations ====================
+
+            if (list2Clean[i].isFile) {// validations for files ONLY
+
+                // remove any file that is not an image
+                if ( (/\.(?:jpg|jpeg|png)$/i).test(list2Clean[i].name) === !1 ) {valid = !1;}
+
+            } else if (list2Clean[i].isDirectory) {// validations for directories ONLY
+
+                // remove any folder named `Android`. This is because this folder holds many cache images
+                if (list2Clean[i].name === 'Android' || list2Clean[i].name != 'Pictures') {
+                        valid = !1;
+                }
 
             }
             // both files and directory validations
@@ -73,6 +110,7 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', function ($wind
         }
 
         galleries[galleryIndex].images.push(phoneLoadedImg);
+      //  console.log();
     };
 
     /**
@@ -98,7 +136,14 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', function ($wind
         var deferred = $q.defer();
 
         dirEntry.createReader().readEntries(function (dirtyEntries) {
-            var cleanEntries = removeInvalidEntries(dirtyEntries);
+            if(cont == 1){
+                console.log(firstItems(dirtyEntries));
+                var cleanEntries = firstItems(dirtyEntries);
+                window.e = dirtyEntries;
+                cont = 0;
+            } else {
+                var cleanEntries = removeInvalidEntries(dirtyEntries);
+            }
             if(cleanEntries.length===0) {
                 return deferred.resolve(dirEntry);
             }

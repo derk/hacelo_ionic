@@ -1,4 +1,4 @@
-controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader) {
+controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
     $scope.imageStack = SelectedImagesFactory.getAll();
     $scope.galleries = SelectedImagesFactory.getGallery();
 
@@ -17,8 +17,13 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'S
     //                });
     //            }
     //        });
-    //    });
+    //    });ionicLoading
     //};
+
+    $scope.go = function(obj){
+        SelectedImagesFactory.setCurrentGallery(obj);
+        $state.go('app.album');
+    };
 
     $scope.gotoConfirm = function () {
 
@@ -31,8 +36,14 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'S
     };
 
     var init = function () {
+        $ionicLoading.show({
+            template: 'Cargando... '
+        });
         FileReader.scanFileSystem().then(function(res) {
+            window.res = res;
             $scope.galleries = res;
+            SelectedImagesFactory.setGallery(res);
+            $ionicLoading.hide();
         });
     };
 
@@ -40,4 +51,24 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'S
         init();
     }
 
+}]);
+
+
+controllers.controller('albumCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
+    $scope.cant = 0;
+    $scope.imageStack = SelectedImagesFactory.getAll();
+    $scope.galleries = SelectedImagesFactory.getGallery();
+    $scope.getCurrentGallery = SelectedImagesFactory.getCurrentGallery();
+    console.log($scope.getCurrentGallery);
+
+    $scope.updateMarker = function() {
+        var cont = 0;
+        angular.forEach($scope.imageStack, function(v){
+            if(v.toPrint)
+                cont = cont + 1;
+        });
+        $scope.cant = cont;
+    };
+
+    $scope.updateMarker();
 }]);

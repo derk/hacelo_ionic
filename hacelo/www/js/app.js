@@ -120,6 +120,15 @@ angular.module('hacelo', [
             }
         }
     })
+    .state('app.album', {
+        url: "/album",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/album.html",
+                controller: "albumCtrl"
+            }
+        }
+    })
     .state('app.cart', {
         url: "/cart",
         views: {

@@ -5,8 +5,10 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
      */
     var selectedImages = [],
         imageGallery = [],
+        currentGallery = {},
         productLine = {},
         product = {};
+
 
     return {
         addItem: function(pItem) {
@@ -59,6 +61,12 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         },
         getGallery: function(){
             return imageGallery;
+        },
+        setCurrentGallery: function(obj){
+            currentGallery = obj;
+        },
+        getCurrentGallery: function() {
+            return currentGallery;
         },
         getProduct: function(){
             return product;

@@ -435,6 +435,30 @@ body{
         overflow: auto;
     }
 
+    .album {
+        width: 100%;
+        display: inline-block;
+        padding-bottom: 10px;
+        position: relative;
+        img {
+            width: 100px;
+            height: 100px;
+            float: left;
+        }
+
+        h2 {
+            padding: 0;
+            vertical-align: middle;
+            position: absolute;
+            left: 120px;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            height: 31px;
+            font-size: 20px;
+        }
+    }
+
     .image {
         float: left;
         max-width: 33.3333%;
