@@ -4,7 +4,7 @@
 	    <div class="arrow"> Atrás </div> 
 	  </ion-nav-back-button>
 	</ion-nav-bar>
-    <ion-content class="has-header">
+    <ion-content >
         <div class="products-container">
             <div ng-repeat="productLine in productLines" class="product {{productLine.id}}" ng-mousedown="class='fb-down'" ng-mouseup="class='fb-up'" ng-class="class" ng-click="saveProductLine(productLine)" style="background:url({{productLine.images}}) no-repeat top left/100% 100%;">
                 <div class="btn-container-short"><a class="button button-balanced btn-short" ng-click="saveProductLine(productLine)">{{productLine.name}}</a></div>
