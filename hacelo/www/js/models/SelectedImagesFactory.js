@@ -22,6 +22,9 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         getToPrintOnes: function() {
             return $filter('filter')(selectedImages, {toPrint:true});
         },
+        getByGallery: function(pGallery){
+            return $filter('filter')(selectedImages, {gallery: pGallery});
+        },
         getPrintItemsCount: function () {
             /**
              * Return how many items the user want to print

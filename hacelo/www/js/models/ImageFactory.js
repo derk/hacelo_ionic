@@ -17,7 +17,7 @@ models.factory('ImageFactory', ['$q', function ($q) {
     };
 
     // Class used as an abstraction of images loaded from phone gallery
-    function PhoneLoadedImg (uri) {
+    function PhoneLoadedImg (uri, gallery) {
         ImageWrapper.call(this, ImageWrapper.sources.PHN, uri, {}, false);
         this.images.thumbnail = {
             "url": "",
@@ -31,6 +31,7 @@ models.factory('ImageFactory', ['$q', function ($q) {
             "height": 0
         };
 
+        this.gallery = gallery;
         this._originalSource = uri;
 
         this.imageInit = function(){

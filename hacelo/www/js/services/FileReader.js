@@ -1,7 +1,8 @@
-services.service('FileReader', ['$window', '$q', 'ImageFactory', function ($window, $q, ImageFactory){
+services.service('FileReader', ['$window', '$q', 'ImageFactory', 'SelectedImagesFactory', function ($window, $q, ImageFactory, SelectedImagesFactory){
     var processFolder;
     var galleries = [];
     var cont = 1;
+    var imageStack = SelectedImagesFactory.getAll();
     /**
      * Helper of processFolder
      * Filter the given entries list.
@@ -48,6 +49,8 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', function ($wind
         var clean = [],
             len = list2Clean.length;
 
+        window.list = list2Clean;
+
         for (var i=0; i < len; i++) {
             var valid = !0; // flag that indicate if this entry is valid
 
@@ -61,8 +64,14 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', function ($wind
             } else if (list2Clean[i].isDirectory) {// validations for directories ONLY
 
                 // remove any folder named `Android`. This is because this folder holds many cache images
-                if (list2Clean[i].name === 'Android' || list2Clean[i].name != 'Pictures') {
+                if (list2Clean[i].name === 'Android') {
                         valid = !1;
+                }
+
+                if (list2Clean[i].name == 'Pictures' || list2Clean[i].name == 'DCIM'){
+                    valid = !0;
+                } else {
+                    valid = !1;
                 }
 
             }
@@ -78,6 +87,7 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', function ($wind
             }
         }
         list2Clean = null; // garbage collector help
+        console.log(clean);
         return clean;
     };
 
@@ -108,7 +118,8 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', function ($wind
             });
             galleryIndex = galleries.length-1;
         }
-
+        phoneLoadedImg.gallery = galleryName;
+        imageStack.push(phoneLoadedImg);
         galleries[galleryIndex].images.push(phoneLoadedImg);
       //  console.log();
     };

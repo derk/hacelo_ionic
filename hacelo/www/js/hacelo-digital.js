@@ -279,15 +279,15 @@ angular.module('hacelo', [
       };
     } ]);
 
-var controllers = angular.module('hacelo.controllers', []);
 var commons = angular.module('hacelo.config', []);
+var controllers = angular.module('hacelo.controllers', []);
 /**
  * Created   on 30/11/2014.
  */
 var directives = angular.module('hacelo.directives', []);
 
-var services = angular.module('hacelo.services', []);
 var models = angular.module('hacelo.models', []);
+var services = angular.module('hacelo.services', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
         /*
@@ -2459,7 +2459,7 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'S
 
     var init = function () {
         $ionicLoading.show({
-            template: 'Cargando... '
+            template: 'Estamos cargando tus fotos<br> esto puede tardar unos minutos... '
         });
         FileReader.scanFileSystem().then(function(res) {
             window.res = res;
@@ -2478,10 +2478,9 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'S
 
 controllers.controller('albumCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
     $scope.cant = 0;
-    $scope.imageStack = SelectedImagesFactory.getAll();
-    $scope.galleries = SelectedImagesFactory.getGallery();
     $scope.getCurrentGallery = SelectedImagesFactory.getCurrentGallery();
-    console.log($scope.getCurrentGallery);
+    $scope.imageStack = SelectedImagesFactory.getAll();
+    $scope.height = screen.width / 3;
 
     $scope.updateMarker = function() {
         var cont = 0;
@@ -2490,6 +2489,11 @@ controllers.controller('albumCtrl', ['$scope', '$state', '$ionicPopup', 'Selecte
                 cont = cont + 1;
         });
         $scope.cant = cont;
+    };
+
+    $scope.checkImage = function(image){
+        image.toPrint = !image.toPrint;
+        $scope.updateMarker();
     };
 
     $scope.updateMarker();
@@ -2630,640 +2634,6 @@ controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ion
         window.plugins.socialsharing.shareViaEmail('Hacelo','Hacelo');
     };
 });
-models.factory('ImageFactory', ['$q', function ($q) {
-    function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
-        this.origin = pOrigin;
-        this._originalSource = pOriginalSource;
-        this.images = pImages;
-        this.toPrint = pToPrint || false;
-        this.quantity = pQuantity || 0;
-
-        return this;
-    }
-    // ---
-    // STATIC ATTRIBUTES.
-    // ---
-    ImageWrapper.sources = {
-        INS: "instagram",
-        PHN: "phone"
-    };
-
-    // Class used as an abstraction of images loaded from phone gallery
-    function PhoneLoadedImg (uri) {
-        ImageWrapper.call(this, ImageWrapper.sources.PHN, uri, {}, false);
-        this.images.thumbnail = {
-            "url": "",
-            // the generated thumbnail will have this width
-            "width": 150,
-            "height": 0
-        };
-        this.images.standard_resolution = {
-            "url": uri,
-            "width": 0,
-            "height": 0
-        };
-
-        this._originalSource = uri;
-
-        this.imageInit = function(){
-            var self = this,
-                deferred = $q.defer();
-            fabric.Image.fromURL(this._originalSource, function(oImg) {
-                var imgs = self.images;
-                // Setting standard_resolution values
-                imgs.standard_resolution.width = oImg.getWidth();
-                imgs.standard_resolution.height = oImg.getHeight();
-                // Setting thumbnail values
-                oImg.scaleToWidth(imgs.thumbnail.width);
-                imgs.thumbnail.url = oImg.toDataURL({"format": "jpeg"});
-                imgs.thumbnail.height = oImg.getHeight();
-                // All done here. Now notify the controller with success response
-                deferred.resolve(self);
-            });
-
-            return deferred.promise;
-        };
-    }
-    PhoneLoadedImg.prototype = new ImageWrapper();
-    PhoneLoadedImg.prototype.constructor = PhoneLoadedImg;
-
-    // Class used as an abstraction of images loaded from Instagram
-    function InstagramLoadedImg (imagesObj) {
-        ImageWrapper.call(this, ImageWrapper.sources.INS, imagesObj, angular.copy(imagesObj,{}));
-    }
-    InstagramLoadedImg.prototype = new ImageWrapper();
-    InstagramLoadedImg.prototype.constructor = InstagramLoadedImg;
-
-    return {
-        getPhoneLoadedImg: function (pUri) {
-            return new PhoneLoadedImg(pUri);
-        },
-        getInstagramLoadedImg: function (pImagesObj) {
-            return new InstagramLoadedImg(pImagesObj);
-        },
-        restoreImage: function(pObj){
-            var restoredImage;
-            switch (pObj.origin) {
-                case ImageWrapper.sources.PHN:
-                    restoredImage = this.getPhoneLoadedImg(pObj._originalSource);
-                    break;
-                case ImageWrapper.sources.INS:
-                    restoredImage = this.getInstagramLoadedImg(pObj._originalSource);
-                    break;
-            }
-            restoredImage.images = pObj.images;
-            restoredImage.toPrint = pObj.toPrint;
-            restoredImage.quantity = pObj.quantity;
-            return restoredImage;
-        }
-    };
-}]);
-
-// I provide a utility class for preloading image objects.
-models.factory("PreloaderFactory", function ($q, $rootScope) {
-    // I manage the preloading of image objects. Accepts an array of image URLs.
-    function Preloader(imageLocations) {
-
-        // I am the image SRC values to preload.
-        this.imageLocations = imageLocations;
-
-        // As the images load, we'll need to keep track of the load/error
-        // counts when announing the progress on the loading.
-        this.imageCount = this.imageLocations.length;
-        this.loadCount = 0;
-        this.errorCount = 0;
-
-        // I am the possible states that the preloader can be in.
-        this.states = {
-            PENDING: 1,
-            LOADING: 2,
-            RESOLVED: 3,
-            REJECTED: 4
-        };
-
-        // I keep track of the current state of the preloader.
-        this.state = this.states.PENDING;
-
-        // When loading the images, a promise will be returned to indicate
-        // when the loading has completed (and / or progressed).
-        this.deferred = $q.defer();
-        this.promise = this.deferred.promise;
-    }
-
-
-    // ---
-    // STATIC METHODS.
-    // ---
-    Preloader.preloadImages = function (imageLocations) {
-        // I reload the given images [Array] and return a promise. The promise
-        // will be resolved with the array of image locations.
-        var preloader = new Preloader(imageLocations);
-        return ( preloader.load() );
-    };
-
-
-    // ---
-    // INSTANCE METHODS.
-    // ---
-    Preloader.prototype = {
-        // Best practice for "instanceof" operator.
-        constructor: Preloader,
-
-        // ---
-        // PUBLIC METHODS.
-        // ---
-        isInitiated: function isInitiated() {
-            // I determine if the preloader has started loading images yet.
-            return ( this.state !== this.states.PENDING );
-        },
-        isRejected: function isRejected() {
-            // I determine if the preloader has failed to load all of the images.
-            return ( this.state === this.states.REJECTED );
-        },
-        isResolved: function isResolved() {
-            // I determine if the preloader has successfully loaded all of the images.
-            return ( this.state === this.states.RESOLVED );
-        },
-        load: function load() {
-            // I initiate the preload of the images. Returns a promise.
-            // If the images are already loading, return the existing promise.
-            if (this.isInitiated()) {
-                return (this.promise);
-            }
-
-            this.state = this.states.LOADING;
-
-            for (var i = 0; i < this.imageCount; i++) {
-                this.loadImageLocation(this.imageLocations[i]);
-            }
-
-            // Return the deferred promise for the load event.
-            return ( this.promise );
-        },
-
-        // ---
-        // PRIVATE METHODS.
-        // ---
-        handleImageError: function handleImageError(imageLocation) {
-            // I handle the load-failure of the given image location.
-            this.errorCount++;
-
-            // If the preload action has already failed, ignore further action.
-            if (this.isRejected()) {
-                return;
-            }
-
-            this.state = this.states.REJECTED;
-            this.deferred.reject(imageLocation);
-        },
-        handleImageLoad: function handleImageLoad(imageLocation) {
-            // I handle the load-success of the given image location.
-            this.loadCount++;
-            // If the preload action has already failed, ignore further action.
-            if (this.isRejected()) {
-                return;
-            }
-
-            // Notify the progress of the overall deferred. This is different
-            // than Resolving the deferred - you can call notify many times
-            // before the ultimate resolution (or rejection) of the deferred.
-            this.deferred.notify({
-                percent: Math.ceil(this.loadCount / this.imageCount * 100),
-                imageLocation: imageLocation
-            });
-
-            // If all of the images have loaded, we can resolve the deferred
-            // value that we returned to the calling context.
-            if (this.loadCount === this.imageCount) {
-                this.state = this.states.RESOLVED;
-                this.deferred.resolve(this.imageLocations);
-            }
-        },
-        loadImageLocation: function loadImageLocation(imageLocation) {
-            // I load the given image location and then wire the load / error
-            // events back into the preloader instance.
-            // --
-            // NOTE: The load/error events trigger a $digest.
-            var preloader = this;
-            // When it comes to creating the image object, it is critical that
-            // we bind the event handlers BEFORE we actually set the image
-            // source. Failure to do so will prevent the events from proper
-            // triggering in some browsers.
-            var image = $(new Image())
-                    .load(
-                    function (event) {
-                        // Since the load event is asynchronous, we have to
-                        // tell AngularJS that something changed.
-                        $rootScope.$apply(
-                            function () {
-                                preloader.handleImageLoad(event.target.src);
-                                // Clean up object reference to help with the
-                                // garbage collection in the closure.
-                                preloader = image = event = null;
-                            }
-                        );
-                    }
-                )
-                    .error(
-                    function (event) {
-                        // Since the load event is asynchronous, we have to
-                        // tell AngularJS that something changed.
-                        $rootScope.$apply(
-                            function () {
-                                preloader.handleImageError(event.target.src);
-                                // Clean up object reference to help with the
-                                // garbage collection in the closure.
-                                preloader = image = event = null;
-                            }
-                        );
-                    }
-                )
-                    .prop("src", imageLocation)
-                ;
-        }
-    };
-    // Return the factory instance.
-    return ( Preloader );
-});
-models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
-    /**
-     * A simple service that returns the array of selected images.
-     * Also store the selected product with his parent product line
-     */
-    var selectedImages = [],
-        imageGallery = [],
-        currentGallery = {},
-        productLine = {},
-        product = {};
-
-
-    return {
-        addItem: function(pItem) {
-            if (angular.isObject(pItem)) {
-                angular.copy(pItem, selectedImages);
-            }
-        },
-        getInstagramOnes: function() {
-            return $filter('filter')(selectedImages, {origin:"instagram"});
-        },
-        getToPrintOnes: function() {
-            return $filter('filter')(selectedImages, {toPrint:true});
-        },
-        getPrintItemsCount: function () {
-            /**
-             * Return how many items the user want to print
-             * This is because .length does not return the correct value
-             * */
-            var aux = this.getToPrintOnes(),
-                count = 0;
-
-            for (var i = aux.length - 1; i >= 0; i--) {
-                count += aux[i].quantity;
-            }
-
-            return count;
-        },
-        clearAndAdd : function(items){
-            var notPrint = $filter('filter')(selectedImages, {toPrint:false});; 
-            var print = notPrint.concat(items);
-            selectedImages = print;
-        },
-        getAll: function() {
-            return selectedImages;
-        },
-        getOne: function(id){
-            return this.getToPrintOnes()[id];
-        },
-        setProductLine: function(pProductLine){
-            productLine = pProductLine;
-        },
-        getProductLine: function(){
-            return productLine;
-        },
-        setProduct: function(pProduct){
-            product = pProduct;
-        },
-        setGallery: function(gallery){
-            imageGallery = gallery;
-        },
-        getGallery: function(){
-            return imageGallery;
-        },
-        setCurrentGallery: function(obj){
-            currentGallery = obj;
-        },
-        getCurrentGallery: function() {
-            return currentGallery;
-        },
-        getProduct: function(){
-            return product;
-        },
-        clearImages: function () {
-            selectedImages = null; // helping garbage collector
-            selectedImages = [];
-        },
-        clearSelection: function () {
-            this.clearImages();
-            productLine = {};
-            product = {};
-        }
-    };
-}]);
-
-/**
- * Created   on 29/11/2014.
- */
-models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', function ($q, StorageService, ImageFactory) {
-    // ---
-    // PRIVATE ATTRIBUTES.
-    // ---
-    var shoppingCart;
-
-    // ---
-    // APPLICATION OBJECT MODELS
-    // ---
-    function Order (pProductLine, pProduct, pItems){
-        // ---
-        // PRIVATE METHODS.
-        // ---
-        var makeId = function(){
-            // creates unique ID's for orders
-            var id = '';
-            for (var i = 5 - 1; i >= 0; i--) {
-                var rand = (((1 + Math.random()) * 0x10000) | 0).toString(16);
-                id += rand;
-                id += (i>0)?'-':'';
-            }
-            return id;
-        };
-
-        // ---
-        // PUBLIC ATTRIBUTES.
-        // ---
-        this.id = makeId();
-        this.productLine = pProductLine;
-        this.product = pProduct;
-        this.items = pItems;
-
-        // ---
-        // PUBLIC METHODS.
-        // ---
-        this.getQuantity = function () {
-            var numberOfItems = 0;
-            for (var i = this.items.length - 1; i >= 0; i--) {
-                numberOfItems += this.items[i].quantity;
-            }
-            return numberOfItems;
-        };
-
-        this.computeSubTotal = function () {
-            var subTotal = 0,
-                numberOfItems = this.getQuantity(),
-                firstItems = this.product.prices.first_items,
-                additionalItem = this.product.prices.additional;
-
-            if (numberOfItems <= firstItems.quantity) {
-                subTotal = firstItems.price;
-            } else if (numberOfItems > firstItems.quantity) {
-                var numberOfAdditionalItems = numberOfItems - firstItems.quantity;
-                subTotal = firstItems.price + (numberOfAdditionalItems * additionalItem.price);
-            }
-
-            return subTotal;
-        };
-    }
-
-    function ShoppingCart(pCustomer, pOrders) {
-        // ---
-        // PUBLIC ATTRIBUTES.
-        // ---
-        this.customer = (angular.isObject(pCustomer))? pCustomer : {
-            name: "",
-            firstName: "",
-            secondSurname: "",
-            phone: "",
-            email: "",
-            address: {
-                province: "",
-                canton: "",
-                district: "",
-                exacta: ""
-            }
-        };
-        this.orders = pOrders || [];
-
-        this.travel = {
-            direction :{
-                canton : "",
-                distrito : "",
-                provincia : "",
-                exacta: ""
-            }, 
-            price : 0
-        };
-
-        this.payment = {
-            card: "",
-            month: "",
-            year: "",
-            type: ""
-        };
-
-        // ---
-        // PUBLIC METHODS.
-        // ---
-        this.addOrder = function(DummyOrder){
-            if( (DummyOrder instanceof Order) === false ) {return;}
-
-            this.orders.push(DummyOrder);
-            return this.orders[this.orders.length-1];
-        };
-
-        this.getDummyOrder = function(pProductLine, pProduct, pItems){
-            return new Order(pProductLine, pProduct, pItems);
-        };
-
-        this.removeOrder = function(pOrderId){
-            for (var i = this.orders.length - 1; i >= 0; i--) {
-                if (this.orders[i].id === pOrderId) {
-                    this.orders.splice(i,1);
-                }
-            }
-        };
-
-        this.getWeight = function(){
-            var weight = 0; 
-            for (var i = this.orders.length - 1; i >= 0; i--) {
-                weight = this.orders[i].product.weight + weight;
-            }
-
-            weight = weight/1000;
-
-            if(weight < 1){
-                weight = 1;
-            }
-
-            return weight;
-        };
-
-        this.computeSubTotal = function () {
-            var subTotal = 0;
-            for (var i = this.orders.length - 1; i >= 0; i--) {
-                subTotal += this.orders[i].computeSubTotal();
-            }
-            return subTotal;
-        };
-
-        this.getTotal = function(){
-            var t = parseInt(this.computeSubTotal());
-            var p = parseInt(this.travel.price);
-
-            return t+p;
-        };
-
-        this.getTotalQuantity = function(){
-            var quantity = 0;
-            for (var i = this.orders.length - 1; i >= 0; i--) {
-                quantity += this.orders[i].getQuantity();
-            }
-            return quantity;
-        };
-    }
-
-    // ---
-    // FACTORY HELPER METHODS.
-    // ---
-    var restoreImages = function (pImages2Restore) {
-        var restored = [];
-
-        for (var i = 0, j = pImages2Restore.length; i < j; i++) {
-            restored.push(ImageFactory.restoreImage(pImages2Restore[i]));
-        }
-
-        return restored;
-    };
-
-    var restoreOrders = function (pOrders2Restore) {
-        var restored = [];
-
-        for (var i = 0, j = pOrders2Restore.length; i < j; i++) {
-            restored.push(
-                new Order(
-                    pOrders2Restore[i].productLine,
-                    pOrders2Restore[i].product,
-                    restoreImages(pOrders2Restore[i].items)
-                )
-            );
-        }
-
-        return restored;
-    };
-
-    return {
-        saveShoppingCart: function(){
-            return StorageService.save(shoppingCart);
-        },
-
-
-        load : function(){
-           var defer = $q.defer();
-           var self = this;
-            /*
-            * Load any data stored
-            * then check if some shopping cart was already created
-            * if yes load it or create a new one and save it (for future usage)
-            * and finally return the loaded/created shopping cart
-            * */
-            var lastShoppingCart,
-                restoredOrders;
-
-            if (angular.isUndefined(shoppingCart)) {
-                StorageService.loadFile().then(function(e){
-                    lastShoppingCart = angular.fromJson(e);
-                    if(angular.isObject(lastShoppingCart)){
-                        restoredOrders = restoreOrders(lastShoppingCart.orders);
-                        shoppingCart = new ShoppingCart(lastShoppingCart.customer, restoredOrders);
-                        defer.resolve(shoppingCart);
-                    } else {
-                        shoppingCart = new ShoppingCart();
-                        defer.resolve(shoppingCart);
-                        self.saveShoppingCart();
-                    }
-
-                });
-            } else {
-                defer.resolve(shoppingCart);
-            }
-
-            return defer.promise;
-        },
-
-        loadShoppingCart: function(){
-            /*
-            * Load any data stored
-            * then check if some shopping cart was already created
-            * if yes load it or create a new one and save it (for future usage)
-            * and finally return the loaded/created shopping cart
-            * */
-            var lastShoppingCart,
-                restoredOrders;
-
-            if (angular.isUndefined(shoppingCart)) {
-                lastShoppingCart = StorageService.load();
-
-                if(angular.isObject(lastShoppingCart)){
-                    restoredOrders = restoreOrders(lastShoppingCart.orders);
-                    shoppingCart = new ShoppingCart(lastShoppingCart.customer, restoredOrders);
-                } else {
-                    shoppingCart = new ShoppingCart();
-                    this.saveShoppingCart();
-                }
-            }
-            return shoppingCart;
-        },
-
-        removeOrder: function (pOrderId) {
-            shoppingCart.removeOrder(pOrderId);
-            this.saveShoppingCart();
-        },
-
-        savePayment : function(pCard, pMonth, pYear, pType){
-            shoppingCart.payment = {
-                card: pCard,
-                month: pMonth,
-                year: pYear,
-                type: pType
-            };
-
-            this.saveShoppingCart();
-        },
-
-        saveTravel : function(money, canton, distrito, provincia, exacta){
-            shoppingCart.travel = {
-                price : money
-            };
-  
-            this.saveShoppingCart();
-        },
-
-        saveCustomer : function(name, secondSurname, phone, email, province, canton, district, exacta){
-            shoppingCart.customer = {
-                name: name,
-                firstName: name,
-                secondSurname: secondSurname,
-                phone: phone,
-                email: email,
-                address: {
-                    province: province,
-                    canton: canton,
-                    district: district,
-                    exacta: exacta
-                }
-            };
-            this.saveShoppingCart();
-        }
-    };
-}]);
 /**
  * Created   on 30/11/2014.
  */
@@ -3314,10 +2684,11 @@ services.service('CordovaCameraService', ['$window','$q', function ($window,$q) 
     ionic.Platform.ready(init);
 }]);
 
-services.service('FileReader', ['$window', '$q', 'ImageFactory', function ($window, $q, ImageFactory){
+services.service('FileReader', ['$window', '$q', 'ImageFactory', 'SelectedImagesFactory', function ($window, $q, ImageFactory, SelectedImagesFactory){
     var processFolder;
     var galleries = [];
     var cont = 1;
+    var imageStack = SelectedImagesFactory.getAll();
     /**
      * Helper of processFolder
      * Filter the given entries list.
@@ -3364,6 +2735,8 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', function ($wind
         var clean = [],
             len = list2Clean.length;
 
+        window.list = list2Clean;
+
         for (var i=0; i < len; i++) {
             var valid = !0; // flag that indicate if this entry is valid
 
@@ -3377,8 +2750,14 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', function ($wind
             } else if (list2Clean[i].isDirectory) {// validations for directories ONLY
 
                 // remove any folder named `Android`. This is because this folder holds many cache images
-                if (list2Clean[i].name === 'Android' || list2Clean[i].name != 'Pictures') {
+                if (list2Clean[i].name === 'Android') {
                         valid = !1;
+                }
+
+                if (list2Clean[i].name == 'Pictures' || list2Clean[i].name == 'DCIM'){
+                    valid = !0;
+                } else {
+                    valid = !1;
                 }
 
             }
@@ -3394,6 +2773,7 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', function ($wind
             }
         }
         list2Clean = null; // garbage collector help
+        console.log(clean);
         return clean;
     };
 
@@ -3424,7 +2804,8 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', function ($wind
             });
             galleryIndex = galleries.length-1;
         }
-
+        phoneLoadedImg.gallery = galleryName;
+        imageStack.push(phoneLoadedImg);
         galleries[galleryIndex].images.push(phoneLoadedImg);
       //  console.log();
     };
@@ -4046,4 +3427,643 @@ this.compareArray = function(a, b) {
     return true;
 };
 
+}]);
+
+models.factory('ImageFactory', ['$q', function ($q) {
+    function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
+        this.origin = pOrigin;
+        this._originalSource = pOriginalSource;
+        this.images = pImages;
+        this.toPrint = pToPrint || false;
+        this.quantity = pQuantity || 0;
+
+        return this;
+    }
+    // ---
+    // STATIC ATTRIBUTES.
+    // ---
+    ImageWrapper.sources = {
+        INS: "instagram",
+        PHN: "phone"
+    };
+
+    // Class used as an abstraction of images loaded from phone gallery
+    function PhoneLoadedImg (uri, gallery) {
+        ImageWrapper.call(this, ImageWrapper.sources.PHN, uri, {}, false);
+        this.images.thumbnail = {
+            "url": "",
+            // the generated thumbnail will have this width
+            "width": 150,
+            "height": 0
+        };
+        this.images.standard_resolution = {
+            "url": uri,
+            "width": 0,
+            "height": 0
+        };
+
+        this.gallery = gallery;
+        this._originalSource = uri;
+
+        this.imageInit = function(){
+            var self = this,
+                deferred = $q.defer();
+            fabric.Image.fromURL(this._originalSource, function(oImg) {
+                var imgs = self.images;
+                // Setting standard_resolution values
+                imgs.standard_resolution.width = oImg.getWidth();
+                imgs.standard_resolution.height = oImg.getHeight();
+                // Setting thumbnail values
+                oImg.scaleToWidth(imgs.thumbnail.width);
+                imgs.thumbnail.url = oImg.toDataURL({"format": "jpeg"});
+                imgs.thumbnail.height = oImg.getHeight();
+                // All done here. Now notify the controller with success response
+                deferred.resolve(self);
+            });
+
+            return deferred.promise;
+        };
+    }
+    PhoneLoadedImg.prototype = new ImageWrapper();
+    PhoneLoadedImg.prototype.constructor = PhoneLoadedImg;
+
+    // Class used as an abstraction of images loaded from Instagram
+    function InstagramLoadedImg (imagesObj) {
+        ImageWrapper.call(this, ImageWrapper.sources.INS, imagesObj, angular.copy(imagesObj,{}));
+    }
+    InstagramLoadedImg.prototype = new ImageWrapper();
+    InstagramLoadedImg.prototype.constructor = InstagramLoadedImg;
+
+    return {
+        getPhoneLoadedImg: function (pUri) {
+            return new PhoneLoadedImg(pUri);
+        },
+        getInstagramLoadedImg: function (pImagesObj) {
+            return new InstagramLoadedImg(pImagesObj);
+        },
+        restoreImage: function(pObj){
+            var restoredImage;
+            switch (pObj.origin) {
+                case ImageWrapper.sources.PHN:
+                    restoredImage = this.getPhoneLoadedImg(pObj._originalSource);
+                    break;
+                case ImageWrapper.sources.INS:
+                    restoredImage = this.getInstagramLoadedImg(pObj._originalSource);
+                    break;
+            }
+            restoredImage.images = pObj.images;
+            restoredImage.toPrint = pObj.toPrint;
+            restoredImage.quantity = pObj.quantity;
+            return restoredImage;
+        }
+    };
+}]);
+
+// I provide a utility class for preloading image objects.
+models.factory("PreloaderFactory", function ($q, $rootScope) {
+    // I manage the preloading of image objects. Accepts an array of image URLs.
+    function Preloader(imageLocations) {
+
+        // I am the image SRC values to preload.
+        this.imageLocations = imageLocations;
+
+        // As the images load, we'll need to keep track of the load/error
+        // counts when announing the progress on the loading.
+        this.imageCount = this.imageLocations.length;
+        this.loadCount = 0;
+        this.errorCount = 0;
+
+        // I am the possible states that the preloader can be in.
+        this.states = {
+            PENDING: 1,
+            LOADING: 2,
+            RESOLVED: 3,
+            REJECTED: 4
+        };
+
+        // I keep track of the current state of the preloader.
+        this.state = this.states.PENDING;
+
+        // When loading the images, a promise will be returned to indicate
+        // when the loading has completed (and / or progressed).
+        this.deferred = $q.defer();
+        this.promise = this.deferred.promise;
+    }
+
+
+    // ---
+    // STATIC METHODS.
+    // ---
+    Preloader.preloadImages = function (imageLocations) {
+        // I reload the given images [Array] and return a promise. The promise
+        // will be resolved with the array of image locations.
+        var preloader = new Preloader(imageLocations);
+        return ( preloader.load() );
+    };
+
+
+    // ---
+    // INSTANCE METHODS.
+    // ---
+    Preloader.prototype = {
+        // Best practice for "instanceof" operator.
+        constructor: Preloader,
+
+        // ---
+        // PUBLIC METHODS.
+        // ---
+        isInitiated: function isInitiated() {
+            // I determine if the preloader has started loading images yet.
+            return ( this.state !== this.states.PENDING );
+        },
+        isRejected: function isRejected() {
+            // I determine if the preloader has failed to load all of the images.
+            return ( this.state === this.states.REJECTED );
+        },
+        isResolved: function isResolved() {
+            // I determine if the preloader has successfully loaded all of the images.
+            return ( this.state === this.states.RESOLVED );
+        },
+        load: function load() {
+            // I initiate the preload of the images. Returns a promise.
+            // If the images are already loading, return the existing promise.
+            if (this.isInitiated()) {
+                return (this.promise);
+            }
+
+            this.state = this.states.LOADING;
+
+            for (var i = 0; i < this.imageCount; i++) {
+                this.loadImageLocation(this.imageLocations[i]);
+            }
+
+            // Return the deferred promise for the load event.
+            return ( this.promise );
+        },
+
+        // ---
+        // PRIVATE METHODS.
+        // ---
+        handleImageError: function handleImageError(imageLocation) {
+            // I handle the load-failure of the given image location.
+            this.errorCount++;
+
+            // If the preload action has already failed, ignore further action.
+            if (this.isRejected()) {
+                return;
+            }
+
+            this.state = this.states.REJECTED;
+            this.deferred.reject(imageLocation);
+        },
+        handleImageLoad: function handleImageLoad(imageLocation) {
+            // I handle the load-success of the given image location.
+            this.loadCount++;
+            // If the preload action has already failed, ignore further action.
+            if (this.isRejected()) {
+                return;
+            }
+
+            // Notify the progress of the overall deferred. This is different
+            // than Resolving the deferred - you can call notify many times
+            // before the ultimate resolution (or rejection) of the deferred.
+            this.deferred.notify({
+                percent: Math.ceil(this.loadCount / this.imageCount * 100),
+                imageLocation: imageLocation
+            });
+
+            // If all of the images have loaded, we can resolve the deferred
+            // value that we returned to the calling context.
+            if (this.loadCount === this.imageCount) {
+                this.state = this.states.RESOLVED;
+                this.deferred.resolve(this.imageLocations);
+            }
+        },
+        loadImageLocation: function loadImageLocation(imageLocation) {
+            // I load the given image location and then wire the load / error
+            // events back into the preloader instance.
+            // --
+            // NOTE: The load/error events trigger a $digest.
+            var preloader = this;
+            // When it comes to creating the image object, it is critical that
+            // we bind the event handlers BEFORE we actually set the image
+            // source. Failure to do so will prevent the events from proper
+            // triggering in some browsers.
+            var image = $(new Image())
+                    .load(
+                    function (event) {
+                        // Since the load event is asynchronous, we have to
+                        // tell AngularJS that something changed.
+                        $rootScope.$apply(
+                            function () {
+                                preloader.handleImageLoad(event.target.src);
+                                // Clean up object reference to help with the
+                                // garbage collection in the closure.
+                                preloader = image = event = null;
+                            }
+                        );
+                    }
+                )
+                    .error(
+                    function (event) {
+                        // Since the load event is asynchronous, we have to
+                        // tell AngularJS that something changed.
+                        $rootScope.$apply(
+                            function () {
+                                preloader.handleImageError(event.target.src);
+                                // Clean up object reference to help with the
+                                // garbage collection in the closure.
+                                preloader = image = event = null;
+                            }
+                        );
+                    }
+                )
+                    .prop("src", imageLocation)
+                ;
+        }
+    };
+    // Return the factory instance.
+    return ( Preloader );
+});
+models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
+    /**
+     * A simple service that returns the array of selected images.
+     * Also store the selected product with his parent product line
+     */
+    var selectedImages = [],
+        imageGallery = [],
+        currentGallery = {},
+        productLine = {},
+        product = {};
+
+
+    return {
+        addItem: function(pItem) {
+            if (angular.isObject(pItem)) {
+                angular.copy(pItem, selectedImages);
+            }
+        },
+        getInstagramOnes: function() {
+            return $filter('filter')(selectedImages, {origin:"instagram"});
+        },
+        getToPrintOnes: function() {
+            return $filter('filter')(selectedImages, {toPrint:true});
+        },
+        getByGallery: function(pGallery){
+            return $filter('filter')(selectedImages, {gallery: pGallery});
+        },
+        getPrintItemsCount: function () {
+            /**
+             * Return how many items the user want to print
+             * This is because .length does not return the correct value
+             * */
+            var aux = this.getToPrintOnes(),
+                count = 0;
+
+            for (var i = aux.length - 1; i >= 0; i--) {
+                count += aux[i].quantity;
+            }
+
+            return count;
+        },
+        clearAndAdd : function(items){
+            var notPrint = $filter('filter')(selectedImages, {toPrint:false});; 
+            var print = notPrint.concat(items);
+            selectedImages = print;
+        },
+        getAll: function() {
+            return selectedImages;
+        },
+        getOne: function(id){
+            return this.getToPrintOnes()[id];
+        },
+        setProductLine: function(pProductLine){
+            productLine = pProductLine;
+        },
+        getProductLine: function(){
+            return productLine;
+        },
+        setProduct: function(pProduct){
+            product = pProduct;
+        },
+        setGallery: function(gallery){
+            imageGallery = gallery;
+        },
+        getGallery: function(){
+            return imageGallery;
+        },
+        setCurrentGallery: function(obj){
+            currentGallery = obj;
+        },
+        getCurrentGallery: function() {
+            return currentGallery;
+        },
+        getProduct: function(){
+            return product;
+        },
+        clearImages: function () {
+            selectedImages = null; // helping garbage collector
+            selectedImages = [];
+        },
+        clearSelection: function () {
+            this.clearImages();
+            productLine = {};
+            product = {};
+        }
+    };
+}]);
+
+/**
+ * Created   on 29/11/2014.
+ */
+models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', function ($q, StorageService, ImageFactory) {
+    // ---
+    // PRIVATE ATTRIBUTES.
+    // ---
+    var shoppingCart;
+
+    // ---
+    // APPLICATION OBJECT MODELS
+    // ---
+    function Order (pProductLine, pProduct, pItems){
+        // ---
+        // PRIVATE METHODS.
+        // ---
+        var makeId = function(){
+            // creates unique ID's for orders
+            var id = '';
+            for (var i = 5 - 1; i >= 0; i--) {
+                var rand = (((1 + Math.random()) * 0x10000) | 0).toString(16);
+                id += rand;
+                id += (i>0)?'-':'';
+            }
+            return id;
+        };
+
+        // ---
+        // PUBLIC ATTRIBUTES.
+        // ---
+        this.id = makeId();
+        this.productLine = pProductLine;
+        this.product = pProduct;
+        this.items = pItems;
+
+        // ---
+        // PUBLIC METHODS.
+        // ---
+        this.getQuantity = function () {
+            var numberOfItems = 0;
+            for (var i = this.items.length - 1; i >= 0; i--) {
+                numberOfItems += this.items[i].quantity;
+            }
+            return numberOfItems;
+        };
+
+        this.computeSubTotal = function () {
+            var subTotal = 0,
+                numberOfItems = this.getQuantity(),
+                firstItems = this.product.prices.first_items,
+                additionalItem = this.product.prices.additional;
+
+            if (numberOfItems <= firstItems.quantity) {
+                subTotal = firstItems.price;
+            } else if (numberOfItems > firstItems.quantity) {
+                var numberOfAdditionalItems = numberOfItems - firstItems.quantity;
+                subTotal = firstItems.price + (numberOfAdditionalItems * additionalItem.price);
+            }
+
+            return subTotal;
+        };
+    }
+
+    function ShoppingCart(pCustomer, pOrders) {
+        // ---
+        // PUBLIC ATTRIBUTES.
+        // ---
+        this.customer = (angular.isObject(pCustomer))? pCustomer : {
+            name: "",
+            firstName: "",
+            secondSurname: "",
+            phone: "",
+            email: "",
+            address: {
+                province: "",
+                canton: "",
+                district: "",
+                exacta: ""
+            }
+        };
+        this.orders = pOrders || [];
+
+        this.travel = {
+            direction :{
+                canton : "",
+                distrito : "",
+                provincia : "",
+                exacta: ""
+            }, 
+            price : 0
+        };
+
+        this.payment = {
+            card: "",
+            month: "",
+            year: "",
+            type: ""
+        };
+
+        // ---
+        // PUBLIC METHODS.
+        // ---
+        this.addOrder = function(DummyOrder){
+            if( (DummyOrder instanceof Order) === false ) {return;}
+
+            this.orders.push(DummyOrder);
+            return this.orders[this.orders.length-1];
+        };
+
+        this.getDummyOrder = function(pProductLine, pProduct, pItems){
+            return new Order(pProductLine, pProduct, pItems);
+        };
+
+        this.removeOrder = function(pOrderId){
+            for (var i = this.orders.length - 1; i >= 0; i--) {
+                if (this.orders[i].id === pOrderId) {
+                    this.orders.splice(i,1);
+                }
+            }
+        };
+
+        this.getWeight = function(){
+            var weight = 0; 
+            for (var i = this.orders.length - 1; i >= 0; i--) {
+                weight = this.orders[i].product.weight + weight;
+            }
+
+            weight = weight/1000;
+
+            if(weight < 1){
+                weight = 1;
+            }
+
+            return weight;
+        };
+
+        this.computeSubTotal = function () {
+            var subTotal = 0;
+            for (var i = this.orders.length - 1; i >= 0; i--) {
+                subTotal += this.orders[i].computeSubTotal();
+            }
+            return subTotal;
+        };
+
+        this.getTotal = function(){
+            var t = parseInt(this.computeSubTotal());
+            var p = parseInt(this.travel.price);
+
+            return t+p;
+        };
+
+        this.getTotalQuantity = function(){
+            var quantity = 0;
+            for (var i = this.orders.length - 1; i >= 0; i--) {
+                quantity += this.orders[i].getQuantity();
+            }
+            return quantity;
+        };
+    }
+
+    // ---
+    // FACTORY HELPER METHODS.
+    // ---
+    var restoreImages = function (pImages2Restore) {
+        var restored = [];
+
+        for (var i = 0, j = pImages2Restore.length; i < j; i++) {
+            restored.push(ImageFactory.restoreImage(pImages2Restore[i]));
+        }
+
+        return restored;
+    };
+
+    var restoreOrders = function (pOrders2Restore) {
+        var restored = [];
+
+        for (var i = 0, j = pOrders2Restore.length; i < j; i++) {
+            restored.push(
+                new Order(
+                    pOrders2Restore[i].productLine,
+                    pOrders2Restore[i].product,
+                    restoreImages(pOrders2Restore[i].items)
+                )
+            );
+        }
+
+        return restored;
+    };
+
+    return {
+        saveShoppingCart: function(){
+            return StorageService.save(shoppingCart);
+        },
+
+
+        load : function(){
+           var defer = $q.defer();
+           var self = this;
+            /*
+            * Load any data stored
+            * then check if some shopping cart was already created
+            * if yes load it or create a new one and save it (for future usage)
+            * and finally return the loaded/created shopping cart
+            * */
+            var lastShoppingCart,
+                restoredOrders;
+
+            if (angular.isUndefined(shoppingCart)) {
+                StorageService.loadFile().then(function(e){
+                    lastShoppingCart = angular.fromJson(e);
+                    if(angular.isObject(lastShoppingCart)){
+                        restoredOrders = restoreOrders(lastShoppingCart.orders);
+                        shoppingCart = new ShoppingCart(lastShoppingCart.customer, restoredOrders);
+                        defer.resolve(shoppingCart);
+                    } else {
+                        shoppingCart = new ShoppingCart();
+                        defer.resolve(shoppingCart);
+                        self.saveShoppingCart();
+                    }
+
+                });
+            } else {
+                defer.resolve(shoppingCart);
+            }
+
+            return defer.promise;
+        },
+
+        loadShoppingCart: function(){
+            /*
+            * Load any data stored
+            * then check if some shopping cart was already created
+            * if yes load it or create a new one and save it (for future usage)
+            * and finally return the loaded/created shopping cart
+            * */
+            var lastShoppingCart,
+                restoredOrders;
+
+            if (angular.isUndefined(shoppingCart)) {
+                lastShoppingCart = StorageService.load();
+
+                if(angular.isObject(lastShoppingCart)){
+                    restoredOrders = restoreOrders(lastShoppingCart.orders);
+                    shoppingCart = new ShoppingCart(lastShoppingCart.customer, restoredOrders);
+                } else {
+                    shoppingCart = new ShoppingCart();
+                    this.saveShoppingCart();
+                }
+            }
+            return shoppingCart;
+        },
+
+        removeOrder: function (pOrderId) {
+            shoppingCart.removeOrder(pOrderId);
+            this.saveShoppingCart();
+        },
+
+        savePayment : function(pCard, pMonth, pYear, pType){
+            shoppingCart.payment = {
+                card: pCard,
+                month: pMonth,
+                year: pYear,
+                type: pType
+            };
+
+            this.saveShoppingCart();
+        },
+
+        saveTravel : function(money, canton, distrito, provincia, exacta){
+            shoppingCart.travel = {
+                price : money
+            };
+  
+            this.saveShoppingCart();
+        },
+
+        saveCustomer : function(name, secondSurname, phone, email, province, canton, district, exacta){
+            shoppingCart.customer = {
+                name: name,
+                firstName: name,
+                secondSurname: secondSurname,
+                phone: phone,
+                email: email,
+                address: {
+                    province: province,
+                    canton: canton,
+                    district: district,
+                    exacta: exacta
+                }
+            };
+            this.saveShoppingCart();
+        }
+    };
 }]);

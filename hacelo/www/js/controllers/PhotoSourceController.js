@@ -37,7 +37,7 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'S
 
     var init = function () {
         $ionicLoading.show({
-            template: 'Cargando... '
+            template: 'Estamos cargando tus fotos<br> esto puede tardar unos minutos... '
         });
         FileReader.scanFileSystem().then(function(res) {
             window.res = res;
@@ -56,10 +56,9 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'S
 
 controllers.controller('albumCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
     $scope.cant = 0;
-    $scope.imageStack = SelectedImagesFactory.getAll();
-    $scope.galleries = SelectedImagesFactory.getGallery();
     $scope.getCurrentGallery = SelectedImagesFactory.getCurrentGallery();
-    console.log($scope.getCurrentGallery);
+    $scope.imageStack = SelectedImagesFactory.getAll();
+    $scope.height = screen.width / 3;
 
     $scope.updateMarker = function() {
         var cont = 0;
@@ -68,6 +67,11 @@ controllers.controller('albumCtrl', ['$scope', '$state', '$ionicPopup', 'Selecte
                 cont = cont + 1;
         });
         $scope.cant = cont;
+    };
+
+    $scope.checkImage = function(image){
+        image.toPrint = !image.toPrint;
+        $scope.updateMarker();
     };
 
     $scope.updateMarker();

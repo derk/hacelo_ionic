@@ -10,9 +10,10 @@
   		<div class="photos">
 			<div class="images-container">
 				<div class="image"
-					 ng-repeat="image in getCurrentGallery.images"
+					 ng-repeat="image in imageStack | filter:{gallery: getCurrentGallery.name}"
 					 ng-init="mini = image.images.thumbnail"
-					 ng-class="{selected: image.toPrint}">
+					 ng-class="{selected: image.toPrint}"
+					 style="height: {{height}}px; overflow:hidden;">
 					<a ng-click="checkImage(image)">
 						<i class="icon ion-checkmark-circled"></i>
 						<img ng-src="{{mini.url}}"
