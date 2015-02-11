@@ -281,13 +281,13 @@ angular.module('hacelo', [
 
 var controllers = angular.module('hacelo.controllers', []);
 var commons = angular.module('hacelo.config', []);
+var models = angular.module('hacelo.models', []);
 /**
  * Created   on 30/11/2014.
  */
 var directives = angular.module('hacelo.directives', []);
 
 var services = angular.module('hacelo.services', []);
-var models = angular.module('hacelo.models', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
         /*
