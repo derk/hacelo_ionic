@@ -32,7 +32,7 @@ $dark:                            #444 !default;
 */
 
 $green: #80b846;
-$darkerGreen: #6e9e3b;
+/*$darkerGreen: #6e9e3b;*/
 $waterGreen: #33e3a5;
 $blue: #0e619a;
 $darkerBlue: #0f5587;
@@ -130,7 +130,7 @@ body{
 }
 
 .bar-header, .bar{
-    height: 44px;
+    height: 0px;
     border: none;
 }
 
@@ -148,8 +148,8 @@ body{
     }
     &.grey{
         height: 48px;
-        background-color: black;
-        opacity: 0.3;
+        background: rgba(0,0,0,0.5);
+        
         .back-button{
             color: #fff;
             font-size: 0.9em;
@@ -161,7 +161,6 @@ body{
                 height: 34px;
                 text-align: right;
                 padding-right: 8px;
-                opacity: 0.3;
                 background: url('../img/arrow-buttons-grey.png') no-repeat center;
                 background-position: 0 0;
                 &:hover{
@@ -196,7 +195,7 @@ body{
         }
     }
     &.lightOrange{
-        height: 44px;
+        height: 0px;
         background-color: $lightOrange;
         &.bar-stable .title{
             color: #FFF;
@@ -204,7 +203,7 @@ body{
     }
     &.info{
         background-color: #fff;
-        height: 44px;
+        height: 0px;
         border-style:none;
         &.bar-stable {
             .exit{
@@ -537,7 +536,7 @@ body{
             text-align: left;
             overflow: hidden;
             font-style: italic;
-            text-transform: none;
+            text-transform: capitalize;
             border: none;
             color: $grey;
             p{
@@ -557,7 +556,7 @@ body{
                 &.answer{
                     margin-bottom: 12%;
                     a{
-                        color: $blue;
+                        color: $orange;
                         display: block;
                         margin: auto;
                         width: 65%;
@@ -913,7 +912,7 @@ body{
                     line-height: 15px;
                     min-height: 32px;
                     width: 60%;
-                    background: $blue;
+                    background: $orange;
                     text-transform: capitalize;
                     font-size: 0.8em;
                     margin: auto;
