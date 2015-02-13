@@ -76,5 +76,4 @@ this.compareArray = function(a, b) {
     }
     return true;
 };
-
 }]);

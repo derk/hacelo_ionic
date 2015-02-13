@@ -9,32 +9,14 @@
 			<div class="loading"></div>
 			<div class="loading-counter">
 				<p class="photos-counter">
-					<span id="photos-loaded">37 </span> /
-					<span id="total-photos">54</span>
+					<span id="photos-loaded">{{initial}}</span> /
+					<span id="total-photos">{{all}}</span>
 				</p>
 				<p class="uploaded-copy">Fotos Subidas</p>
 			</div>
 			<p class="disclaimer">
 				Por favor espere mientras subimos sus fotos y luego procesamos su pago, gracias.
 			</p>
-				<form action="{{api}}" method="post" >
-					<input type="text" name="data" value="mobileTest"/>
-					<input type="submit" value="Submit">
-					<div id="information" ng-repeat="photo in market.orders track by $index">
-
-						<div ng-repeat="single in photo.items track by $index">
-							<div ng-repeat="number in range(single.quantity) track by $index">
-								<input value="{{single.images.standard_resolution.url}}" type="text" name="images[]"/>
-								<input value="{{photo.productLine.name}}_{{photo.product.name}}" name="category[]"	/>
-							</div>
-						</div>
-
-
-					</div>
-				</form>
-
-				<canvas id="canvas"></canvas>
-				<img id="imgToCanvas" src="{{customUrl}}">
 		</div>
   	</ion-content>
 </ion-view>

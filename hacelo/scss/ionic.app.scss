@@ -1316,6 +1316,9 @@ body{
    =============  order-sent page  ============= 
 */
 .order-sent-page{
+    &, & * {
+        background: $green !important;    
+    }
     .order-sent-container{
         text-transform: capitalize;
         font-family: verdana;
