@@ -2101,6 +2101,18 @@ controllers.controller('infoCtrl', function($scope) {
 		return $scope.shownGroup === group;
 	};
 
+	$scope.shareFb = function(){
+        window.plugins.socialsharing.shareViaFacebook('https://www.facebook.com/pages/Printea/726483530762215?ref=hl')
+    };
+
+    $scope.shareTwitter = function(){
+        window.plugins.socialsharing.shareViaTwitter('http://www.twitter.com/printeaApp')
+    };
+
+    $scope.shareEmail = function(){
+        window.plugins.socialsharing.shareViaEmail('Printea','Printea');
+    };
+
 });
 controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$ionicLoading', 'SelectedImagesFactory', 'MessageService', 'InstagramService', 'ImageFactory', 'PhotoSizeChecker', function ($scope, $filter, $ionicPopup, $ionicLoading, SelectedImagesFactory, MessageService, InstagramService, ImageFactory, PhotoSizeChecker) {
     $scope.loading = false;
@@ -2498,7 +2510,7 @@ controllers.controller('albumCtrl', ['$scope', '$state', '$ionicPopup', 'Selecte
 
     $scope.updateMarker();
 }]);
-controllers.controller('processingCtrl', ['$scope', '$ionicLoading', '$sce', 'SelectedImagesFactory','StorageService','ShoppingCartFactory', 'MessageService', 'Utils', 'Processing', function($scope, $ionicLoading, $sce, SelectedImagesFactory, StorageService, ShoppingCartFactory, Messages, Utils, Processing) {
+controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$sce', 'SelectedImagesFactory','StorageService','ShoppingCartFactory', 'MessageService', 'Utils', 'Processing', function($scope, $state, $ionicLoading, $sce, SelectedImagesFactory, StorageService, ShoppingCartFactory, Messages, Utils, Processing) {
 
     $scope.market = ShoppingCartFactory.loadShoppingCart();
     $scope.images = SelectedImagesFactory.getToPrintOnes();
@@ -2522,25 +2534,39 @@ controllers.controller('processingCtrl', ['$scope', '$ionicLoading', '$sce', 'Se
 
     // Prepating photos
     var preparePhotos = function(url){
+        var el = [];
         $ionicLoading.show(cache);
 
         // $scope.market.orders[0].items[0].images.standard_resolution.url
         for(var x = 0; x < $scope.market.orders.length; x++){
             for(var y = 0; y < $scope.market.orders[x].items.length; y++){
+                $scope.all = $scope.all + $scope.market.orders[x].items[y].quantity;
                 if ($scope.market.orders[x].items[y].images.standard_resolution.url.indexOf(prefix) == -1) {
+                    console.log($scope.market.orders[x].items[y].images.standard_resolution.url);
                     photos = photos + 1;
-                    $scope.all = $scope.all + $scope.market.orders[x].items[y].quantity;
-                    Utils.getImageDataURL($scope.market.orders[x].items[y].images.standard_resolution.url, x, y).then(function(e){
-                        cont = cont + 1;
-                        $scope.market.orders[e.x].items[e.y].images.standard_resolution.url = e.data;
-                        if(cont == photos){
-                            $ionicLoading.hide();
-                            createAjaxCall();
-                        }
-                    });
+                    el.push({x:x, y:y});
                 } //Close of if
             }
         }
+
+        if (el.length < 0 ) {
+            $ionicLoading.hide();
+            createAjaxCall();
+        } else {
+            window.p = [];
+            angular.forEach(el, function(v){
+                Utils.getImageDataURL($scope.market.orders[v.x].items[v.y].images.standard_resolution.url, v.x, v.y).then(function(e){
+                    p.push(e.data);
+                    cont = cont + 1;
+                    $scope.market.orders[e.x].items[e.y].images.standard_resolution.url = e.data;
+                    if(cont == el.length){
+                        $ionicLoading.hide();
+                        createAjaxCall();
+                    }
+                });
+            });
+        }
+
     };
 
     var createAjaxCall = function() {
@@ -2554,9 +2580,11 @@ controllers.controller('processingCtrl', ['$scope', '$ionicLoading', '$sce', 'Se
             }
         }
 
-        formData.append('data','nacion_test');
-
+        formData.append('data',$scope.market.customer.name+"_"+$scope.market.customer.secondSurname);
+        
         Processing.upload(formData).then(function(e){
+            console.log(e)
+            setTimeout(function(){$state.go('app.order-sent');});
             StorageService.clear();
         }, function(e) {
             alert('Ha habido un error, vamos a intentarlo de nuevo');
@@ -2584,17 +2612,7 @@ controllers.controller('productCrtl', ['$scope', '$state', 'SelectedImagesFactor
 
 controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
     
-    $scope.shareFb = function(){
-        window.plugins.socialsharing.shareViaFacebook('http://www.hacelodigital.com/')
-    };
-
-    $scope.shareTwitter = function(){
-        window.plugins.socialsharing.shareViaTwitter('http://www.hacelodigital.com/')
-    };
-
-    $scope.shareEmail = function(){
-        window.plugins.socialsharing.shareViaEmail('Hacelo','Hacelo');
-    };
+    
 });
 models.factory('ImageFactory', ['$q', function ($q) {
     function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
@@ -2618,7 +2636,7 @@ models.factory('ImageFactory', ['$q', function ($q) {
     function PhoneLoadedImg (uri, gallery) {
         ImageWrapper.call(this, ImageWrapper.sources.PHN, uri, {}, false);
         this.images.thumbnail = {
-            "url": "",
+            "url": uri,
             // the generated thumbnail will have this width
             "width": 150,
             "height": 0
@@ -2642,7 +2660,7 @@ models.factory('ImageFactory', ['$q', function ($q) {
                 imgs.standard_resolution.height = oImg.getHeight();
                 // Setting thumbnail values
                 oImg.scaleToWidth(imgs.thumbnail.width);
-                imgs.thumbnail.url = oImg.toDataURL({"format": "jpeg"});
+                imgs.thumbnail.url = oImg.toDataURL({"format": "png"});
                 imgs.thumbnail.height = oImg.getHeight();
                 // All done here. Now notify the controller with success response
                 deferred.resolve(self);
@@ -3147,7 +3165,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             var lastShoppingCart,
                 restoredOrders;
 
-            if (angular.isUndefined(shoppingCart)) {
+           // if (angular.isUndefined(shoppingCart)) {
                 StorageService.loadFile().then(function(e){
                     lastShoppingCart = angular.fromJson(e);
                     if(angular.isObject(lastShoppingCart)){
@@ -3161,9 +3179,9 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
                     }
 
                 });
-            } else {
-                defer.resolve(shoppingCart);
-            }
+            //} else {
+            //    defer.resolve(shoppingCart);
+            //}
 
             return defer.promise;
         },
@@ -3421,10 +3439,10 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', 'SelectedImages
         var deferred = $q.defer(),
             phoneLoadedImg = ImageFactory.getPhoneLoadedImg(fileEntry.nativeURL);
 
-            phoneLoadedImg.imageInit().then(function (img) {
-                addImage2Gallery(fileEntry, phoneLoadedImg);
-                deferred.resolve(img);
-            });
+            //phoneLoadedImg.imageInit().then(function (img) {
+            addImage2Gallery(fileEntry, phoneLoadedImg);
+            deferred.resolve(fileEntry.nativeURL);
+            //});
 
         return deferred.promise;
     };
@@ -3840,8 +3858,8 @@ services.service('Processing', ['$http', '$q', function ($http, $q) {
 			contentType: false,
 			processData: false,
 			data: formData, 
-			error: function(e){defer.reject(true)}, 
-			success: function(e){defer.resolve(true)},
+			error: function(e){defer.reject(e)}, 
+			success: function(e){console.log(e);defer.resolve(e)},
 			url: url, 
 			type: "POST",
 			xhr : function () {
@@ -3849,6 +3867,7 @@ services.service('Processing', ['$http', '$q', function ($http, $q) {
 		        xhr.upload.addEventListener("progress", function (evt) {
 		            if (evt.lengthComputable) {
 		                var percentComplete = evt.loaded / evt.total;
+		                console.log(percentComplete);
 		                defer.notify(percentComplete);
 		                if (percentComplete === 1) {
 		                    defer.resolve(true);
@@ -4023,16 +4042,17 @@ services.service('Utils', ['$q', '$timeout', '$filter', function ($q, $timeout, 
         img.onload = function(){
             // Create the canvas element.
             canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
+            canvas.width = screen.width;
+            canvas.height = (screen.width * img.height) /img.width;
             // Get '2d' context and draw the image.
             ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0);
+            ctx.drawImage(img, 0, 0, screen.width, (screen.width * img.height) /img.width);
             // Get canvas data URL
             try{
                 // console.log("got it");
                 data = canvas.toDataURL();
-                defer.resolve({image:img, data:data, x:x, y:y});
+                window.r = data;
+                defer.resolve({data:data, x:x, y:y});
             }catch(e){
                 // console.log("broke");
                 defer.reject(e);
@@ -4048,6 +4068,11 @@ services.service('Utils', ['$q', '$timeout', '$filter', function ($q, $timeout, 
 
     
     return defer.promise;
+
+};
+
+
+this.create64 = function(url){
 
 };
 

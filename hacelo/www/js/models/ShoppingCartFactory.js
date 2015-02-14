@@ -205,7 +205,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             var lastShoppingCart,
                 restoredOrders;
 
-            if (angular.isUndefined(shoppingCart)) {
+           // if (angular.isUndefined(shoppingCart)) {
                 StorageService.loadFile().then(function(e){
                     lastShoppingCart = angular.fromJson(e);
                     if(angular.isObject(lastShoppingCart)){
@@ -219,9 +219,9 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
                     }
 
                 });
-            } else {
-                defer.resolve(shoppingCart);
-            }
+            //} else {
+            //    defer.resolve(shoppingCart);
+            //}
 
             return defer.promise;
         },

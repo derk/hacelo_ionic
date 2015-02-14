@@ -18,16 +18,17 @@ services.service('Utils', ['$q', '$timeout', '$filter', function ($q, $timeout, 
         img.onload = function(){
             // Create the canvas element.
             canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
+            canvas.width = screen.width;
+            canvas.height = (screen.width * img.height) /img.width;
             // Get '2d' context and draw the image.
             ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0);
+            ctx.drawImage(img, 0, 0, screen.width, (screen.width * img.height) /img.width);
             // Get canvas data URL
             try{
                 // console.log("got it");
                 data = canvas.toDataURL();
-                defer.resolve({image:img, data:data, x:x, y:y});
+                window.r = data;
+                defer.resolve({data:data, x:x, y:y});
             }catch(e){
                 // console.log("broke");
                 defer.reject(e);
@@ -43,6 +44,11 @@ services.service('Utils', ['$q', '$timeout', '$filter', function ($q, $timeout, 
 
     
     return defer.promise;
+
+};
+
+
+this.create64 = function(url){
 
 };
 

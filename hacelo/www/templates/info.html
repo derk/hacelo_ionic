@@ -180,9 +180,9 @@
 				Compartí
 				</ion-item>
 				<div class="item-accordion item social-btns" ng-show="isGroupShown('share')">
-					<a href="https://www.facebook.com/pages/Printea/726483530762215?ref=hl" class="share fb"></a>
-					<a href="http://www.twitter.com/printeaApp" class="share twitter"></a>
-					<a href="3" class="share email"></a>
+					<a ng-click="shareFb()" class="share fb"></a>
+					<a ng-click="shareTwitter()" class="share twitter"></a>
+					<a ng-click="shareEmail()" class="share email"></a>
 				</div>
 				<ion-item ng-model="contacto" class="item-stable" ng-click="toggleGroup('contacto')" ng-class="{active: isGroupShown('contacto')}">
 					Contáctenos

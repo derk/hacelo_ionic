@@ -516,7 +516,7 @@ body{
     text-transform: capitalize;
     position: relative;
 
-    .list .item{
+    .item{
         &.item-stable{
             background: $lightOrange;
             color: #FFF;
@@ -588,7 +588,7 @@ body{
                     margin-bottom: 3%;
                 }
             }
-            .social-btns{
+            &.social-btns{
                 width: 294px;
                 margin: auto;
                 padding: 4% 0;

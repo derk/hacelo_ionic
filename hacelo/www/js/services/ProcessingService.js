@@ -27,8 +27,8 @@ services.service('Processing', ['$http', '$q', function ($http, $q) {
 			contentType: false,
 			processData: false,
 			data: formData, 
-			error: function(e){defer.reject(true)}, 
-			success: function(e){defer.resolve(true)},
+			error: function(e){defer.reject(e)}, 
+			success: function(e){console.log(e);defer.resolve(e)},
 			url: url, 
 			type: "POST",
 			xhr : function () {
@@ -36,6 +36,7 @@ services.service('Processing', ['$http', '$q', function ($http, $q) {
 		        xhr.upload.addEventListener("progress", function (evt) {
 		            if (evt.lengthComputable) {
 		                var percentComplete = evt.loaded / evt.total;
+		                console.log(percentComplete);
 		                defer.notify(percentComplete);
 		                if (percentComplete === 1) {
 		                    defer.resolve(true);

@@ -44,7 +44,7 @@ models.factory('ImageFactory', ['$q', function ($q) {
                 imgs.standard_resolution.height = oImg.getHeight();
                 // Setting thumbnail values
                 oImg.scaleToWidth(imgs.thumbnail.width);
-                imgs.thumbnail.url = oImg.toDataURL({"format": "jpeg"});
+                imgs.thumbnail.url = oImg.toDataURL({"format": "png"});
                 imgs.thumbnail.height = oImg.getHeight();
                 // All done here. Now notify the controller with success response
                 deferred.resolve(self);

@@ -1,4 +1,4 @@
-controllers.controller('processingCtrl', ['$scope', '$ionicLoading', '$sce', 'SelectedImagesFactory','StorageService','ShoppingCartFactory', 'MessageService', 'Utils', 'Processing', function($scope, $ionicLoading, $sce, SelectedImagesFactory, StorageService, ShoppingCartFactory, Messages, Utils, Processing) {
+controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$sce', 'SelectedImagesFactory','StorageService','ShoppingCartFactory', 'MessageService', 'Utils', 'Processing', function($scope, $state, $ionicLoading, $sce, SelectedImagesFactory, StorageService, ShoppingCartFactory, Messages, Utils, Processing) {
 
     $scope.market = ShoppingCartFactory.loadShoppingCart();
     $scope.images = SelectedImagesFactory.getToPrintOnes();
@@ -22,25 +22,39 @@ controllers.controller('processingCtrl', ['$scope', '$ionicLoading', '$sce', 'Se
 
     // Prepating photos
     var preparePhotos = function(url){
+        var el = [];
         $ionicLoading.show(cache);
 
         // $scope.market.orders[0].items[0].images.standard_resolution.url
         for(var x = 0; x < $scope.market.orders.length; x++){
             for(var y = 0; y < $scope.market.orders[x].items.length; y++){
+                $scope.all = $scope.all + $scope.market.orders[x].items[y].quantity;
                 if ($scope.market.orders[x].items[y].images.standard_resolution.url.indexOf(prefix) == -1) {
+                    console.log($scope.market.orders[x].items[y].images.standard_resolution.url);
                     photos = photos + 1;
-                    $scope.all = $scope.all + $scope.market.orders[x].items[y].quantity;
-                    Utils.getImageDataURL($scope.market.orders[x].items[y].images.standard_resolution.url, x, y).then(function(e){
-                        cont = cont + 1;
-                        $scope.market.orders[e.x].items[e.y].images.standard_resolution.url = e.data;
-                        if(cont == photos){
-                            $ionicLoading.hide();
-                            createAjaxCall();
-                        }
-                    });
+                    el.push({x:x, y:y});
                 } //Close of if
             }
         }
+
+        if (el.length < 0 ) {
+            $ionicLoading.hide();
+            createAjaxCall();
+        } else {
+            window.p = [];
+            angular.forEach(el, function(v){
+                Utils.getImageDataURL($scope.market.orders[v.x].items[v.y].images.standard_resolution.url, v.x, v.y).then(function(e){
+                    p.push(e.data);
+                    cont = cont + 1;
+                    $scope.market.orders[e.x].items[e.y].images.standard_resolution.url = e.data;
+                    if(cont == el.length){
+                        $ionicLoading.hide();
+                        createAjaxCall();
+                    }
+                });
+            });
+        }
+
     };
 
     var createAjaxCall = function() {
@@ -54,12 +68,11 @@ controllers.controller('processingCtrl', ['$scope', '$ionicLoading', '$sce', 'Se
             }
         }
 
-        formData.append('data','nacion_test');
-
+        formData.append('data',$scope.market.customer.name+"_"+$scope.market.customer.secondSurname);
+        
         Processing.upload(formData).then(function(e){
-            setTimeout(function(){
-                $state.go('app.order-sent');
-            });
+            console.log(e)
+            setTimeout(function(){$state.go('app.order-sent');});
             StorageService.clear();
         }, function(e) {
             alert('Ha habido un error, vamos a intentarlo de nuevo');

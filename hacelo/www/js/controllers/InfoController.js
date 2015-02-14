@@ -16,4 +16,16 @@ controllers.controller('infoCtrl', function($scope) {
 		return $scope.shownGroup === group;
 	};
 
+	$scope.shareFb = function(){
+        window.plugins.socialsharing.shareViaFacebook('https://www.facebook.com/pages/Printea/726483530762215?ref=hl')
+    };
+
+    $scope.shareTwitter = function(){
+        window.plugins.socialsharing.shareViaTwitter('http://www.twitter.com/printeaApp')
+    };
+
+    $scope.shareEmail = function(){
+        window.plugins.socialsharing.shareViaEmail('Printea','Printea');
+    };
+
 });
