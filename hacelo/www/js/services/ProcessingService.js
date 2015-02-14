@@ -28,7 +28,7 @@ services.service('Processing', ['$http', '$q', function ($http, $q) {
 			processData: false,
 			data: formData, 
 			error: function(e){defer.reject(e)}, 
-			success: function(e){console.log(e);defer.resolve(e)},
+			success: function(e){defer.resolve(e)},
 			url: url, 
 			type: "POST",
 			xhr : function () {
@@ -38,9 +38,6 @@ services.service('Processing', ['$http', '$q', function ($http, $q) {
 		                var percentComplete = evt.loaded / evt.total;
 		                console.log(percentComplete);
 		                defer.notify(percentComplete);
-		                if (percentComplete === 1) {
-		                    defer.resolve(true);
-		                }
 		            }
 		        }, false);
 		        return xhr;

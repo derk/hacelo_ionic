@@ -288,6 +288,897 @@ var directives = angular.module('hacelo.directives', []);
 
 var models = angular.module('hacelo.models', []);
 var services = angular.module('hacelo.services', []);
+controllers.controller('addedCtrl', ['$scope', '$stateParams', function ($scope, $stateParams) {
+    $scope.productName = $stateParams.productName;
+}]);
+/**
+ * Created   on 30/11/2014.
+ */
+controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $ionicPopup, Messages, ShoppingCartFactory,Payment) {
+    $scope.cart = ShoppingCartFactory.loadShoppingCart();
+    console.log($scope.cart);
+    $scope.removeOrder = function (pOrderToRemove) {
+        var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_order_delete"),
+            confirmPopup = $ionicPopup.confirm(cache);
+
+        confirmPopup.then(function (res) {
+            if (res) {
+                ShoppingCartFactory.removeOrder(pOrderToRemove.id);
+            }
+        });
+    };
+
+    $scope.minus = function(order){
+
+    };
+
+}]);
+
+
+/**
+ * Created by Raiam on 02/01/2015.
+ */
+controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading','$ionicPopup', 'MessageService', 'ShoppingCartFactory','PlacesConfig','Payment', function($scope, $state, $ionicLoading, $ionicPopup, Messages, ShoppingCartFactory, PlacesConfig, Payment) {
+    
+    $scope.cart = ShoppingCartFactory.loadShoppingCart();
+    $scope.sucursal = true;
+    $scope.provinces = [];
+    $scope.cantones = [];
+    $scope.districts = [];
+    $scope.info = {};  
+
+    var places = PlacesConfig.places;
+
+    angular.forEach(Object.keys(places), function(v){
+        $scope.provinces.push({"name":v});
+    });
+
+
+    $scope.showCanton = function(){
+        $scope.cantones = [];
+        $scope.districts = [];
+
+         angular.forEach(Object.keys(places[$scope.info.province.name].Cantones), function(v){
+            $scope.cantones.push({"name":v});
+        });
+    };
+
+    $scope.showDistrict = function(){
+        $scope.districts = [];
+
+         angular.forEach(places[$scope.info.province.name].Cantones[$scope.info.canton.name], function(v){
+            $scope.districts.push({"name":v});
+        });
+    };
+
+
+    $scope.show = function() {
+        $ionicLoading.show({
+          template: 'Calculando Transporte'
+        });
+    };
+
+    $scope.hide = function(){
+        $ionicLoading.hide();
+    };
+
+    $scope.changeSucursal = function(s){
+       $scope.sucursal = s;
+    };
+
+    $scope.saveInformation = function(){
+        ShoppingCartFactory.saveCustomer($scope.info.name, $scope.info.last, $scope.info.phone,  $scope.info.email, $scope.info.province.name, $scope.info.canton.name, $scope.info.district.name, $scope.info.exact);
+    };
+
+    $scope.calculatePrice = function(){
+
+        if($scope.sucursal == true){
+            ShoppingCartFactory.saveTravel(0);
+            $state.go("app.redeem");
+        } else {
+            $scope.show();
+            Payment.sendWeight($scope.cart.getWeight()).then(function(response){
+                ShoppingCartFactory.saveTravel(response.message.precio);
+                $scope.hide();
+                $state.go("app.redeem");
+            });
+        }
+        
+    };
+    
+}]);
+
+
+/**
+ * Created by Raiam on 02/01/2015.
+ */
+
+controllers.controller('redeemCtrl', ['$scope', '$ionicPopup', '$state', 'MessageService', 'ShoppingCartFactory', 'Payment', function($scope, $ionicPopup, $state, Messages, ShoppingCartFactory, Payment) {
+    
+    $scope.cart = ShoppingCartFactory.loadShoppingCart();
+    $scope.userData = {};
+    $scope.years = [];
+    $scope.months = [];
+    $scope.emisor = [
+        {
+            "name": "American Express", 
+            "value": "AMEX"
+        },
+        {
+            "name": "VISA", 
+            "value": "VISA"
+        },
+        {
+            "name": "Master Card", 
+            "value": "MasterCard"
+        }
+    ]
+
+    for(var el = 2015; el <= 2050; el++){
+        $scope.years.push({"name": el, "value": el});
+    }
+
+    for(var el = 1; el <= 12; el++){
+        $scope.months.push({"name": el, "value": el});
+    }
+
+
+    $scope.userData.year = $scope.years[0];
+    $scope.userData.month = $scope.months[0];
+    $scope.userData.emisor = $scope.emisor[0];
+
+    $scope.submit = function(){
+        ShoppingCartFactory.savePayment($scope.userData.card, $scope.userData.month.value, $scope.userData.year.value,$scope.userData.emisor.value );
+        $state.go("app.confirm-order");
+        /*Payment.makePay(1, $scope.cart.customer.firstName, $scope.cart.customer.secondSurname, $scope.userData.emisor.value, $scope.userData.card, $scope.userData.month.value, $scope.userData.year.value, $scope.cart.computeSubTotal(), $scope.cart.travel.price).then(function(e){
+            if(e.error != ""){
+                $ionicPopup.alert({
+                    title: 'Error',
+                    template: 'Hubo un error al procesar tu pago, intntalo mas tarde.'
+                });
+            } else {
+                $state.go("app.processing-order");
+            }
+        });*/
+    };
+
+}]);
+/**
+ * Created by joseph on 25/01/2015.
+ */
+controllers.controller('categoryCrtl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService',function($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService) {
+    $scope.productLine = SelectedImagesFactory.getProductLine();
+
+    $scope.saveProduct = function(pProduct) {
+        SelectedImagesFactory.setProduct(pProduct);
+        $state.go("app.photo");
+    };
+
+    var lookForImages = function () {
+        if(SelectedImagesFactory.getAll().length>0) {
+            $ionicPopup
+                .confirm(MessageService.search("loss_of_selected_images"))
+                .then(function(res) {
+                    if(res) {
+                        // You are sure
+                        SelectedImagesFactory.clearImages();
+                    } else {
+                        // You are not sure
+                        $state.go("app.photo");
+                    }
+                });
+        }
+    };
+
+    lookForImages();
+}]);
+
+controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "SelectedImagesFactory", "MessageService", "PreloaderFactory", function($scope, $state, $ionicPopup, SelectedImagesFactory, Messages, preloader) {
+    $scope.images = SelectedImagesFactory.getToPrintOnes();
+    // keep track of the state of the loading images.
+    $scope.isLoading = true;
+    $scope.isSuccessful = false;
+    $scope.percentLoaded = 0;
+
+    var preload = function (imageLocations) {
+        preloader.preloadImages( imageLocations ).then(
+            function handleResolve( imageLocations ) {
+
+                // Loading was successful.
+                $scope.isLoading = false;
+                $scope.isSuccessful = true;
+            },
+            function handleReject( imageLocation ) {
+
+                // Loading failed on at least one image.
+                $scope.isLoading = false;
+                $scope.isSuccessful = false;
+
+                console.error( "Image Failed", imageLocation );
+                console.info( "Preload Failure" );
+
+            },
+            function handleNotify( event ) {
+
+                // Update UI to show progress percentage
+                $scope.percentLoaded = event.percent;
+            }
+        );
+    };
+
+    var init = function () {
+        /*
+         * Ensure that every selected image have at least a quantity equals to one
+         * If the image has other quantity already just preserve that value.
+         * Also create a new array of image locations (URLs) to be preloaded
+         * */
+        var imageLocations = [];
+         for (var i = $scope.images.length - 1; i >= 0; i--) {
+             if ($scope.images[i].quantity === 0) {
+                 $scope.images[i].quantity = 1;
+             }
+
+             imageLocations.push($scope.images[i].images.standard_resolution.url);
+        }
+
+        preload(imageLocations);
+    };
+
+    /*
+     * Se encarga de ingresar en el carrito de compras los datos que ya se encuentran 
+     * en el array de imagenes, se guardan todos los tipos de fotos asi como la cantidad de cada una
+     * y se redirecciona la pantalla de confirmacion.
+     * */
+    $scope.addToCart = function () {
+        var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_check_screen"),
+            numOfItems2Print = SelectedImagesFactory.getPrintItemsCount(),
+            numberOfPicksConfirm = {
+                "title" : "Estas segur@?",
+                "template" : "Escogiste "+numOfItems2Print+" imagen(es), pero podés escoger hasta "+SelectedImagesFactory.getProduct().prices.first_items.quantity+ " por el mismo precio.",
+                "cancelText" : "Cancelar",
+                "okText" : "Aceptar"
+            },
+            go2Confirm = function (res) {
+                if (res) {
+                    $state.go("app.confirm");
+                }
+            };
+
+        if(numOfItems2Print >= SelectedImagesFactory.getProduct().prices.first_items.quantity){
+            $ionicPopup.confirm(cache).then(go2Confirm);
+
+        } else {
+            $ionicPopup.confirm(numberOfPicksConfirm).then(function(res){
+                if(res){
+                    $ionicPopup.confirm(cache).then(go2Confirm);
+                }
+            });
+        }
+    };
+
+    init();
+
+}]);
+/**
+ * Created   on 30/11/2014.
+ */
+controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', 'SelectedImagesFactory', function ($scope, $state, $ionicPopup, Messages, ShoppingCartFactory, SelectedImagesFactory) {
+    var cart = ShoppingCartFactory.loadShoppingCart();
+    /*
+     * Create a new order based on the selected: product line, product, and images
+     * */
+    if (angular.isObject($scope.actualOrder)){
+        $scope.actualOrder = null; // trash collector help
+    }
+
+    $scope.actualOrder = cart.getDummyOrder(
+        SelectedImagesFactory.getProductLine(),
+        SelectedImagesFactory.getProduct(),
+        SelectedImagesFactory.getToPrintOnes()
+    );
+
+    $scope.addToCart = function(){
+        // todo: revisar porque no se estan enviando los parametros por URL hacia el estado app.added
+        var stateParams = {
+                productName: SelectedImagesFactory.getProduct().name
+            },
+            cache;
+
+        cart.addOrder($scope.actualOrder);
+
+        // Checking if the order was saved
+        if(ShoppingCartFactory.saveShoppingCart()) {
+            SelectedImagesFactory.clearSelection();
+            $state.go("app.added",stateParams);
+        } else {
+            var cache = angular.isDefined(cache) ? cache: Messages.search("shopping_cart_full");
+            $ionicPopup.alert(cache);
+        }
+    };
+
+    $scope.url =  $scope.actualOrder.product.slider[0].images;
+    $scope.height = screen.width;
+}]);
+controllers.controller('confirmOrderCtrl', ['$scope', '$state' ,'$ionicPopup','$ionicLoading', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $state, $ionicPopup, $ionicLoading, Messages, ShoppingCartFactory,Payment) {
+    $scope.cart = ShoppingCartFactory.loadShoppingCart();
+
+   console.log($scope.cart);
+
+   window.el = $scope.cart;
+
+   $scope.show = function() {
+        $ionicLoading.show({
+          template: 'Realizando Pago...'
+        });
+    };
+
+    $scope.hide = function(){
+        $ionicLoading.hide();
+    };
+
+   
+   $scope.pay = function(){
+   		$scope.show();
+   		Payment.makePay(1, $scope.cart.customer.firstName, $scope.cart.customer.secondSurname, $scope.cart.payment.type, $scope.cart.payment.card, $scope.cart.payment.month, $scope.cart.payment.year, $scope.cart.computeSubTotal(), $scope.cart.travel.price).then(function(e){
+            $scope.hide();
+            if(e.error != ""){
+                $ionicPopup.alert({
+                    title: 'Error',
+                    template: 'Hubo un error al procesar tu pago, intntalo mas tarde.'
+                });
+            } else {
+            	 
+               $state.go("app.processing-order");
+            }
+        });
+   };
+
+}]);
+/**
+ * Created   on 07/12/2014.
+ */
+controllers.controller('congratsCtrl', ['clearSelection', function (clearSelection) {
+    clearSelection.clearSelection();
+}]);
+/* InfoCtrl Accordion List
+ * $scope - Scope de la pantalla
+ */
+
+controllers.controller('infoCtrl', function($scope) {
+
+	$scope.toggleGroup = function(group){
+		if($scope.isGroupShown(group)){
+			$scope.shownGroup = null;
+		}else{ 
+			$scope.shownGroup = group;	
+		}
+	};
+
+	$scope.isGroupShown = function(group){
+		return $scope.shownGroup === group;
+	};
+
+	$scope.shareFb = function(){
+        window.plugins.socialsharing.shareViaFacebook('https://www.facebook.com/pages/Printea/726483530762215?ref=hl')
+    };
+
+    $scope.shareTwitter = function(){
+        window.plugins.socialsharing.shareViaTwitter('http://www.twitter.com/printeaApp')
+    };
+
+    $scope.shareEmail = function(){
+        window.plugins.socialsharing.shareViaEmail('Printea','Printea');
+    };
+
+});
+controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$ionicLoading', 'SelectedImagesFactory', 'MessageService', 'InstagramService', 'ImageFactory', 'PhotoSizeChecker', function ($scope, $filter, $ionicPopup, $ionicLoading, SelectedImagesFactory, MessageService, InstagramService, ImageFactory, PhotoSizeChecker) {
+    $scope.loading = false;
+    $scope.imageStack = SelectedImagesFactory.getAll();
+    $scope.canLoadMore = false;
+    $scope.cant = 0;
+
+    $scope.$watch('loading', function(newVal, oldVal) {// for showing and hiding load spinner
+        var cache = angular.isDefined(cache)? cache: MessageService.search("loading");
+        if (newVal !== oldVal) {
+            if (newVal === true) {
+                $ionicLoading.show(cache);
+            } else {
+                $ionicLoading.hide();
+            }
+        }
+    });
+
+    var extractInstagramImages = function(apiResponse) {
+        /*
+         *   Aquí reviso la respuesta que me devolvió Instagram, le quito los videos y
+         *   luego reviso si luego de filtrar lo quedaron  imágenes en caso de que no
+         *   quedaran muestro un mensaje al usuario diciéndole que no tiene imágenes
+         *   que su cuenta de Instagram y lo envió a la pantalla anterior.
+         *   Si hay imágenes las meto al scope para que el usuario decida cuales
+         *   imágenes va a imprimir.
+         * */
+        var filteredResponse = $filter('filter')(apiResponse.data, {type:"image"}),
+            j = filteredResponse.length;
+
+        if (j === 0) {
+            $ionicPopup.alert(MessageService.search("no-images-found")).then(function(){
+                sendUserBackToChoose();
+            });
+        } else {
+            for (var i = 0; i < j; i++) {
+                var img = ImageFactory.getInstagramLoadedImg(filteredResponse[i].images);
+                $scope.imageStack.push(img);
+            }
+        }
+    };
+
+    var getRecentMedia = function(v){
+        /*  Se conecta con la API de Instagram por medio del servicio y trae las
+         *  ultimas imágenes.En caso de que la respuesta de Instagram venga con
+         *  un error (token vencido o alguno otro) Fuerzo al servicio a que haga
+         *  un nuevo log in para refrescar el token.
+         * */
+        $scope.loading = true;
+        InstagramService.getRecentMedia()
+            .then(function(response) {
+                $scope.loading = false;
+                if (response.data.meta.code === 400) { // check if token is expired
+                    authenticateInstagramUser();
+                } else {
+                    extractInstagramImages(response.data);
+                    canLoadMoreImages();
+                }
+            }, function(err) {
+                $scope.loading = false;
+                $ionicPopup.alert(MessageService.search("cannot-load-media"));
+            });
+
+            if(v){
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+            }
+
+    };
+
+    var sendUserBackToChoose = function(){
+        $state.go('app.choose');
+    };
+
+    var havePreviousImages = function () {
+        return (SelectedImagesFactory.getInstagramOnes().length > 0);
+    };
+
+    var authenticateInstagramUser = function (){
+        /*
+        * Muestra la ventana en la que el usuario inicia sesión con su cuenta de Instagram.
+        * si el usario no otorga aceso a la cuenta muestra un mensaje de error y redirecciona
+        * al usuario a la ventana anterior.
+        * */
+        InstagramService.auth()
+            .then(function(result) {
+                getRecentMedia();
+            }, function(err) {
+                $ionicPopup.alert(MessageService.search("user-denied-access")).then(function(){
+                    sendUserBackToChoose();
+                });
+            });
+    };
+
+    var canLoadMoreImages = function(){
+        $scope.canLoadMore = InstagramService.canLoadMore();
+    };
+
+    var init = function(){
+        if (InstagramService.isAuthenticated()){
+            if(havePreviousImages()){
+                canLoadMoreImages();
+            } else {
+                if(InstagramService.hasUserMedia()) {
+                    InstagramService.cleanUserMedia();
+                }
+                getRecentMedia();
+            }
+        } else {
+            authenticateInstagramUser();
+        }
+    };
+
+    $scope.loadMore = getRecentMedia;
+
+    $scope.checkRequirements = function(image){
+        if(image.toPrint === true) {
+            image.toPrint = false;
+        } else {
+            if(PhotoSizeChecker.meetsMinimumRequirements(image, SelectedImagesFactory.getProduct())) {
+                image.toPrint = true;
+            } else {
+                $ionicPopup.alert({
+                    title: 'La imagen es muy pequenna',
+                    template: 'Lo sentimos :( la foto tiene que ser'+
+                    'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
+                    'una impresión de la más alta calidad.'
+                });
+            }
+        }
+    };
+
+    $scope.updateMarker = function() {
+        var cont = 0;
+        angular.forEach($scope.imageStack, function(v){
+            if(v.toPrint)
+                cont = cont + 1;
+        });
+        $scope.cant = cont;
+    };
+
+    $scope.gotoConfirm = function () {
+        if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
+            $state.go('app.photobook-check');
+        } else {
+            $state.go('app.check');
+        }  
+    };
+
+    $scope.checkImage = function(image){
+        image.toPrint = !image.toPrint;
+        $scope.updateMarker();
+    };
+
+    init();
+    $scope.updateMarker();
+}]);
+/**
+ * Created by joseph on 25/01/2015.
+ */
+controllers.controller('landingCtrl', ['$scope', '$ionicLoading','ShoppingCartFactory','MessageService',function($scope, $ionicLoading, ShoppingCartFactory, MessageService) {
+    $scope.cart = null;
+
+    $ionicLoading.show({
+        template: 'Cargando... '
+    });
+
+    ShoppingCartFactory.load().then(function(e){
+        $scope.cart = e;
+        $ionicLoading.hide();
+    });
+
+}]);
+
+/**
+ * Created by joseph on 25/01/2015.
+ */
+controllers.controller('photobookCheckCtrl', ['$scope', '$state', '$ionicPopup','SelectedImagesFactory', 'PhotoPrintConfig','MessageService', 'Utils',function($scope, $state, $ionicPopup, SelectedImagesFactory, PhotoPrintConfig, Messages, Utils) {
+    var popup = angular.isDefined(popup) ? popup: Messages.search("photobook_few");
+
+
+    if(SelectedImagesFactory.getProduct().prices.first_items.quantity   !=  SelectedImagesFactory.getToPrintOnes().length){
+        $ionicPopup.alert(popup).then(function(res){
+            window.history.back();
+        });
+    } else {
+        $scope.productLines = PhotoPrintConfig.products;
+        $scope.images = SelectedImagesFactory.getToPrintOnes();
+
+    }
+
+    window.el = SelectedImagesFactory;
+
+    $scope.saveProductLine = function(pProductLine) {
+        SelectedImagesFactory.setProductLine(pProductLine);
+        $state.go("app.category");
+    };
+
+    $scope.mix = function () {
+        $scope.images = Utils.shuffle($scope.images);
+        SelectedImagesFactory.clearAndAdd($scope.images);
+    };
+
+    /*
+     * Se encarga de ingresar en el carrito de compras los datos que ya se encuentran
+     * en el array de imagenes, se guardan todos los tipos de fotos asi como la cantidad de cada una
+     * y se redirecciona la pantalla de confirmacion.
+     * */
+    $scope.addToCart = function () {
+        var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_check_screen");
+        $ionicPopup.confirm(cache).then(function (res) {
+            if (res) {
+                $state.go("app.confirm");
+            }
+        });
+
+    };
+}]);
+
+
+controllers.controller('photobookCoverCtrl', ['$scope', '$state', '$ionicPopup','SelectedImagesFactory', 'PhotoPrintConfig','MessageService', 'Utils',function($scope, $state, $ionicPopup, SelectedImagesFactory, PhotoPrintConfig, Messages, Utils) {
+    $scope.productLines = PhotoPrintConfig.products;
+    $scope.images = SelectedImagesFactory.getToPrintOnes();
+
+    $scope.saveProductLine = function(pProductLine) {
+        SelectedImagesFactory.setProductLine(pProductLine);
+        $state.go("app.category");
+    };
+
+    $scope.mix = function () {
+        $scope.images = Utils.shuffle($scope.images);
+        SelectedImagesFactory.clearAndAdd($scope.images);
+    };
+
+    $scope.range = function(){
+        var el = [];
+        for(var x = 0; x > 9; x ++){
+            el.push($scope.images[x]);
+        }
+        window.i = el;
+        console.log(el);
+        return el;
+    };
+
+    /*
+     * Se encarga de ingresar en el carrito de compras los datos que ya se encuentran 
+     * en el array de imagenes, se guardan todos los tipos de fotos asi como la cantidad de cada una
+     * y se redirecciona la pantalla de confirmacion.
+     * */
+    $scope.addToCart = function () {
+        var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_check_screen");
+            $ionicPopup.confirm(cache).then(function (res) {
+                if (res) {
+                    $state.go("app.confirm");
+                }
+            });
+
+    };
+}]);
+
+/**
+ * Created by joseph on 25/01/2015.
+ */
+controllers.controller('photoCrtl', ['$scope', '$state', '$ionicPopup', '$timeout', '$window', 'MessageService','SelectedImagesFactory',function($scope, $state, $ionicPopup, $timeout, $window, Messages, SelectedImagesFactory) {
+    var cache = angular.isDefined(cache) ? cache: Messages.search("photobook_alert");
+
+    $scope.product = SelectedImagesFactory.getProduct();
+    $scope.height = screen.width;
+
+    if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
+        $ionicPopup.alert(cache);
+        $timeout(function () {
+            angular.element(".popup").addClass("photobook-popup");
+        },1000);
+        console.log("get");
+    }
+
+
+}]);
+/**
+ * Created   on 30/11/2014.
+ */
+controllers.controller('PhotoEditCtrl', ['$scope', '$stateParams', '$state', 'SelectedImagesFactory', function ($scope, $stateParams, $state, SelectedImagesFactory) {
+    $scope.image = SelectedImagesFactory.getOne($stateParams.id);
+    $scope.sResolution = $scope.image.images.standard_resolution;
+
+    var selectedProduct = SelectedImagesFactory.getProduct(),
+        drkr;
+
+    $scope.darkroomInit = function(){
+        drkr = new Darkroom('#editableImage', {
+            // minWidth: selectedProduct.pixel_size.minimum.width,
+            // minHeight: selectedProduct.pixel_size.minimum.height,
+            maxWidth: angular.element('.canvas').width(),
+            plugins: {
+                crop: {
+                    ratio: ($scope.sResolution.width/$scope.sResolution.height)
+                },
+                save: false
+            },
+            init: function(){
+                var cropPlugin = this.getPlugin('crop'),
+                    optimalWidth = selectedProduct.pixel_size.optimal.width,
+                    optimalHeight = selectedProduct.pixel_size.optimal.height;
+                cropPlugin.selectZone(
+                    (this.image.width-optimalWidth)/2,
+                    (this.image.height-optimalHeight)/2,
+                    optimalWidth,
+                    optimalHeight
+                );
+            }
+        });
+    };
+
+    $scope.done = function(){
+        $scope.sResolution.url = drkr.snapshotImage();
+        drkr.selfDestroy();
+        $state.go('app.check');
+    };
+}]);
+controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
+    $scope.imageStack = SelectedImagesFactory.getAll();
+    $scope.galleries = SelectedImagesFactory.getGallery();
+
+    //$scope.phoneImageLoad = function () {
+    //    CordovaCameraService.getImage().then(function (result) {
+    //        var img = ImageFactory.getPhoneLoadedImg(result);
+    //        img.imageInit().then(function(result){
+    //            if(PhotoSizeChecker.meetsMinimumRequirements(result, SelectedImagesFactory.getProduct())){
+    //                $scope.imageStack.push(result);
+    //            } else {
+    //                $ionicPopup.alert({
+    //                    title: 'La imagen es muy pequenna',
+    //                    template: 'Lo sentimos :( la foto tiene que ser'+
+    //                    'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
+    //                    'una impresión de la más alta calidad.'
+    //                });
+    //            }
+    //        });
+    //    });ionicLoading
+    //};
+
+    $scope.go = function(obj){
+        SelectedImagesFactory.setCurrentGallery(obj);
+        $state.go('app.album');
+    };
+
+    $scope.gotoConfirm = function () {
+
+        if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
+            $state.go('app.photobook-check');
+        } else {
+            $state.go('app.check');
+        }
+        
+    };
+
+    var init = function () {
+        $ionicLoading.show({
+            template: 'Estamos cargando tus fotos<br> esto puede tardar unos minutos... '
+        });
+        FileReader.scanFileSystem().then(function(res) {
+            window.res = res;
+            $scope.galleries = res;
+            SelectedImagesFactory.setGallery(res);
+            $ionicLoading.hide();
+        });
+    };
+
+    if($scope.galleries.length == 0){
+        init();
+    }
+
+}]);
+
+
+controllers.controller('albumCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
+    $scope.cant = 0;
+    $scope.getCurrentGallery = SelectedImagesFactory.getCurrentGallery();
+    $scope.imageStack = SelectedImagesFactory.getAll();
+    $scope.height = screen.width / 3;
+
+    $scope.updateMarker = function() {
+        var cont = 0;
+        angular.forEach($scope.imageStack, function(v){
+            if(v.toPrint)
+                cont = cont + 1;
+        });
+        $scope.cant = cont;
+    };
+
+    $scope.checkImage = function(image){
+        image.toPrint = !image.toPrint;
+        $scope.updateMarker();
+    };
+
+    $scope.updateMarker();
+}]);
+controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$sce', 'SelectedImagesFactory','StorageService','ShoppingCartFactory', 'MessageService', 'Utils', 'Processing', function($scope, $state, $ionicLoading, $sce, SelectedImagesFactory, StorageService, ShoppingCartFactory, Messages, Utils, Processing) {
+
+    $scope.market = ShoppingCartFactory.loadShoppingCart();
+    $scope.images = SelectedImagesFactory.getToPrintOnes();
+    $scope.all = 0;
+    $scope.initial = 0;
+    $scope.progress = 0;
+    var data = '';
+
+    window.el = $scope.market;
+
+    var prefix = "data:image/png;base64,",
+        cache = angular.isDefined(cache) ? cache: Messages.search("processing"),
+        uploading = angular.isDefined(uploading) ? uploading : Messages.search();
+        photos = 0,
+        cont = 0;
+
+
+    $scope.range = function(n) {
+        return new Array(n);
+    };
+
+    // Prepating photos
+    var preparePhotos = function(url){
+        var el = [];
+        $ionicLoading.show(cache);
+
+        // $scope.market.orders[0].items[0].images.standard_resolution.url
+        for(var x = 0; x < $scope.market.orders.length; x++){
+            for(var y = 0; y < $scope.market.orders[x].items.length; y++){
+                $scope.all = $scope.all + $scope.market.orders[x].items[y].quantity;
+                if ($scope.market.orders[x].items[y].images.standard_resolution.url.indexOf(prefix) == -1) {
+                    console.log($scope.market.orders[x].items[y].images.standard_resolution.url);
+                    photos = photos + 1;
+                    el.push({x:x, y:y});
+                } //Close of if
+            }
+        }
+
+        if (el.length < 0 ) {
+            $ionicLoading.hide();
+            createAjaxCall();
+        } else {
+            window.p = [];
+            angular.forEach(el, function(v){
+                Utils.getImageDataURL($scope.market.orders[v.x].items[v.y].images.standard_resolution.url, v.x, v.y).then(function(e){
+                    p.push(e.data);
+                    cont = cont + 1;
+                    $scope.market.orders[e.x].items[e.y].images.standard_resolution.url = e.data;
+                    if(cont == el.length){
+                        $ionicLoading.hide();
+                        createAjaxCall();
+                    }
+                });
+            });
+        }
+
+    };
+
+    var createAjaxCall = function() {
+        var formData = new FormData();
+
+        for(var x = 0; x < $scope.market.orders.length; x++){
+            for(var y = 0; y < $scope.market.orders[x].items.length; y++){
+                var blob = Processing.dataURItoBlob($scope.market.orders[x].items[y].images.standard_resolution.url);
+                formData.append('images[]', blob);      
+                formData.append('category[]', $scope.market.orders[x].productLine.name+"_"+$scope.market.orders[x].product.name);          
+            }
+        }
+
+        formData.append('data',$scope.market.customer.name+"_"+$scope.market.customer.secondSurname);
+        
+        Processing.upload(formData).then(function(e){
+            window.e = e;
+            var response = angular.fromJson(e);
+
+            if(response.data === 'ok'){
+                setTimeout(function(){$state.go('app.order-sent');});
+                StorageService.clear();
+            } else {
+                alert("Ha ocurrido un error interno.");
+            }
+
+            
+        }, function(e) {
+            alert('Ha habido un error, vamos a intentarlo de nuevo');
+        }, function(e){
+            $scope.initial = Math.floor($scope.all * e);
+        });
+    };
+
+    preparePhotos();
+
+}]);
+
+
+controllers.controller('productCrtl', ['$scope', '$state', 'SelectedImagesFactory', 'PhotoPrintConfig', function($scope, $state, SelectedImagesFactory, PhotoPrintConfig) {
+	$scope.productLines = PhotoPrintConfig.products;
+	$scope.saveProductLine = function(pProductLine) {
+		SelectedImagesFactory.setProductLine(pProductLine);
+		$state.go("app.category");
+	};
+}]);
+
+
+
+
+
+controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
+    
+    
+});
 commons.constant('PhotoPrintConfig', {
     "products": [
         /*
@@ -1731,889 +2622,6 @@ commons.constant('PlacesConfig', {
         }
     }
 });
-controllers.controller('addedCtrl', ['$scope', '$stateParams', function ($scope, $stateParams) {
-    $scope.productName = $stateParams.productName;
-}]);
-/**
- * Created   on 30/11/2014.
- */
-controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $ionicPopup, Messages, ShoppingCartFactory,Payment) {
-    $scope.cart = ShoppingCartFactory.loadShoppingCart();
-    console.log($scope.cart);
-    $scope.removeOrder = function (pOrderToRemove) {
-        var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_order_delete"),
-            confirmPopup = $ionicPopup.confirm(cache);
-
-        confirmPopup.then(function (res) {
-            if (res) {
-                ShoppingCartFactory.removeOrder(pOrderToRemove.id);
-            }
-        });
-    };
-
-    $scope.minus = function(order){
-
-    };
-
-}]);
-
-
-/**
- * Created by Raiam on 02/01/2015.
- */
-controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading','$ionicPopup', 'MessageService', 'ShoppingCartFactory','PlacesConfig','Payment', function($scope, $state, $ionicLoading, $ionicPopup, Messages, ShoppingCartFactory, PlacesConfig, Payment) {
-    
-    $scope.cart = ShoppingCartFactory.loadShoppingCart();
-    $scope.sucursal = true;
-    $scope.provinces = [];
-    $scope.cantones = [];
-    $scope.districts = [];
-    $scope.info = {};  
-
-    var places = PlacesConfig.places;
-
-    angular.forEach(Object.keys(places), function(v){
-        $scope.provinces.push({"name":v});
-    });
-
-
-    $scope.showCanton = function(){
-        $scope.cantones = [];
-        $scope.districts = [];
-
-         angular.forEach(Object.keys(places[$scope.info.province.name].Cantones), function(v){
-            $scope.cantones.push({"name":v});
-        });
-    };
-
-    $scope.showDistrict = function(){
-        $scope.districts = [];
-
-         angular.forEach(places[$scope.info.province.name].Cantones[$scope.info.canton.name], function(v){
-            $scope.districts.push({"name":v});
-        });
-    };
-
-
-    $scope.show = function() {
-        $ionicLoading.show({
-          template: 'Calculando Transporte'
-        });
-    };
-
-    $scope.hide = function(){
-        $ionicLoading.hide();
-    };
-
-    $scope.changeSucursal = function(s){
-       $scope.sucursal = s;
-    };
-
-    $scope.saveInformation = function(){
-        ShoppingCartFactory.saveCustomer($scope.info.name, $scope.info.last, $scope.info.phone,  $scope.info.email, $scope.info.province.name, $scope.info.canton.name, $scope.info.district.name, $scope.info.exact);
-    };
-
-    $scope.calculatePrice = function(){
-
-        if($scope.sucursal == true){
-            ShoppingCartFactory.saveTravel(0);
-            $state.go("app.redeem");
-        } else {
-            $scope.show();
-            Payment.sendWeight($scope.cart.getWeight()).then(function(response){
-                ShoppingCartFactory.saveTravel(response.message.precio);
-                $scope.hide();
-                $state.go("app.redeem");
-            });
-        }
-        
-    };
-    
-}]);
-
-
-/**
- * Created by Raiam on 02/01/2015.
- */
-
-controllers.controller('redeemCtrl', ['$scope', '$ionicPopup', '$state', 'MessageService', 'ShoppingCartFactory', 'Payment', function($scope, $ionicPopup, $state, Messages, ShoppingCartFactory, Payment) {
-    
-    $scope.cart = ShoppingCartFactory.loadShoppingCart();
-    $scope.userData = {};
-    $scope.years = [];
-    $scope.months = [];
-    $scope.emisor = [
-        {
-            "name": "American Express", 
-            "value": "AMEX"
-        },
-        {
-            "name": "VISA", 
-            "value": "VISA"
-        },
-        {
-            "name": "Master Card", 
-            "value": "MasterCard"
-        }
-    ]
-
-    for(var el = 2015; el <= 2050; el++){
-        $scope.years.push({"name": el, "value": el});
-    }
-
-    for(var el = 1; el <= 12; el++){
-        $scope.months.push({"name": el, "value": el});
-    }
-
-
-    $scope.userData.year = $scope.years[0];
-    $scope.userData.month = $scope.months[0];
-    $scope.userData.emisor = $scope.emisor[0];
-
-    $scope.submit = function(){
-        ShoppingCartFactory.savePayment($scope.userData.card, $scope.userData.month.value, $scope.userData.year.value,$scope.userData.emisor.value );
-        $state.go("app.confirm-order");
-        /*Payment.makePay(1, $scope.cart.customer.firstName, $scope.cart.customer.secondSurname, $scope.userData.emisor.value, $scope.userData.card, $scope.userData.month.value, $scope.userData.year.value, $scope.cart.computeSubTotal(), $scope.cart.travel.price).then(function(e){
-            if(e.error != ""){
-                $ionicPopup.alert({
-                    title: 'Error',
-                    template: 'Hubo un error al procesar tu pago, intntalo mas tarde.'
-                });
-            } else {
-                $state.go("app.processing-order");
-            }
-        });*/
-    };
-
-}]);
-/**
- * Created by joseph on 25/01/2015.
- */
-controllers.controller('categoryCrtl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService',function($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService) {
-    $scope.productLine = SelectedImagesFactory.getProductLine();
-
-    $scope.saveProduct = function(pProduct) {
-        SelectedImagesFactory.setProduct(pProduct);
-        $state.go("app.photo");
-    };
-
-    var lookForImages = function () {
-        if(SelectedImagesFactory.getAll().length>0) {
-            $ionicPopup
-                .confirm(MessageService.search("loss_of_selected_images"))
-                .then(function(res) {
-                    if(res) {
-                        // You are sure
-                        SelectedImagesFactory.clearImages();
-                    } else {
-                        // You are not sure
-                        $state.go("app.photo");
-                    }
-                });
-        }
-    };
-
-    lookForImages();
-}]);
-
-controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "SelectedImagesFactory", "MessageService", "PreloaderFactory", function($scope, $state, $ionicPopup, SelectedImagesFactory, Messages, preloader) {
-    $scope.images = SelectedImagesFactory.getToPrintOnes();
-    // keep track of the state of the loading images.
-    $scope.isLoading = true;
-    $scope.isSuccessful = false;
-    $scope.percentLoaded = 0;
-
-    var preload = function (imageLocations) {
-        preloader.preloadImages( imageLocations ).then(
-            function handleResolve( imageLocations ) {
-
-                // Loading was successful.
-                $scope.isLoading = false;
-                $scope.isSuccessful = true;
-            },
-            function handleReject( imageLocation ) {
-
-                // Loading failed on at least one image.
-                $scope.isLoading = false;
-                $scope.isSuccessful = false;
-
-                console.error( "Image Failed", imageLocation );
-                console.info( "Preload Failure" );
-
-            },
-            function handleNotify( event ) {
-
-                // Update UI to show progress percentage
-                $scope.percentLoaded = event.percent;
-            }
-        );
-    };
-
-    var init = function () {
-        /*
-         * Ensure that every selected image have at least a quantity equals to one
-         * If the image has other quantity already just preserve that value.
-         * Also create a new array of image locations (URLs) to be preloaded
-         * */
-        var imageLocations = [];
-         for (var i = $scope.images.length - 1; i >= 0; i--) {
-             if ($scope.images[i].quantity === 0) {
-                 $scope.images[i].quantity = 1;
-             }
-
-             imageLocations.push($scope.images[i].images.standard_resolution.url);
-        }
-
-        preload(imageLocations);
-    };
-
-    /*
-     * Se encarga de ingresar en el carrito de compras los datos que ya se encuentran 
-     * en el array de imagenes, se guardan todos los tipos de fotos asi como la cantidad de cada una
-     * y se redirecciona la pantalla de confirmacion.
-     * */
-    $scope.addToCart = function () {
-        var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_check_screen"),
-            numOfItems2Print = SelectedImagesFactory.getPrintItemsCount(),
-            numberOfPicksConfirm = {
-                "title" : "Estas segur@?",
-                "template" : "Escogiste "+numOfItems2Print+" imagen(es), pero podés escoger hasta "+SelectedImagesFactory.getProduct().prices.first_items.quantity+ " por el mismo precio.",
-                "cancelText" : "Cancelar",
-                "okText" : "Aceptar"
-            },
-            go2Confirm = function (res) {
-                if (res) {
-                    $state.go("app.confirm");
-                }
-            };
-
-        if(numOfItems2Print >= SelectedImagesFactory.getProduct().prices.first_items.quantity){
-            $ionicPopup.confirm(cache).then(go2Confirm);
-
-        } else {
-            $ionicPopup.confirm(numberOfPicksConfirm).then(function(res){
-                if(res){
-                    $ionicPopup.confirm(cache).then(go2Confirm);
-                }
-            });
-        }
-    };
-
-    init();
-
-}]);
-/**
- * Created   on 30/11/2014.
- */
-controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', 'SelectedImagesFactory', function ($scope, $state, $ionicPopup, Messages, ShoppingCartFactory, SelectedImagesFactory) {
-    var cart = ShoppingCartFactory.loadShoppingCart();
-    /*
-     * Create a new order based on the selected: product line, product, and images
-     * */
-    if (angular.isObject($scope.actualOrder)){
-        $scope.actualOrder = null; // trash collector help
-    }
-
-    $scope.actualOrder = cart.getDummyOrder(
-        SelectedImagesFactory.getProductLine(),
-        SelectedImagesFactory.getProduct(),
-        SelectedImagesFactory.getToPrintOnes()
-    );
-
-    $scope.addToCart = function(){
-        // todo: revisar porque no se estan enviando los parametros por URL hacia el estado app.added
-        var stateParams = {
-                productName: SelectedImagesFactory.getProduct().name
-            },
-            cache;
-
-        cart.addOrder($scope.actualOrder);
-
-        // Checking if the order was saved
-        if(ShoppingCartFactory.saveShoppingCart()) {
-            SelectedImagesFactory.clearSelection();
-            $state.go("app.added",stateParams);
-        } else {
-            var cache = angular.isDefined(cache) ? cache: Messages.search("shopping_cart_full");
-            $ionicPopup.alert(cache);
-        }
-    };
-
-    $scope.url =  $scope.actualOrder.product.slider[0].images;
-    $scope.height = screen.width;
-}]);
-controllers.controller('confirmOrderCtrl', ['$scope', '$state' ,'$ionicPopup','$ionicLoading', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $state, $ionicPopup, $ionicLoading, Messages, ShoppingCartFactory,Payment) {
-    $scope.cart = ShoppingCartFactory.loadShoppingCart();
-
-   console.log($scope.cart);
-
-   window.el = $scope.cart;
-
-   $scope.show = function() {
-        $ionicLoading.show({
-          template: 'Realizando Pago...'
-        });
-    };
-
-    $scope.hide = function(){
-        $ionicLoading.hide();
-    };
-
-   
-   $scope.pay = function(){
-   		$scope.show();
-   		Payment.makePay(1, $scope.cart.customer.firstName, $scope.cart.customer.secondSurname, $scope.cart.payment.type, $scope.cart.payment.card, $scope.cart.payment.month, $scope.cart.payment.year, $scope.cart.computeSubTotal(), $scope.cart.travel.price).then(function(e){
-            $scope.hide();
-            if(e.error != ""){
-                $ionicPopup.alert({
-                    title: 'Error',
-                    template: 'Hubo un error al procesar tu pago, intntalo mas tarde.'
-                });
-            } else {
-            	 
-               $state.go("app.processing-order");
-            }
-        });
-   };
-
-}]);
-/**
- * Created   on 07/12/2014.
- */
-controllers.controller('congratsCtrl', ['clearSelection', function (clearSelection) {
-    clearSelection.clearSelection();
-}]);
-/* InfoCtrl Accordion List
- * $scope - Scope de la pantalla
- */
-
-controllers.controller('infoCtrl', function($scope) {
-
-	$scope.toggleGroup = function(group){
-		if($scope.isGroupShown(group)){
-			$scope.shownGroup = null;
-		}else{ 
-			$scope.shownGroup = group;	
-		}
-	};
-
-	$scope.isGroupShown = function(group){
-		return $scope.shownGroup === group;
-	};
-
-	$scope.shareFb = function(){
-        window.plugins.socialsharing.shareViaFacebook('https://www.facebook.com/pages/Printea/726483530762215?ref=hl')
-    };
-
-    $scope.shareTwitter = function(){
-        window.plugins.socialsharing.shareViaTwitter('http://www.twitter.com/printeaApp')
-    };
-
-    $scope.shareEmail = function(){
-        window.plugins.socialsharing.shareViaEmail('Printea','Printea');
-    };
-
-});
-controllers.controller('InstagramCrtl', ['$scope', '$filter', '$ionicPopup', '$ionicLoading', 'SelectedImagesFactory', 'MessageService', 'InstagramService', 'ImageFactory', 'PhotoSizeChecker', function ($scope, $filter, $ionicPopup, $ionicLoading, SelectedImagesFactory, MessageService, InstagramService, ImageFactory, PhotoSizeChecker) {
-    $scope.loading = false;
-    $scope.imageStack = SelectedImagesFactory.getAll();
-    $scope.canLoadMore = false;
-    $scope.cant = 0;
-
-    $scope.$watch('loading', function(newVal, oldVal) {// for showing and hiding load spinner
-        var cache = angular.isDefined(cache)? cache: MessageService.search("loading");
-        if (newVal !== oldVal) {
-            if (newVal === true) {
-                $ionicLoading.show(cache);
-            } else {
-                $ionicLoading.hide();
-            }
-        }
-    });
-
-    var extractInstagramImages = function(apiResponse) {
-        /*
-         *   Aquí reviso la respuesta que me devolvió Instagram, le quito los videos y
-         *   luego reviso si luego de filtrar lo quedaron  imágenes en caso de que no
-         *   quedaran muestro un mensaje al usuario diciéndole que no tiene imágenes
-         *   que su cuenta de Instagram y lo envió a la pantalla anterior.
-         *   Si hay imágenes las meto al scope para que el usuario decida cuales
-         *   imágenes va a imprimir.
-         * */
-        var filteredResponse = $filter('filter')(apiResponse.data, {type:"image"}),
-            j = filteredResponse.length;
-
-        if (j === 0) {
-            $ionicPopup.alert(MessageService.search("no-images-found")).then(function(){
-                sendUserBackToChoose();
-            });
-        } else {
-            for (var i = 0; i < j; i++) {
-                var img = ImageFactory.getInstagramLoadedImg(filteredResponse[i].images);
-                $scope.imageStack.push(img);
-            }
-        }
-    };
-
-    var getRecentMedia = function(v){
-        /*  Se conecta con la API de Instagram por medio del servicio y trae las
-         *  ultimas imágenes.En caso de que la respuesta de Instagram venga con
-         *  un error (token vencido o alguno otro) Fuerzo al servicio a que haga
-         *  un nuevo log in para refrescar el token.
-         * */
-        $scope.loading = true;
-        InstagramService.getRecentMedia()
-            .then(function(response) {
-                $scope.loading = false;
-                if (response.data.meta.code === 400) { // check if token is expired
-                    authenticateInstagramUser();
-                } else {
-                    extractInstagramImages(response.data);
-                    canLoadMoreImages();
-                }
-            }, function(err) {
-                $scope.loading = false;
-                $ionicPopup.alert(MessageService.search("cannot-load-media"));
-            });
-
-            if(v){
-                $scope.$broadcast('scroll.infiniteScrollComplete');
-            }
-
-    };
-
-    var sendUserBackToChoose = function(){
-        $state.go('app.choose');
-    };
-
-    var havePreviousImages = function () {
-        return (SelectedImagesFactory.getInstagramOnes().length > 0);
-    };
-
-    var authenticateInstagramUser = function (){
-        /*
-        * Muestra la ventana en la que el usuario inicia sesión con su cuenta de Instagram.
-        * si el usario no otorga aceso a la cuenta muestra un mensaje de error y redirecciona
-        * al usuario a la ventana anterior.
-        * */
-        InstagramService.auth()
-            .then(function(result) {
-                getRecentMedia();
-            }, function(err) {
-                $ionicPopup.alert(MessageService.search("user-denied-access")).then(function(){
-                    sendUserBackToChoose();
-                });
-            });
-    };
-
-    var canLoadMoreImages = function(){
-        $scope.canLoadMore = InstagramService.canLoadMore();
-    };
-
-    var init = function(){
-        if (InstagramService.isAuthenticated()){
-            if(havePreviousImages()){
-                canLoadMoreImages();
-            } else {
-                if(InstagramService.hasUserMedia()) {
-                    InstagramService.cleanUserMedia();
-                }
-                getRecentMedia();
-            }
-        } else {
-            authenticateInstagramUser();
-        }
-    };
-
-    $scope.loadMore = getRecentMedia;
-
-    $scope.checkRequirements = function(image){
-        if(image.toPrint === true) {
-            image.toPrint = false;
-        } else {
-            if(PhotoSizeChecker.meetsMinimumRequirements(image, SelectedImagesFactory.getProduct())) {
-                image.toPrint = true;
-            } else {
-                $ionicPopup.alert({
-                    title: 'La imagen es muy pequenna',
-                    template: 'Lo sentimos :( la foto tiene que ser'+
-                    'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
-                    'una impresión de la más alta calidad.'
-                });
-            }
-        }
-    };
-
-    $scope.updateMarker = function() {
-        var cont = 0;
-        angular.forEach($scope.imageStack, function(v){
-            if(v.toPrint)
-                cont = cont + 1;
-        });
-        $scope.cant = cont;
-    };
-
-    $scope.gotoConfirm = function () {
-        if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
-            $state.go('app.photobook-check');
-        } else {
-            $state.go('app.check');
-        }  
-    };
-
-    $scope.checkImage = function(image){
-        image.toPrint = !image.toPrint;
-        $scope.updateMarker();
-    };
-
-    init();
-    $scope.updateMarker();
-}]);
-/**
- * Created by joseph on 25/01/2015.
- */
-controllers.controller('landingCtrl', ['$scope', '$ionicLoading','ShoppingCartFactory','MessageService',function($scope, $ionicLoading, ShoppingCartFactory, MessageService) {
-    $scope.cart = null;
-
-    $ionicLoading.show({
-        template: 'Cargando... '
-    });
-
-    ShoppingCartFactory.load().then(function(e){
-        $scope.cart = e;
-        $ionicLoading.hide();
-    });
-
-}]);
-
-/**
- * Created by joseph on 25/01/2015.
- */
-controllers.controller('photobookCheckCtrl', ['$scope', '$state', '$ionicPopup','SelectedImagesFactory', 'PhotoPrintConfig','MessageService', 'Utils',function($scope, $state, $ionicPopup, SelectedImagesFactory, PhotoPrintConfig, Messages, Utils) {
-    var popup = angular.isDefined(popup) ? popup: Messages.search("photobook_few");
-
-
-    if(SelectedImagesFactory.getProduct().prices.first_items.quantity   !=  SelectedImagesFactory.getToPrintOnes().length){
-        $ionicPopup.alert(popup).then(function(res){
-            window.history.back();
-        });
-    } else {
-        $scope.productLines = PhotoPrintConfig.products;
-        $scope.images = SelectedImagesFactory.getToPrintOnes();
-
-    }
-
-    window.el = SelectedImagesFactory;
-
-    $scope.saveProductLine = function(pProductLine) {
-        SelectedImagesFactory.setProductLine(pProductLine);
-        $state.go("app.category");
-    };
-
-    $scope.mix = function () {
-        $scope.images = Utils.shuffle($scope.images);
-        SelectedImagesFactory.clearAndAdd($scope.images);
-    };
-
-    /*
-     * Se encarga de ingresar en el carrito de compras los datos que ya se encuentran
-     * en el array de imagenes, se guardan todos los tipos de fotos asi como la cantidad de cada una
-     * y se redirecciona la pantalla de confirmacion.
-     * */
-    $scope.addToCart = function () {
-        var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_check_screen");
-        $ionicPopup.confirm(cache).then(function (res) {
-            if (res) {
-                $state.go("app.confirm");
-            }
-        });
-
-    };
-}]);
-
-
-controllers.controller('photobookCoverCtrl', ['$scope', '$state', '$ionicPopup','SelectedImagesFactory', 'PhotoPrintConfig','MessageService', 'Utils',function($scope, $state, $ionicPopup, SelectedImagesFactory, PhotoPrintConfig, Messages, Utils) {
-    $scope.productLines = PhotoPrintConfig.products;
-    $scope.images = SelectedImagesFactory.getToPrintOnes();
-
-    $scope.saveProductLine = function(pProductLine) {
-        SelectedImagesFactory.setProductLine(pProductLine);
-        $state.go("app.category");
-    };
-
-    $scope.mix = function () {
-        $scope.images = Utils.shuffle($scope.images);
-        SelectedImagesFactory.clearAndAdd($scope.images);
-    };
-
-    $scope.range = function(){
-        var el = [];
-        for(var x = 0; x > 9; x ++){
-            el.push($scope.images[x]);
-        }
-        window.i = el;
-        console.log(el);
-        return el;
-    };
-
-    /*
-     * Se encarga de ingresar en el carrito de compras los datos que ya se encuentran 
-     * en el array de imagenes, se guardan todos los tipos de fotos asi como la cantidad de cada una
-     * y se redirecciona la pantalla de confirmacion.
-     * */
-    $scope.addToCart = function () {
-        var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_check_screen");
-            $ionicPopup.confirm(cache).then(function (res) {
-                if (res) {
-                    $state.go("app.confirm");
-                }
-            });
-
-    };
-}]);
-
-/**
- * Created by joseph on 25/01/2015.
- */
-controllers.controller('photoCrtl', ['$scope', '$state', '$ionicPopup', '$timeout', '$window', 'MessageService','SelectedImagesFactory',function($scope, $state, $ionicPopup, $timeout, $window, Messages, SelectedImagesFactory) {
-    var cache = angular.isDefined(cache) ? cache: Messages.search("photobook_alert");
-
-    $scope.product = SelectedImagesFactory.getProduct();
-    $scope.height = screen.width;
-
-    if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
-        $ionicPopup.alert(cache);
-        $timeout(function () {
-            angular.element(".popup").addClass("photobook-popup");
-        },1000);
-        console.log("get");
-    }
-
-
-}]);
-/**
- * Created   on 30/11/2014.
- */
-controllers.controller('PhotoEditCtrl', ['$scope', '$stateParams', '$state', 'SelectedImagesFactory', function ($scope, $stateParams, $state, SelectedImagesFactory) {
-    $scope.image = SelectedImagesFactory.getOne($stateParams.id);
-    $scope.sResolution = $scope.image.images.standard_resolution;
-
-    var selectedProduct = SelectedImagesFactory.getProduct(),
-        drkr;
-
-    $scope.darkroomInit = function(){
-        drkr = new Darkroom('#editableImage', {
-            // minWidth: selectedProduct.pixel_size.minimum.width,
-            // minHeight: selectedProduct.pixel_size.minimum.height,
-            maxWidth: angular.element('.canvas').width(),
-            plugins: {
-                crop: {
-                    ratio: ($scope.sResolution.width/$scope.sResolution.height)
-                },
-                save: false
-            },
-            init: function(){
-                var cropPlugin = this.getPlugin('crop'),
-                    optimalWidth = selectedProduct.pixel_size.optimal.width,
-                    optimalHeight = selectedProduct.pixel_size.optimal.height;
-                cropPlugin.selectZone(
-                    (this.image.width-optimalWidth)/2,
-                    (this.image.height-optimalHeight)/2,
-                    optimalWidth,
-                    optimalHeight
-                );
-            }
-        });
-    };
-
-    $scope.done = function(){
-        $scope.sResolution.url = drkr.snapshotImage();
-        drkr.selfDestroy();
-        $state.go('app.check');
-    };
-}]);
-controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
-    $scope.imageStack = SelectedImagesFactory.getAll();
-    $scope.galleries = SelectedImagesFactory.getGallery();
-
-    //$scope.phoneImageLoad = function () {
-    //    CordovaCameraService.getImage().then(function (result) {
-    //        var img = ImageFactory.getPhoneLoadedImg(result);
-    //        img.imageInit().then(function(result){
-    //            if(PhotoSizeChecker.meetsMinimumRequirements(result, SelectedImagesFactory.getProduct())){
-    //                $scope.imageStack.push(result);
-    //            } else {
-    //                $ionicPopup.alert({
-    //                    title: 'La imagen es muy pequenna',
-    //                    template: 'Lo sentimos :( la foto tiene que ser'+
-    //                    'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
-    //                    'una impresión de la más alta calidad.'
-    //                });
-    //            }
-    //        });
-    //    });ionicLoading
-    //};
-
-    $scope.go = function(obj){
-        SelectedImagesFactory.setCurrentGallery(obj);
-        $state.go('app.album');
-    };
-
-    $scope.gotoConfirm = function () {
-
-        if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
-            $state.go('app.photobook-check');
-        } else {
-            $state.go('app.check');
-        }
-        
-    };
-
-    var init = function () {
-        $ionicLoading.show({
-            template: 'Estamos cargando tus fotos<br> esto puede tardar unos minutos... '
-        });
-        FileReader.scanFileSystem().then(function(res) {
-            window.res = res;
-            $scope.galleries = res;
-            SelectedImagesFactory.setGallery(res);
-            $ionicLoading.hide();
-        });
-    };
-
-    if($scope.galleries.length == 0){
-        init();
-    }
-
-}]);
-
-
-controllers.controller('albumCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
-    $scope.cant = 0;
-    $scope.getCurrentGallery = SelectedImagesFactory.getCurrentGallery();
-    $scope.imageStack = SelectedImagesFactory.getAll();
-    $scope.height = screen.width / 3;
-
-    $scope.updateMarker = function() {
-        var cont = 0;
-        angular.forEach($scope.imageStack, function(v){
-            if(v.toPrint)
-                cont = cont + 1;
-        });
-        $scope.cant = cont;
-    };
-
-    $scope.checkImage = function(image){
-        image.toPrint = !image.toPrint;
-        $scope.updateMarker();
-    };
-
-    $scope.updateMarker();
-}]);
-controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$sce', 'SelectedImagesFactory','StorageService','ShoppingCartFactory', 'MessageService', 'Utils', 'Processing', function($scope, $state, $ionicLoading, $sce, SelectedImagesFactory, StorageService, ShoppingCartFactory, Messages, Utils, Processing) {
-
-    $scope.market = ShoppingCartFactory.loadShoppingCart();
-    $scope.images = SelectedImagesFactory.getToPrintOnes();
-    $scope.all = 0;
-    $scope.initial = 0;
-    $scope.progress = 0;
-    var data = '';
-
-    window.el = $scope.market;
-
-    var prefix = "data:image/png;base64,",
-        cache = angular.isDefined(cache) ? cache: Messages.search("processing"),
-        uploading = angular.isDefined(uploading) ? uploading : Messages.search();
-        photos = 0,
-        cont = 0;
-
-
-    $scope.range = function(n) {
-        return new Array(n);
-    };
-
-    // Prepating photos
-    var preparePhotos = function(url){
-        var el = [];
-        $ionicLoading.show(cache);
-
-        // $scope.market.orders[0].items[0].images.standard_resolution.url
-        for(var x = 0; x < $scope.market.orders.length; x++){
-            for(var y = 0; y < $scope.market.orders[x].items.length; y++){
-                $scope.all = $scope.all + $scope.market.orders[x].items[y].quantity;
-                if ($scope.market.orders[x].items[y].images.standard_resolution.url.indexOf(prefix) == -1) {
-                    console.log($scope.market.orders[x].items[y].images.standard_resolution.url);
-                    photos = photos + 1;
-                    el.push({x:x, y:y});
-                } //Close of if
-            }
-        }
-
-        if (el.length < 0 ) {
-            $ionicLoading.hide();
-            createAjaxCall();
-        } else {
-            window.p = [];
-            angular.forEach(el, function(v){
-                Utils.getImageDataURL($scope.market.orders[v.x].items[v.y].images.standard_resolution.url, v.x, v.y).then(function(e){
-                    p.push(e.data);
-                    cont = cont + 1;
-                    $scope.market.orders[e.x].items[e.y].images.standard_resolution.url = e.data;
-                    if(cont == el.length){
-                        $ionicLoading.hide();
-                        createAjaxCall();
-                    }
-                });
-            });
-        }
-
-    };
-
-    var createAjaxCall = function() {
-        var formData = new FormData();
-
-        for(var x = 0; x < $scope.market.orders.length; x++){
-            for(var y = 0; y < $scope.market.orders[x].items.length; y++){
-                var blob = Processing.dataURItoBlob($scope.market.orders[x].items[y].images.standard_resolution.url);
-                formData.append('images[]', blob);      
-                formData.append('category[]', $scope.market.orders[x].productLine.name+"_"+$scope.market.orders[x].product.name);          
-            }
-        }
-
-        formData.append('data',$scope.market.customer.name+"_"+$scope.market.customer.secondSurname);
-        
-        Processing.upload(formData).then(function(e){
-            console.log(e)
-            setTimeout(function(){$state.go('app.order-sent');});
-            StorageService.clear();
-        }, function(e) {
-            alert('Ha habido un error, vamos a intentarlo de nuevo');
-        }, function(e){
-            $scope.initial = Math.floor($scope.all * e);
-        });
-    };
-
-    preparePhotos();
-
-}]);
-
-
-controllers.controller('productCrtl', ['$scope', '$state', 'SelectedImagesFactory', 'PhotoPrintConfig', function($scope, $state, SelectedImagesFactory, PhotoPrintConfig) {
-	$scope.productLines = PhotoPrintConfig.products;
-	$scope.saveProductLine = function(pProductLine) {
-		SelectedImagesFactory.setProductLine(pProductLine);
-		$state.go("app.category");
-	};
-}]);
-
-
-
-
-
-controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
-    
-    
-});
 models.factory('ImageFactory', ['$q', function ($q) {
     function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
         this.origin = pOrigin;
@@ -3440,8 +3448,8 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', 'SelectedImages
             phoneLoadedImg = ImageFactory.getPhoneLoadedImg(fileEntry.nativeURL);
 
             //phoneLoadedImg.imageInit().then(function (img) {
-            addImage2Gallery(fileEntry, phoneLoadedImg);
-            deferred.resolve(fileEntry.nativeURL);
+                addImage2Gallery(fileEntry, phoneLoadedImg);
+                deferred.resolve(fileEntry.nativeURL);
             //});
 
         return deferred.promise;
@@ -3859,7 +3867,7 @@ services.service('Processing', ['$http', '$q', function ($http, $q) {
 			processData: false,
 			data: formData, 
 			error: function(e){defer.reject(e)}, 
-			success: function(e){console.log(e);defer.resolve(e)},
+			success: function(e){defer.resolve(e)},
 			url: url, 
 			type: "POST",
 			xhr : function () {
@@ -3869,9 +3877,6 @@ services.service('Processing', ['$http', '$q', function ($http, $q) {
 		                var percentComplete = evt.loaded / evt.total;
 		                console.log(percentComplete);
 		                defer.notify(percentComplete);
-		                if (percentComplete === 1) {
-		                    defer.resolve(true);
-		                }
 		            }
 		        }, false);
 		        return xhr;

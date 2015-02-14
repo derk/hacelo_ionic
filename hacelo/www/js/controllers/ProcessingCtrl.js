@@ -71,9 +71,17 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
         formData.append('data',$scope.market.customer.name+"_"+$scope.market.customer.secondSurname);
         
         Processing.upload(formData).then(function(e){
-            console.log(e)
-            setTimeout(function(){$state.go('app.order-sent');});
-            StorageService.clear();
+            window.e = e;
+            var response = angular.fromJson(e);
+
+            if(response.data === 'ok'){
+                setTimeout(function(){$state.go('app.order-sent');});
+                StorageService.clear();
+            } else {
+                alert("Ha ocurrido un error interno.");
+            }
+
+            
         }, function(e) {
             alert('Ha habido un error, vamos a intentarlo de nuevo');
         }, function(e){
