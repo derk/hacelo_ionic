@@ -25,7 +25,7 @@ $stable:                          #f8f8f8 !default;
 $positive:                        #4a87ee !default;
 $calm:                            #43cee6 !default;
 $balanced:                        #66cc33 !default;
-$energized:                       #f0b840 !default;
+$energized:                       #f0b840 !default; 
 $assertive:                       #ef4e3a !default;
 $royal:                           #8a6de9 !default;
 $dark:                            #444 !default;
@@ -93,6 +93,7 @@ body{
     background-color: $lightOrange;
     font-weight: bold;
     border-radius: 0;
+    opacity: 0.9;
 }
 
 .button.button-light{
@@ -326,6 +327,7 @@ body{
             margin: 10px;
             padding: 0;
             &.activated {
+                background: $lightOrange;
                 opacity: 0.5;
             }
 
@@ -536,9 +538,12 @@ body{
             text-align: left;
             overflow: hidden;
             font-style: italic;
-            text-transform: capitalize;
+            text-transform: none;
             border: none;
             color: $grey;
+            ul{
+                margin: 20px;
+            }
             p{
                 line-height: 18px;
                 text-overflow: initial;
@@ -549,19 +554,33 @@ body{
                 }
                 &.question{
                     color: $lightOrange;
-                    font-size: 14pt;
+                    font-weight: 700;
                     overflow:initial;
                     font-style: italic;
                 }
                 &.answer{
                     margin-bottom: 12%;
                     a{
-                        color: $orange;
+                        color: $lightGreen;
                         display: block;
                         margin: auto;
                         width: 65%;
                         text-align: center;
+                        text-decoration: initial;
                     }
+                }
+            }
+            ul.list-price{
+                li{
+                    list-style-type: none;
+                    list-style-position: inside;
+                    white-space: normal;
+                    text-overflow: inherit;
+                    border: none;
+                    font-size: 0.9em;
+                    line-height: 18px;
+                    text-align: center;
+                    font-style: normal;
                 }
             }
             ul.list{
@@ -626,7 +645,7 @@ body{
                 margin-top: 5%;
                 margin-bottom: 8%;
                 display: block;
-                border-color: $lightOrange;
+                border-color: $black;
                 font-style: italic;
                 input, textarea{
                    color: $lightOrange;
@@ -641,10 +660,11 @@ body{
                 }
             }
             button{
-                background: $lightOrange;
+                background: $lightGreen;
                 text-transform: capitalize;
                 color: #FFF;
                 font-weight: bold;
+                border: none;
             }
         }//item-accordion
 
