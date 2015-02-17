@@ -84,6 +84,7 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
             
         }, function(e) {
             alert('Ha habido un error, vamos a intentarlo de nuevo');
+            preparePhotos();
         }, function(e){
             $scope.initial = Math.floor($scope.all * e);
         });

@@ -83,7 +83,7 @@ body{
 }
 
 .button{
-    text-transform: capitalize;
+    /*text-transform: capitalize;*/
     font-family: Arial;
     font-weight: bold;
 }
@@ -118,7 +118,7 @@ body{
     display: inline-block;
     padding: 3% 0;
     margin-bottom: 0.5%;
-    text-transform: capitalize;
+    /*text-transform: capitalize;*/
     letter-spacing: 2px;
 }
 
@@ -277,7 +277,7 @@ body{
                 width: 90%;
                 display: inline-block;
                 margin: 3% 5%;
-                text-transform: capitalize;
+                /*text-transform: capitalize;*/
                 float: left;
                 text-align: center;
                 font-weight: bold;
@@ -400,7 +400,7 @@ body{
             background: #FFF;
             box-shadow: none;
             p {
-                text-transform: capitalize;
+                /*text-transform: capitalize;*/
                 font-size: 0.9em;
                 padding: 0.5% 0;
                 color: $darkerGrey;
@@ -515,7 +515,7 @@ body{
 
 .info-container{
     text-align: center;
-    text-transform: capitalize;
+    /*text-transform: capitalize;*/
     position: relative;
 
     .item{
@@ -661,7 +661,7 @@ body{
             }
             button{
                 background: $lightGreen;
-                text-transform: capitalize;
+                /*text-transform: capitalize;*/
                 color: #FFF;
                 font-weight: bold;
                 border: none;
@@ -687,7 +687,7 @@ body{
 .confirm-page{
      .confirm-container {
         text-align: center;
-        text-transform: capitalize;
+        /*text-transform: capitalize;*/
         position: relative;
         .photo-cover {
             background: url('../img/bg-fotos.jpg') no-repeat center center;
@@ -723,7 +723,7 @@ body{
 .added-page{
     .added-cart {
         background: $lightOrange;
-        text-transform: capitalize;
+        /*text-transform: capitalize;*/
         text-align: center;
         color: #FFF;
         h3:first-child {
@@ -770,7 +770,7 @@ body{
    }
    .cart-container {
         text-align: center;
-        text-transform: capitalize;
+        /*text-transform: capitalize;*/
         .photo-cover{
             width: 100%;
             height: 155px;
@@ -933,7 +933,7 @@ body{
                     min-height: 32px;
                     width: 60%;
                     background: $orange;
-                    text-transform: capitalize;
+                    /*text-transform: capitalize;*/
                     font-size: 0.8em;
                     margin: auto;
                 }
@@ -959,7 +959,7 @@ body{
        .button-balanced {
             display: block;
             width: 92%;
-            text-transform: capitalize;
+            /*text-transform: capitalize;*/
             font-size: 1.2em;
             line-height: 40px;
             position: absolute;
@@ -981,7 +981,7 @@ body{
     .cart-checkout-container {
         margin: 3% 0;
         color: $text-grey;
-        text-transform: capitalize;
+        /*text-transform: capitalize;*/
         ul {
             margin: 0 3%;
             li {
@@ -1036,7 +1036,7 @@ body{
                     border: none;
                     button{
                         margin-bottom: 0;
-                        text-transform: capitalize;
+                        /*text-transform: capitalize;*/
                         margin-top: 0;
                         font-weight: bold;
                     }   
@@ -1092,7 +1092,7 @@ body{
    =============  cart-empty page  ============= 
 */
  .cart-empty-container {
-    text-transform: capitalize;
+    /*text-transform: capitalize;*/
     //REPLACE FOR THE IMAGE 
     .image {
         width: 100%;
@@ -1158,7 +1158,7 @@ body{
                     border: 0;
                     width: 100%;
                     color: $text-grey;
-                    text-transform: capitalize;
+                    /*text-transform: capitalize;*/
                 }
             }
             &.date{
@@ -1213,7 +1213,7 @@ body{
                         text-align: center;
                         font-weight: bold;
                         font-size: 0.8em;
-                        text-transform: capitalize;
+                        /*text-transform: capitalize;*/
                     }
                 }
                 &:last-child{
@@ -1229,7 +1229,7 @@ body{
                 padding: 2%;
                 border: 1px solid $borderColor;
                 span{
-                    text-transform: capitalize;
+                    /*text-transform: capitalize;*/
                     font-size: 0.6em;
                     color: $text-grey;
                 }
@@ -1282,7 +1282,7 @@ body{
 
         a.button{
             width: 91%;
-            text-transform: capitalize;
+            /*text-transform: capitalize;*/
             padding: 0;
             position: absolute;
             bottom: 5%;
@@ -1298,7 +1298,7 @@ body{
 */
 
 .processing-order-container{
-    text-transform: capitalize;
+    /*text-transform: capitalize;*/
     font-family: verdana;
     .loading{
         background: $red;
@@ -1340,7 +1340,7 @@ body{
         background: $green !important;    
     }
     .order-sent-container{
-        text-transform: capitalize;
+        /*text-transform: capitalize;*/
         font-family: verdana;
         margin-top: 5%;
         h2{ 
@@ -1366,18 +1366,30 @@ body{
         div.image{
             background: #ccc;
             width: 94%;
-            height: 150px;
             margin: 0 auto 10%;
+            text-align: center;
+            img {
+                width: 60%;
+            }
+        }
+        P.message {
+            color: $white;
         }
         a.button{
             width: 98%;
             margin: auto;
             display: block;
             min-height: 42px;
-            text-transform: capitalize;
+            /*text-transform: capitalize;*/
             font-family: verdana;
             font-size: 1.2em;
             padding: 5px;
+            background: $blue !important;
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            margin: auto;
         }
     }
 }
@@ -1405,13 +1417,13 @@ body{
         display: block;
         float: none;
         margin-bottom: 1px;
-        text-transform: capitalize;
+        /*text-transform: capitalize;*/
         padding: 5px;
         font-size: 1.15em;
     }
     div.buttons{
         a{
-            text-transform: capitalize;
+            /*text-transform: capitalize;*/
             padding: 5px;
         }
         &.socialbtns{
@@ -1449,7 +1461,7 @@ body{
 */
  .congrats-page {
     background: $lightOrange;
-    text-transform: capitalize;
+    /*text-transform: capitalize;*/
     h2 {
         margin-top: 10%;
         text-align: center;
@@ -1617,7 +1629,7 @@ body{
 
 .photobook-page{
     background: $lightOrange;
-    text-transform: capitalize;
+    /*text-transform: capitalize;*/
     color: #FFF;
     h3{
         color: #FFF;
@@ -1722,7 +1734,7 @@ body{
     border: 6px solid $blue;
 
     .popup-head {
-        background: #0E619A;
+        background: $blue;
         padding: 5px 10px;
 
         .popup-title {

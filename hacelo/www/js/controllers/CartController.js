@@ -1,7 +1,7 @@
 /**
  * Created   on 30/11/2014.
  */
-controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $ionicPopup, Messages, ShoppingCartFactory,Payment) {
+controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', 'CartService', function($scope, $ionicPopup, Messages, ShoppingCartFactory,Payment,CartService) {
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
     console.log($scope.cart);
     $scope.removeOrder = function (pOrderToRemove) {
@@ -17,6 +17,12 @@ controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', '
 
     $scope.minus = function(order){
 
+    };
+
+    $scope.validate = function() {
+        CartService.redeem('dasdasdsa').then(function(e){
+            console.log(e);
+        });
     };
 
 }]);
