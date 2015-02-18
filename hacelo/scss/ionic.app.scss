@@ -907,6 +907,7 @@ body{
                 border-color: $borderColor;
                 input{
                     height: 25px;
+                    text-align: center;
                 }
                 .img{
                     background-repeat: no-repeat;
@@ -920,6 +921,11 @@ body{
                     &.invalid{
                         background: url('../img/small-arrows-sprite.png') -57px 0;
                         background-size: 120px 23px;
+                        width: 24px;
+                    }
+                    &.loading {
+                        background: url('../img/loading.gif') no-repeat 0 0;
+                        background-size: 24px 24px;
                         width: 24px;
                     }
                 }
@@ -1248,7 +1254,7 @@ body{
         }
 
         .product-to-pay {
-            width: 65%;
+            width: 80%;
             float: left;
             color: white;
         }
