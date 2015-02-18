@@ -3,7 +3,10 @@
  */
 controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', 'CartService', function($scope, $ionicPopup, Messages, ShoppingCartFactory,Payment,CartService) {
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
+    $scope.discount = {valid: false, class : ''};
+    $scope.coupon = '';
     console.log($scope.cart);
+
     $scope.removeOrder = function (pOrderToRemove) {
         var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_order_delete"),
             confirmPopup = $ionicPopup.confirm(cache);
@@ -19,10 +22,25 @@ controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', '
 
     };
 
-    $scope.validate = function() {
-        CartService.redeem('dasdasdsa').then(function(e){
-            console.log(e);
+    $scope.validate = function(code) {
+
+        $scope.discount = {valid: false, class : 'loading'};
+        CartService.redeem(code).then(function(e){
+            if (e.hasError) {
+                $scope.discount = {valid: false, class : 'invalid'};
+            } else {
+                $scope.discount = {valid: true, class : 'valid', code: code};
+            }
+        }, function(e){
+             $scope.discount = {valid: false, class : 'invalid'};
         });
+    
+    };
+
+    $scope.checkCoupon = function (coupon) {
+        if ($scope.discount.valid) {
+                ShoppingCartFactory.saveCoupon($scope.discount.code, 1000);
+        }   
     };
 
 }]);

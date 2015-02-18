@@ -97,6 +97,10 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             type: ""
         };
 
+        this.coupon = {
+            code: "",
+            price: 0
+        };
         // ---
         // PUBLIC METHODS.
         // ---
@@ -271,6 +275,15 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
                 price : money
             };
   
+            this.saveShoppingCart();
+        },
+
+        saveCoupon : function (coupon, discount) {
+            shoppingCart.coupon = {
+                code: coupon,
+                price: discount
+            };
+
             this.saveShoppingCart();
         },
 

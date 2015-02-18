@@ -39,8 +39,14 @@
 	    <div class="product-to-pay">
 	    	<h3 class="photos">Transporte</h3>
 			<h4 class="total">&#8353; {{cart.travel.price}}</h4>
-	    </div>	
-	    <h4 class="total total-full">TOTAL = &#8353;{{cart.getTotal()}}</h4>
+	    </div>
+
+	    <div class="product-to-pay" ng-if="cart.coupon.price != 0">
+	    	<h3 class="photos">Descuento</h3>
+			<h4 class="total">&#8353; {{cart.coupon.price}}</h4>
+	    </div>
+
+	    <h4 class="total total-full">TOTAL = &#8353;{{cart.getTotal() - cart.coupon.price}}</h4>
 		
 		<a class="button button-balanced" ng-click="pay()">Realizar Pedido</a>
 	</ion-footer-bar>

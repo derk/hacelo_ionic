@@ -1739,7 +1739,10 @@ controllers.controller('addedCtrl', ['$scope', '$stateParams', function ($scope,
  */
 controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', 'ShoppingCartFactory','Payment', 'CartService', function($scope, $ionicPopup, Messages, ShoppingCartFactory,Payment,CartService) {
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
+    $scope.discount = {valid: false, class : ''};
+    $scope.coupon = '';
     console.log($scope.cart);
+
     $scope.removeOrder = function (pOrderToRemove) {
         var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_order_delete"),
             confirmPopup = $ionicPopup.confirm(cache);
@@ -1755,10 +1758,25 @@ controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', '
 
     };
 
-    $scope.validate = function() {
-        CartService.redeem('dasdasdsa').then(function(e){
-            console.log(e);
+    $scope.validate = function(code) {
+
+        $scope.discount = {valid: false, class : 'loading'};
+        CartService.redeem(code).then(function(e){
+            if (e.hasError) {
+                $scope.discount = {valid: false, class : 'invalid'};
+            } else {
+                $scope.discount = {valid: true, class : 'valid', code: code};
+            }
+        }, function(e){
+             $scope.discount = {valid: false, class : 'invalid'};
         });
+    
+    };
+
+    $scope.checkCoupon = function (coupon) {
+        if ($scope.discount.valid) {
+                ShoppingCartFactory.saveCoupon($scope.discount.code, 1000);
+        }   
     };
 
 }]);
@@ -2048,7 +2066,7 @@ controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'Messa
     $scope.url =  $scope.actualOrder.product.slider[0].images;
     $scope.height = screen.width;
 }]);
-controllers.controller('confirmOrderCtrl', ['$scope', '$state' ,'$ionicPopup','$ionicLoading', 'MessageService', 'ShoppingCartFactory','Payment', function($scope, $state, $ionicPopup, $ionicLoading, Messages, ShoppingCartFactory,Payment) {
+controllers.controller('confirmOrderCtrl', ['$scope', '$state' ,'$ionicPopup','$ionicLoading', 'MessageService', 'ShoppingCartFactory','Payment','CartService', function($scope, $state, $ionicPopup, $ionicLoading, Messages, ShoppingCartFactory,Payment, CartService) {
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
 
    console.log($scope.cart);
@@ -2068,18 +2086,29 @@ controllers.controller('confirmOrderCtrl', ['$scope', '$state' ,'$ionicPopup','$
    
    $scope.pay = function(){
    		$scope.show();
-   		Payment.makePay(1, $scope.cart.customer.firstName, $scope.cart.customer.secondSurname, $scope.cart.payment.type, $scope.cart.payment.card, $scope.cart.payment.month, $scope.cart.payment.year, $scope.cart.computeSubTotal(), $scope.cart.travel.price).then(function(e){
-            $scope.hide();
-            if(e.error != ""){
-                $ionicPopup.alert({
-                    title: 'Error',
-                    template: 'Hubo un error al procesar tu pago, intntalo mas tarde.'
-                });
-            } else {
-            	 
-               $state.go("app.processing-order");
-            }
-        });
+      if (angular.isDefined($scope.cart.coupon.code) && $scope.cart.coupon.code != "")  {
+          CartService.redeem($scope.cart.coupon.code, true).then(function(e){
+            console.log(e);
+            $scope.payment();           
+          });
+      } else {
+          $scope.payment();           
+      }
+         
+   };
+
+   $scope.payment = function () {
+      Payment.makePay(1, $scope.cart.customer.firstName, $scope.cart.customer.secondSurname, $scope.cart.payment.type, $scope.cart.payment.card, $scope.cart.payment.month, $scope.cart.payment.year, $scope.cart.computeSubTotal(), $scope.cart.travel.price, $scope.cart.coupon.price | 0).then(function(e){
+        $scope.hide();
+        if(e.error != ""){
+          $ionicPopup.alert({
+            title: 'Error',
+            template: 'Hubo un error al procesar tu pago, intentalo mas tarde.'
+          });
+        } else {
+            $state.go("app.processing-order");
+        }
+      });
    };
 
 }]);
@@ -2646,860 +2675,6 @@ directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $tim
         }
     };
 }]);
-services.service('CartService', ['$http', '$q', function ($http, $q) {
-    // Private stuff
-
-    var api = "http://www.codabi.com/api/e1eadb3ffeca4f8788be5b7355d2517d/"
-    this.redeem = function (code) {
-        var defer = $q.defer();
-
-        $http.get(api + code +"/eat/")
-            .success(function(e){
-                defer.resolve(e);
-            }).error(function(e){
-                defer.resolve(false);
-            });
-
-        return defer.promise;
-    };
-
-}]);
-services.service('CordovaCameraService', ['$window','$q', function ($window,$q) {
-    var cam,
-        cameraOptions,
-        init = function() {
-            cam = $window.navigator.camera;
-            cameraOptions = {
-                quality : 100,
-                destinationType : cam.DestinationType.FILE_URI,
-                sourceType : cam.PictureSourceType.PHOTOLIBRARY,
-                /*allowEdit : true,
-                encodingType: Camera.EncodingType.JPEG,
-                targetWidth: 100,
-                targetHeight: 100,
-                popoverOptions: CameraPopoverOptions,
-                saveToPhotoAlbum: false*/
-            };
-        };
-
-    this.getImage = function() {
-        var q = $q.defer();
-        cam.getPicture(function(result) {
-            q.resolve(result);
-        }, function(result) {
-            q.reject(result);
-        }, cameraOptions);
-
-        return q.promise;
-    };
-
-    // wait until the device is ready to setup everything
-    ionic.Platform.ready(init);
-}]);
-
-services.service('FileReader', ['$window', '$q', 'ImageFactory', 'SelectedImagesFactory', function ($window, $q, ImageFactory, SelectedImagesFactory){
-    var processFolder;
-    var galleries = [];
-    var cont = 1;
-    var imageStack = SelectedImagesFactory.getAll();
-    /**
-     * Helper of processFolder
-     * Filter the given entries list.
-     * Remove any entry that we are not interested to work.
-     * @param  {Array : array to process}
-     * @return {Array : filtered array}
-     */
-    var removeInvalidEntries = function (list2Clean){
-        var clean = [],
-            len = list2Clean.length;
-
-        for (var i=0; i < len; i++) {
-            var valid = !0; // flag that indicate if this entry is valid
-
-            //==================== Start entry validations ====================
-
-            if (list2Clean[i].isFile) {// validations for files ONLY
-
-                // remove any file that is not an image
-                if ( (/\.(?:jpg|jpeg|png)$/i).test(list2Clean[i].name) === !1 ) {valid = !1;}
-
-            } else if (list2Clean[i].isDirectory) {// validations for directories ONLY
-
-                // remove any folder named `Android`. This is because this folder holds many cache images
-                if (list2Clean[i].name === 'Android') {valid = !1;}
-
-            }
-            // both files and directory validations
-
-            // Remove any item that is hidden.
-            if ( list2Clean[i].name.charAt(0) === '.' ) {valid = !1;}
-
-            //==================== End entry validations ====================
-
-            if(valid) {
-                clean.push(list2Clean[i]);
-            }
-        }
-        list2Clean = null; // garbage collector help
-        return clean;
-    };
-
-    var firstItems = function (list2Clean) {
-        var clean = [],
-            len = list2Clean.length;
-
-        window.list = list2Clean;
-
-        for (var i=0; i < len; i++) {
-            var valid = !0; // flag that indicate if this entry is valid
-
-            //==================== Start entry validations ====================
-
-            if (list2Clean[i].isFile) {// validations for files ONLY
-
-                // remove any file that is not an image
-                if ( (/\.(?:jpg|jpeg|png)$/i).test(list2Clean[i].name) === !1 ) {valid = !1;}
-
-            } else if (list2Clean[i].isDirectory) {// validations for directories ONLY
-
-                // remove any folder named `Android`. This is because this folder holds many cache images
-                if (list2Clean[i].name === 'Android') {
-                        valid = !1;
-                }
-
-                if (list2Clean[i].name == 'Pictures' || list2Clean[i].name == 'DCIM'){
-                    valid = !0;
-                } else {
-                    valid = !1;
-                }
-
-            }
-            // both files and directory validations
-
-            // Remove any item that is hidden.
-            if ( list2Clean[i].name.charAt(0) === '.' ) {valid = !1;}
-
-            //==================== End entry validations ====================
-
-            if(valid) {
-                clean.push(list2Clean[i]);
-            }
-        }
-        list2Clean = null; // garbage collector help
-        console.log(clean);
-        return clean;
-    };
-
-    /**
-     * Helper of processImage
-     * This function takes care of checking if the given image
-     * gallery of which it belong and needs to be added to it.
-     * If there no gallery with that name, a new one will be created
-     * 
-     * @param {FileEntry : to extract the gallery name}
-     * @param {PhoneLoadedImage : instance of the image, will be used later by the UI}
-     */
-    var addImage2Gallery = function (fileEntry, phoneLoadedImg) {
-        var galleryName = fileEntry.fullPath.split('/').slice(-2)[0],
-            galleryExists = false,
-            galleryIndex = 0;
-
-        for (var i=0; i < galleries.length; i++){
-            if (galleries[i].name === galleryName) {
-                galleryExists = true;
-                galleryIndex = i;
-            }
-        }
-        if (galleryExists === false)  {
-            galleries.push({
-                name: galleryName,
-                images: []
-            });
-            galleryIndex = galleries.length-1;
-        }
-        phoneLoadedImg.gallery = galleryName;
-        imageStack.push(phoneLoadedImg);
-        galleries[galleryIndex].images.push(phoneLoadedImg);
-      //  console.log();
-    };
-
-    /**
-     * Helper of processFolder
-     * Check if this image has a valid size
-     * because we don't want to have an image with something like
-     * 10px of width and 30px of height.
-     * If the file pass the check is added to the gallery list as an PhoneLoadedImg object
-     * */
-    var processImage = function (fileEntry) {
-        var deferred = $q.defer(),
-            phoneLoadedImg = ImageFactory.getPhoneLoadedImg(fileEntry.nativeURL);
-
-            // phoneLoadedImg.imageInit().then(function (img) {
-                    addImage2Gallery(fileEntry, phoneLoadedImg);
-                    deferred.resolve(fileEntry.nativeURL);
-            // });
-
-        return deferred.promise;
-    };
-
-    var processFolder = function (dirEntry) {
-        var deferred = $q.defer();
-
-        dirEntry.createReader().readEntries(function (dirtyEntries) {
-            if(cont == 1){
-                console.log(firstItems(dirtyEntries));
-                var cleanEntries = firstItems(dirtyEntries);
-                window.e = dirtyEntries;
-                cont = 0;
-            } else {
-                var cleanEntries = removeInvalidEntries(dirtyEntries);
-            }
-            if(cleanEntries.length===0) {
-                return deferred.resolve(dirEntry);
-            }
-
-            async.each(cleanEntries, function (entry, callback) {
-                var successCB = function () {
-                    callback();
-                };
-
-                if (entry.isFile) {
-                    processImage(entry).then(successCB);
-
-                } else if (entry.isDirectory) {
-                    processFolder(entry).then(successCB);
-                }
-
-            }, function (err) {
-                deferred.resolve(dirEntry);
-            });
-
-        }, Log('Unable to read entries of: ' + dirEntry.name));
-
-        return deferred.promise;
-    };
-
-    /**
-     * Kick start
-     * Request access to the file system an then start the scanning process
-     * */
-    this.scanFileSystem = function () {
-        var deferred = $q.defer();
-
-        fileSystemSingleton.load(function (fileSystem){
-            processFolder(fileSystem.root).then(function (res) {
-                deferred.resolve(galleries);
-            });
-        }, Log('Unable to get access to the FileSystem'));
-
-        return deferred.promise;
-    };
-
-}]);
-
-services.service('InstagramService', ['$http', '$window', '$q', function ($http, $window, $q) {
-    var self = this,
-        vault = {
-            user: undefined,
-            userMedia: undefined,
-            accessToken: undefined
-        },
-        config = {
-            clientId: '70a2ae9262fc4805a5571e8036695a4d',
-            redirectUri: 'http://www.wikipedia.org/',
-            apiUrl: 'https://api.instagram.com/v1/',
-            oauthUrl: 'https://instagram.com/oauth/authorize/?',
-            scope: 'basic'
-        };
-
-    this.hasAccessToken = function () {
-        return angular.isDefined(vault.accessToken);
-    };
-
-    this.isAuthenticated = function () {
-        return angular.isDefined(vault.user);
-    };
-
-    var fetch = function (url, options) {
-        var params = {
-                client_id: config.clientId,
-                callback: 'JSON_CALLBACK'
-            };
-        if (self.hasAccessToken()) {
-            params.access_token = vault.accessToken;
-        }
-
-        return $http({
-            cache: true,
-            method: 'jsonp',
-            params: angular.extend({}, params, options),
-            responseType: 'json',
-            url: config.apiUrl + url
-        });
-    };
-
-    var getUrlParameters = function (parameter, staticURL, decode) {
-        /*
-        Function: getUrlParameters
-        Description: Get the value of URL parameters either from 
-                     current URL or static URL
-        Author: Tirumal
-        URL: www.code-tricks.com
-       */
-       var currLocation = (staticURL.length)? staticURL : window.location.search,
-           parArr = currLocation.split('?')[1].split('&'),
-           returnBool = true,
-           parr;
-       
-       for (var i = 0; i < parArr.length; i++){
-            parr = parArr[i].split('=');
-            if(parr[0] == parameter){
-                return (decode) ? decodeURIComponent(parr[1]) : parr[1];
-                returnBool = true;
-            }else{
-                returnBool = false;            
-            }
-       }
-       
-       if(!returnBool) return false;
-    };
-
-    var bindAuthEvents = function(authTab) {
-        // This function bind the evens to the instagram autentication screen
-        // If every thing goes good then store the token
-        // Also handle how the app respond to an authentication error
-        var deferred = $q.defer();
-        authTab.addEventListener('loadstart', function(e) {
-            if (e.url.search('access_token') !== -1) { // access granted
-                vault.accessToken = e.url.substr(e.url.search('access_token')+'access_token='.length);
-                authTab.close();
-                fetch('users/self/').then(
-                    function(response){
-                        vault.user = response.data.data;
-                        deferred.resolve(response.data.data);
-                    }
-                );
-            } else if (e.url.search('error') !== -1) { // User denied access
-                authTab.close();
-                deferred.reject({
-                    error: getUrlParameters('error',e.url,true),
-                    errorReason: getUrlParameters('error_reason',e.url,true),
-                    errorDescription: getUrlParameters('error_description',e.url,true)
-                });
-            }
-        });
-        return deferred.promise;
-    };
-
-    var addUserMedia = function (pMedia2add) {
-        if (angular.isUndefined(vault.userMedia)) {
-            vault.userMedia = pMedia2add;
-        } else {
-            vault.userMedia.pagination = pMedia2add.pagination;
-            vault.userMedia.data.push(pMedia2add.data);
-        }
-    };
-
-    this.auth = function() {
-        var options = {
-                client_id:      config.clientId,
-                redirect_uri:   config.redirectUri,
-                scope:          config.scope,
-                response_type:  'token'
-            },
-            authParams = '';
-
-        angular.forEach(options, function(value, key) {
-            return authParams += key + '=' + value + '&';
-        });
-        var authUrl = config.oauthUrl + authParams;
-
-        return bindAuthEvents($window.open(authUrl, '_blank', 'location=yes;clearcache=yes'));
-    };
-
-    this.hasUserMedia = function(){
-        return angular.isDefined(vault.userMedia);
-    };
-
-    this.cleanUserMedia = function () {
-        vault.userMedia = null; // helping garbage collector
-        vault.userMedia = undefined;
-    }
-
-    this.canLoadMore = function(){
-        var can = true;
-
-        if( self.hasUserMedia() ){
-            if (angular.isDefined(vault.userMedia.pagination)) {
-                if (angular.isUndefined(vault.userMedia.pagination.next_url)){
-                    can = false;
-                }
-            }
-        }
-
-        return can;
-    };
-
-    this.getRecentMedia = function() {
-        var params = {},
-            deferred = $q.defer();
-
-        if (self.hasUserMedia()) {
-            if(self.canLoadMore()) {
-                params.max_id = vault.userMedia.pagination.next_max_id;
-            }
-        }
-        fetch('users/self/media/recent', params).then(
-            function(response){
-                addUserMedia(response.data);
-                deferred.resolve(response);
-            },
-            function(response){
-                deferred.reject(response);
-            }
-        );
-        return deferred.promise;
-    };
-}]);
-services.service('LocationPrvdr', ['$http', function ($http) {
-	var costaRica;
-
-	var init = function() {
-		$http.get('js/common/costa-rica.json').
-			success(function(data, status, headers, config) {
-				costaRica = angular.fromJson(data);
-			}).
-			error(function(data, status, headers, config) {
-				console.log("Costa Rica JSON not found");
-			});
-	};
-
-	var iterate = function(obj) {
-		result = [];
-		angular.forEach(obj, function(value, key, obj) {
-			result.push({
-				id: key,
-				name: value.title
-			});
-		});
-		return result;
-	};
-
-	this.getProvinces = function() {
-		return iterate(costaRica.provincias);
-	};
-
-	this.getCantons = function(provinceID) {
-		return iterate(costaRica.provincias[provinceID].cantones);
-	};
-
-	this.getDistricts = function(provinceID, cantonID) {
-		return iterate(costaRica.provincias[provinceID].cantones[cantonID].distritos);
-	};
-
-	init();
-}])
-services.service('MessageService', ['$http', function ($http) {
-    // Private stuff
-    var messages =          null,
-        messageDBlocation = "js/common/messagesDB.json",
-        self =              this,
-        callbackResult =    function(data, status, headers, config) {
-            messages = data ? angular.fromJson(data) : {};
-        },
-        initMessages =      function() {
-            $http.get(messageDBlocation)
-                .success(callbackResult)
-                .error(callbackResult);
-        };
-    this.keyToValue =   function(searchCriteria, obj) {
-        var resul;
-        if (angular.isDefined(obj[searchCriteria])) {
-            return obj[searchCriteria];
-        }
-        for(var key in obj) {
-            if( angular.isObject(obj[key]) ){
-                var resul = this.keyToValue(searchCriteria, obj[key]);
-            }
-            if (angular.isDefined(resul)) break;
-        }
-        return resul;
-    };
-    // Public stuff
-    this.search = function(msjKey) {
-        var resul = this.keyToValue(msjKey, messages);
-        return resul;
-    };
-
-    this.getMessages = function() {
-        return messages;
-    };
-    // Load the messages from JSON file
-    initMessages();
-}]);
-/**
- * Created by Raiam 
- */
-services.service('Payment', ['$window', '$http', '$q', function ($window, $http, $q) {
-    
-    this.sendWeight = function(h){
-        var defer = $q.defer();
-
-        $.ajax({
-            url: "http://www.gn-digital.info/services/tarifario_courier/api/?method=t_paqueteporpeso&params[peso]="+h+"&params[is_gam]=0",
-            type: 'GET',
-            crossDomain: true,
-            dataType: 'jsonp',
-            jsonpCallback:'tarifario_callback',
-            success: function(response) { defer.resolve(response);},
-            error: function(error){defer.resolve(error);}
-        });
-
-        return defer.promise;
-    };
-
-    this.makePay = function(order_id, name, last, emisor, tarjeta, month, year, price, envio){
-         var defer = $q.defer();
-         console.log("http://www.gn-digital.com/pago_por_api/?sel=save&order_id=3619&ccname="+name+"%20"+last+"&ccnumber=12345&ccissuer="+emisor+"&ccmonth="+month+"&ccyear="+year+"&products[0][id]=2&products[0][name]=CobroFotos&products[0][price]="+price+"&products[0][qty]=1&products[1][id]=3&products[1][name]=Envio&products[1][price]="+envio+"&products[1][qty]=1&callback=jason");
-        
-        $.ajax({
-            url: "http://www.gn-digital.com/pago_por_api/?sel=save&order_id=3619&ccname="+name+"%20"+last+"&ccnumber="+tarjeta+"&ccissuer="+emisor+"&ccmonth="+month+"&ccyear="+year+"&products[0][id]=2&products[0][name]=CobroFotos&products[0][price]="+price+"&products[0][qty]=1&products[1][id]=3&products[1][name]=Envio&products[1][price]="+envio+"&products[1][qty]=1&callback=jason",
-            type: 'GET',
-            crossDomain: true,
-            dataType: 'jsonp',
-            jsonpCallback:'gnpaymentcallback',
-            success: function(response) { defer.resolve(response);},
-            error: function(error){defer.resolve(error);}
-        });
-
-        return defer.promise;
-    };
-
-
-}]);
-/**
- * Created   on 24/11/2014.
- */
-services.service('PhotoSizeChecker', [function () {
-    var self = this,
-        minimumSize,
-        imageDimensions;
-
-    var meetsOrientation = function(){
-        var expectedOrientation = self.getOrientation(minimumSize.width, minimumSize.height),
-            imageOrientation = self.getOrientation(imageDimensions.width, imageDimensions.height);
-        return (expectedOrientation === imageOrientation);
-    };
-
-    var meetsArea = function(){
-        var minimumArea = self.computeArea(minimumSize.width, minimumSize.height),
-            imageArea = self.computeArea(imageDimensions.width, imageDimensions.height);
-
-        return (imageArea >= minimumArea);
-    };
-
-    this.getExpectedSize = function(){
-        return minimumSize.width+"px x "+ minimumSize.height+"px";
-    };
-
-    this.computeArea = function(w, h){
-        return ( w*h );
-    };
-
-    this.getOrientation = function(width, height){
-        var orientation = "square";
-        if(width > height) {
-            orientation = "landscape";
-        } else if(width < height) {
-            orientation = "portrait";
-        }
-        return orientation;
-    };
-
-    this.meetsMinimumRequirements = function(ImageWrapper, pSelectedProduct){
-        // update local helper variables
-        minimumSize  = pSelectedProduct.pixel_size.minimum;
-        imageDimensions = ImageWrapper.images.standard_resolution;
-        // then decide if the provided image meets the minimum requirements
-        return ( meetsArea() );
-    };
-}]);
-services.service('Processing', ['$http', '$q', function ($http, $q) {
-	
-	var url = "https://grooveshark-raiam1234.c9.io/workspace/public/nacion-copy.php";
-
-	/*
-	 * create a blob from png 
-	 **/
-	this.dataURItoBlob = function (dataURI) {
-	  var byteString = atob(dataURI.split(',')[1]);
-	  var ab = new ArrayBuffer(byteString.length);
-	  var ia = new Uint8Array(ab);
-	  for (var i = 0; i < byteString.length; i++) {
-	    ia[i] = byteString.charCodeAt(i);
-	  }
-	    return new Blob([ab], { type: 'image/png' });
-	};
-
-
-
-	/*
-	 * Upload images to FTP by sending a blob file
-	 **/
-	this.upload = function(formData) {
-		var defer = $q.defer();
-		var cache = {
-			cache: false,
-			contentType: false,
-			processData: false,
-			data: formData, 
-			error: function(e){defer.reject(e)}, 
-			success: function(e){defer.resolve(e)},
-			url: url, 
-			type: "POST",
-			xhr : function () {
-		        var xhr = new window.XMLHttpRequest();
-		        xhr.upload.addEventListener("progress", function (evt) {
-		            if (evt.lengthComputable) {
-		                var percentComplete = evt.loaded / evt.total;
-		                console.log(percentComplete);
-		                defer.notify(percentComplete);
-		            }
-		        }, false);
-		        return xhr;
-		    }
-		};
-
-        $.ajax(cache);
-
-        return defer.promise;
-	};
-
-
-}])
-/**
- * Created by joseph on 22/12/2014.
- */
-controllers.service('ScreenHelper', ['$window', function ($window) {
-    var info,
-        init = function() {
-            $window.plugins.aboutScreen.getInfo(function (screenInfo) {
-                console.log("aboutScreen.getInfo", screenInfo);
-                info = screenInfo;
-            }, function () {
-                info = {
-                    height: $window.screen.height,
-                    width: $window.screen.width
-                }
-            });
-        };
-
-    this.getInfo = function() {
-        return info;
-    };
-
-    this.inchToPixel = function (inch) {
-        inch = 1;
-
-
-    }
-
-    ionic.Platform.ready(init);
-}]);
-/**
- * Created   on 30/11/2014.
- */
-services.service('StorageService', ['$window','$q', function ($window, $q) {
-    var storage = $window.localStorage,
-        prefix = "hacelo",
-        cart = "";
-
-    this.save = function(pCartData) {
-        var saved = true;
-        /*try {
-            storage.setItem(prefix, angular.toJson(pCartData, false));
-        } catch (e) {
-            saved = false;
-        }*/
-
-        try {
-            this.saveToDisk(pCartData);
-        } catch (e) {
-            saved = false;
-        }
-        
-        return saved;
-    };
-
-
-    this.load = function() {
-        //return angular.fromJson(cart);
-        return angular.fromJson(storage.getItem(prefix));
-    };
-
-
-    this.loadFile = function(){
-        var defer = $q.defer(),
-            self = this;
-        // This is to ensure device is ready
-        document.addEventListener('deviceready', function(){
-            self.getDataFromDisk().then(function(e){
-                cart = e;
-                defer.resolve(e);
-            });
-        }, false);
-
-
-        return defer.promise;
-    };
-
-
-    this.clear = function() {
-        this.save("");
-    };
-
-
-    this.saveToDisk = function(pCartData){
-        var b = new FileManager(),
-            a = new DirManager();
-
-        a.create_r('Printea',Log('created successfully'));
-        b.write_file('Printea/','shopping.txt', angular.toJson(pCartData, false) ,Log('wrote sucessful!'));
-    };
-
-
-    this.getDataFromDisk = function(){
-        var defer = $q.defer(),
-            a = new DirManager(),
-            b = new FileManager(),
-            c = "" ;
-
-        this.existFolder().then(function(e){
-            //console.log(e);
-            if(!e){
-                b.write_file('Printea/','shopping.txt', null ,function(){
-
-                    b.read_file('Printea/','shopping.txt',function(e){
-                        //console.log(e);
-                        defer.resolve(e);
-                    },function(e){
-                        //console.log(e);
-                        defer.resolve(e);
-                    });
-                });
-            } else {
-                b.read_file('Printea/','shopping.txt',function(e){defer.resolve(e);},function(e){console.log(e);defer.resolve(e)});
-            }
-        });
-        
-        return defer.promise;
-    };
-
-
-    this.existFolder = function(){
-        var defer = $q.defer(),
-            a = new DirManager(),
-            c = "" ;
-
-        a.list('Printea/', function(e){
-            //console.log(e);
-            if(e.length > 0){
-                defer.resolve(true);
-            } else {
-                defer.resolve(false);
-            }
-        });
-
-        return defer.promise;
-    };
-
-}]);
-services.service('Utils', ['$q', '$timeout', '$filter', function ($q, $timeout, $filter) {
-    /**
-     * Converts image URLs to dataURL schema using Javascript only.
-     *
-     * @param {String} url Location of the image file
-     * @param {Function} success Callback function that will handle successful responses. This function should take one parameter
-     *                            <code>dataURL</code> which will be a type of <code>String</code>.
-     * @param {Function} error Error handler.
-     *
-     * getImageDataURL('myimage.png', onSuccess, onError);
-     *
-     */
-    this.getImageDataURL = function(url, x, y) {
-    
-    var defer = $q.defer();
-        var data, canvas, ctx;
-        var img = new Image();
-        img.onload = function(){
-            // Create the canvas element.
-            canvas = document.createElement('canvas');
-            canvas.width = screen.width;
-            canvas.height = (screen.width * img.height) /img.width;
-            // Get '2d' context and draw the image.
-            ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, screen.width, (screen.width * img.height) /img.width);
-            // Get canvas data URL
-            try{
-                // console.log("got it");
-                data = canvas.toDataURL();
-                window.r = data;
-                defer.resolve({data:data, x:x, y:y});
-            }catch(e){
-                // console.log("broke");
-                defer.reject(e);
-            }
-        }
-        // Load image URL.
-        try{
-            img.src = url;
-        }catch(e){
-            // console.log("broke this shit");
-            defer.reject(e);
-        }
-
-    
-    return defer.promise;
-
-};
-
-
-this.create64 = function(url){
-
-};
-
-this.shuffle = function(array) {
-  var currentIndex = array.length, temporaryValue, randomIndex ;
-
-  // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
-
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
-
-    // And swap it with the current element.
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
-  }
-
-  return array;
-};
-
-this.compareArray = function(a, b) {
-    var a = a.sort(),
-        b = b.sort();
-        
-    var i = a.length;
-    if (i != b.length) return false;
-    while (i--) {
-        if (a[i] !== b[i]) return false;
-    }
-    return true;
-};
-}]);
-
 models.factory('ImageFactory', ['$q', function ($q) {
     function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
         this.origin = pOrigin;
@@ -3522,7 +2697,7 @@ models.factory('ImageFactory', ['$q', function ($q) {
     function PhoneLoadedImg (uri, gallery) {
         ImageWrapper.call(this, ImageWrapper.sources.PHN, uri, {}, false);
         this.images.thumbnail = {
-            "url": uri,
+            "url": "",
             // the generated thumbnail will have this width
             "width": 150,
             "height": 0
@@ -3943,6 +3118,10 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             type: ""
         };
 
+        this.coupon = {
+            code: "",
+            price: 0
+        };
         // ---
         // PUBLIC METHODS.
         // ---
@@ -4120,6 +3299,15 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             this.saveShoppingCart();
         },
 
+        saveCoupon : function (coupon, discount) {
+            shoppingCart.coupon = {
+                code: coupon,
+                price: discount
+            };
+
+            this.saveShoppingCart();
+        },
+
         saveCustomer : function(name, secondSurname, phone, email, province, canton, district, exacta){
             shoppingCart.customer = {
                 name: name,
@@ -4137,4 +3325,869 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             this.saveShoppingCart();
         }
     };
+}]);
+services.service('CartService', ['$http', '$q', function ($http, $q) {
+    // Private stuff
+
+    var api = "http://www.codabi.com/api/e1eadb3ffeca4f8788be5b7355d2517d/";
+    var model = {
+        "UNKNOWN" : {"hasError" : true, "Message" : "El Codigo no es valido."},
+        "EATEN" :   {"hasError" : true, "Message" : "Codigo previamente utilizado"},
+        "FOUND" :   {"hasError" : false, "Message" : "Su codigo es valido"},
+        "ALREADY_EATEN" : {"hasError": true, "Message" : "Su codigo ya ha sido utilizado."},
+        "DONE" : {"hasError" : false, "Message" : "Exito"}
+    };
+
+    this.redeem = function (code, redeem) {
+        var defer = $q.defer();
+        var url = api + code;
+        angular.isDefined(redeem) ? url += "/eat/" : url += "/check/";
+
+        $http.get(url)
+            .success(function(e){
+                model[e].code = code;
+                defer.resolve(model[e]);
+            }).error(function(e){
+                defer.reject({error: e, code: code});
+            });
+
+        return defer.promise;
+    };
+
+}]);
+services.service('CordovaCameraService', ['$window','$q', function ($window,$q) {
+    var cam,
+        cameraOptions,
+        init = function() {
+            cam = $window.navigator.camera;
+            cameraOptions = {
+                quality : 100,
+                destinationType : cam.DestinationType.FILE_URI,
+                sourceType : cam.PictureSourceType.PHOTOLIBRARY,
+                /*allowEdit : true,
+                encodingType: Camera.EncodingType.JPEG,
+                targetWidth: 100,
+                targetHeight: 100,
+                popoverOptions: CameraPopoverOptions,
+                saveToPhotoAlbum: false*/
+            };
+        };
+
+    this.getImage = function() {
+        var q = $q.defer();
+        cam.getPicture(function(result) {
+            q.resolve(result);
+        }, function(result) {
+            q.reject(result);
+        }, cameraOptions);
+
+        return q.promise;
+    };
+
+    // wait until the device is ready to setup everything
+    ionic.Platform.ready(init);
+}]);
+
+services.service('FileReader', ['$window', '$q', 'ImageFactory', 'SelectedImagesFactory', function ($window, $q, ImageFactory, SelectedImagesFactory){
+    var processFolder;
+    var galleries = [];
+    var cont = 1;
+    var imageStack = SelectedImagesFactory.getAll();
+    /**
+     * Helper of processFolder
+     * Filter the given entries list.
+     * Remove any entry that we are not interested to work.
+     * @param  {Array : array to process}
+     * @return {Array : filtered array}
+     */
+    var removeInvalidEntries = function (list2Clean){
+        var clean = [],
+            len = list2Clean.length;
+
+        for (var i=0; i < len; i++) {
+            var valid = !0; // flag that indicate if this entry is valid
+
+            //==================== Start entry validations ====================
+
+            if (list2Clean[i].isFile) {// validations for files ONLY
+
+                // remove any file that is not an image
+                if ( (/\.(?:jpg|jpeg|png)$/i).test(list2Clean[i].name) === !1 ) {valid = !1;}
+
+            } else if (list2Clean[i].isDirectory) {// validations for directories ONLY
+
+                // remove any folder named `Android`. This is because this folder holds many cache images
+                if (list2Clean[i].name === 'Android') {valid = !1;}
+
+            }
+            // both files and directory validations
+
+            // Remove any item that is hidden.
+            if ( list2Clean[i].name.charAt(0) === '.' ) {valid = !1;}
+
+            //==================== End entry validations ====================
+
+            if(valid) {
+                clean.push(list2Clean[i]);
+            }
+        }
+        list2Clean = null; // garbage collector help
+        return clean;
+    };
+
+    var firstItems = function (list2Clean) {
+        var clean = [],
+            len = list2Clean.length;
+
+        window.list = list2Clean;
+
+        for (var i=0; i < len; i++) {
+            var valid = !0; // flag that indicate if this entry is valid
+
+            //==================== Start entry validations ====================
+
+            if (list2Clean[i].isFile) {// validations for files ONLY
+
+                // remove any file that is not an image
+                if ( (/\.(?:jpg|jpeg|png)$/i).test(list2Clean[i].name) === !1 ) {valid = !1;}
+
+            } else if (list2Clean[i].isDirectory) {// validations for directories ONLY
+
+                // remove any folder named `Android`. This is because this folder holds many cache images
+                if (list2Clean[i].name === 'Android') {
+                        valid = !1;
+                }
+
+                if (list2Clean[i].name == 'Pictures' || list2Clean[i].name == 'DCIM'){
+                    valid = !0;
+                } else {
+                    valid = !1;
+                }
+
+            }
+            // both files and directory validations
+
+            // Remove any item that is hidden.
+            if ( list2Clean[i].name.charAt(0) === '.' ) {valid = !1;}
+
+            //==================== End entry validations ====================
+
+            if(valid) {
+                clean.push(list2Clean[i]);
+            }
+        }
+        list2Clean = null; // garbage collector help
+        console.log(clean);
+        return clean;
+    };
+
+    /**
+     * Helper of processImage
+     * This function takes care of checking if the given image
+     * gallery of which it belong and needs to be added to it.
+     * If there no gallery with that name, a new one will be created
+     * 
+     * @param {FileEntry : to extract the gallery name}
+     * @param {PhoneLoadedImage : instance of the image, will be used later by the UI}
+     */
+    var addImage2Gallery = function (fileEntry, phoneLoadedImg) {
+        var galleryName = fileEntry.fullPath.split('/').slice(-2)[0],
+            galleryExists = false,
+            galleryIndex = 0;
+
+        for (var i=0; i < galleries.length; i++){
+            if (galleries[i].name === galleryName) {
+                galleryExists = true;
+                galleryIndex = i;
+            }
+        }
+        if (galleryExists === false)  {
+            galleries.push({
+                name: galleryName,
+                images: []
+            });
+            galleryIndex = galleries.length-1;
+        }
+        phoneLoadedImg.gallery = galleryName;
+        imageStack.push(phoneLoadedImg);
+        galleries[galleryIndex].images.push(phoneLoadedImg);
+      //  console.log();
+    };
+
+    /**
+     * Helper of processFolder
+     * Check if this image has a valid size
+     * because we don't want to have an image with something like
+     * 10px of width and 30px of height.
+     * If the file pass the check is added to the gallery list as an PhoneLoadedImg object
+     * */
+    var processImage = function (fileEntry) {
+        var deferred = $q.defer(),
+            phoneLoadedImg = ImageFactory.getPhoneLoadedImg(fileEntry.nativeURL);
+
+            phoneLoadedImg.imageInit().then(function (img) {
+                addImage2Gallery(fileEntry, phoneLoadedImg);
+                deferred.resolve(img);
+            });
+
+        return deferred.promise;
+    };
+
+    var processFolder = function (dirEntry) {
+        var deferred = $q.defer();
+
+        dirEntry.createReader().readEntries(function (dirtyEntries) {
+            if(cont == 1){
+                console.log(firstItems(dirtyEntries));
+                var cleanEntries = firstItems(dirtyEntries);
+                window.e = dirtyEntries;
+                cont = 0;
+            } else {
+                var cleanEntries = removeInvalidEntries(dirtyEntries);
+            }
+            if(cleanEntries.length===0) {
+                return deferred.resolve(dirEntry);
+            }
+
+            async.each(cleanEntries, function (entry, callback) {
+                var successCB = function () {
+                    callback();
+                };
+
+                if (entry.isFile) {
+                    processImage(entry).then(successCB);
+
+                } else if (entry.isDirectory) {
+                    processFolder(entry).then(successCB);
+                }
+
+            }, function (err) {
+                deferred.resolve(dirEntry);
+            });
+
+        }, Log('Unable to read entries of: ' + dirEntry.name));
+
+        return deferred.promise;
+    };
+
+    /**
+     * Kick start
+     * Request access to the file system an then start the scanning process
+     * */
+    this.scanFileSystem = function () {
+        var deferred = $q.defer();
+
+        fileSystemSingleton.load(function (fileSystem){
+            processFolder(fileSystem.root).then(function (res) {
+                deferred.resolve(galleries);
+            });
+        }, Log('Unable to get access to the FileSystem'));
+
+        return deferred.promise;
+    };
+
+}]);
+
+services.service('InstagramService', ['$http', '$window', '$q', function ($http, $window, $q) {
+    var self = this,
+        vault = {
+            user: undefined,
+            userMedia: undefined,
+            accessToken: undefined
+        },
+        config = {
+            clientId: '70a2ae9262fc4805a5571e8036695a4d',
+            redirectUri: 'http://www.wikipedia.org/',
+            apiUrl: 'https://api.instagram.com/v1/',
+            oauthUrl: 'https://instagram.com/oauth/authorize/?',
+            scope: 'basic'
+        };
+
+    this.hasAccessToken = function () {
+        return angular.isDefined(vault.accessToken);
+    };
+
+    this.isAuthenticated = function () {
+        return angular.isDefined(vault.user);
+    };
+
+    var fetch = function (url, options) {
+        var params = {
+                client_id: config.clientId,
+                callback: 'JSON_CALLBACK'
+            };
+        if (self.hasAccessToken()) {
+            params.access_token = vault.accessToken;
+        }
+
+        return $http({
+            cache: true,
+            method: 'jsonp',
+            params: angular.extend({}, params, options),
+            responseType: 'json',
+            url: config.apiUrl + url
+        });
+    };
+
+    var getUrlParameters = function (parameter, staticURL, decode) {
+        /*
+        Function: getUrlParameters
+        Description: Get the value of URL parameters either from 
+                     current URL or static URL
+        Author: Tirumal
+        URL: www.code-tricks.com
+       */
+       var currLocation = (staticURL.length)? staticURL : window.location.search,
+           parArr = currLocation.split('?')[1].split('&'),
+           returnBool = true,
+           parr;
+       
+       for (var i = 0; i < parArr.length; i++){
+            parr = parArr[i].split('=');
+            if(parr[0] == parameter){
+                return (decode) ? decodeURIComponent(parr[1]) : parr[1];
+                returnBool = true;
+            }else{
+                returnBool = false;            
+            }
+       }
+       
+       if(!returnBool) return false;
+    };
+
+    var bindAuthEvents = function(authTab) {
+        // This function bind the evens to the instagram autentication screen
+        // If every thing goes good then store the token
+        // Also handle how the app respond to an authentication error
+        var deferred = $q.defer();
+        authTab.addEventListener('loadstart', function(e) {
+            if (e.url.search('access_token') !== -1) { // access granted
+                vault.accessToken = e.url.substr(e.url.search('access_token')+'access_token='.length);
+                authTab.close();
+                fetch('users/self/').then(
+                    function(response){
+                        vault.user = response.data.data;
+                        deferred.resolve(response.data.data);
+                    }
+                );
+            } else if (e.url.search('error') !== -1) { // User denied access
+                authTab.close();
+                deferred.reject({
+                    error: getUrlParameters('error',e.url,true),
+                    errorReason: getUrlParameters('error_reason',e.url,true),
+                    errorDescription: getUrlParameters('error_description',e.url,true)
+                });
+            }
+        });
+        return deferred.promise;
+    };
+
+    var addUserMedia = function (pMedia2add) {
+        if (angular.isUndefined(vault.userMedia)) {
+            vault.userMedia = pMedia2add;
+        } else {
+            vault.userMedia.pagination = pMedia2add.pagination;
+            vault.userMedia.data.push(pMedia2add.data);
+        }
+    };
+
+    this.auth = function() {
+        var options = {
+                client_id:      config.clientId,
+                redirect_uri:   config.redirectUri,
+                scope:          config.scope,
+                response_type:  'token'
+            },
+            authParams = '';
+
+        angular.forEach(options, function(value, key) {
+            return authParams += key + '=' + value + '&';
+        });
+        var authUrl = config.oauthUrl + authParams;
+
+        return bindAuthEvents($window.open(authUrl, '_blank', 'location=yes;clearcache=yes'));
+    };
+
+    this.hasUserMedia = function(){
+        return angular.isDefined(vault.userMedia);
+    };
+
+    this.cleanUserMedia = function () {
+        vault.userMedia = null; // helping garbage collector
+        vault.userMedia = undefined;
+    }
+
+    this.canLoadMore = function(){
+        var can = true;
+
+        if( self.hasUserMedia() ){
+            if (angular.isDefined(vault.userMedia.pagination)) {
+                if (angular.isUndefined(vault.userMedia.pagination.next_url)){
+                    can = false;
+                }
+            }
+        }
+
+        return can;
+    };
+
+    this.getRecentMedia = function() {
+        var params = {},
+            deferred = $q.defer();
+
+        if (self.hasUserMedia()) {
+            if(self.canLoadMore()) {
+                params.max_id = vault.userMedia.pagination.next_max_id;
+            }
+        }
+        fetch('users/self/media/recent', params).then(
+            function(response){
+                addUserMedia(response.data);
+                deferred.resolve(response);
+            },
+            function(response){
+                deferred.reject(response);
+            }
+        );
+        return deferred.promise;
+    };
+}]);
+services.service('LocationPrvdr', ['$http', function ($http) {
+	var costaRica;
+
+	var init = function() {
+		$http.get('js/common/costa-rica.json').
+			success(function(data, status, headers, config) {
+				costaRica = angular.fromJson(data);
+			}).
+			error(function(data, status, headers, config) {
+				console.log("Costa Rica JSON not found");
+			});
+	};
+
+	var iterate = function(obj) {
+		result = [];
+		angular.forEach(obj, function(value, key, obj) {
+			result.push({
+				id: key,
+				name: value.title
+			});
+		});
+		return result;
+	};
+
+	this.getProvinces = function() {
+		return iterate(costaRica.provincias);
+	};
+
+	this.getCantons = function(provinceID) {
+		return iterate(costaRica.provincias[provinceID].cantones);
+	};
+
+	this.getDistricts = function(provinceID, cantonID) {
+		return iterate(costaRica.provincias[provinceID].cantones[cantonID].distritos);
+	};
+
+	init();
+}])
+services.service('MessageService', ['$http', function ($http) {
+    // Private stuff
+    var messages =          null,
+        messageDBlocation = "js/common/messagesDB.json",
+        self =              this,
+        callbackResult =    function(data, status, headers, config) {
+            messages = data ? angular.fromJson(data) : {};
+        },
+        initMessages =      function() {
+            $http.get(messageDBlocation)
+                .success(callbackResult)
+                .error(callbackResult);
+        };
+    this.keyToValue =   function(searchCriteria, obj) {
+        var resul;
+        if (angular.isDefined(obj[searchCriteria])) {
+            return obj[searchCriteria];
+        }
+        for(var key in obj) {
+            if( angular.isObject(obj[key]) ){
+                var resul = this.keyToValue(searchCriteria, obj[key]);
+            }
+            if (angular.isDefined(resul)) break;
+        }
+        return resul;
+    };
+    // Public stuff
+    this.search = function(msjKey) {
+        var resul = this.keyToValue(msjKey, messages);
+        return resul;
+    };
+
+    this.getMessages = function() {
+        return messages;
+    };
+    // Load the messages from JSON file
+    initMessages();
+}]);
+/**
+ * Created by Raiam 
+ */
+services.service('Payment', ['$window', '$http', '$q', function ($window, $http, $q) {
+    
+    this.sendWeight = function(h){
+        var defer = $q.defer();
+
+        $.ajax({
+            url: "http://www.gn-digital.info/services/tarifario_courier/api/?method=t_paqueteporpeso&params[peso]="+h+"&params[is_gam]=0",
+            type: 'GET',
+            crossDomain: true,
+            dataType: 'jsonp',
+            jsonpCallback:'tarifario_callback',
+            success: function(response) { defer.resolve(response);},
+            error: function(error){defer.resolve(error);}
+        });
+
+        return defer.promise;
+    };
+
+    this.makePay = function(order_id, name, last, emisor, tarjeta, month, year, price, envio, descuento){
+        console.log(descuento);
+         var defer = $q.defer();
+         console.log("http://www.gn-digital.com/pago_por_api/?sel=save&order_id=3619&ccname="+name+"%20"+last+"&ccnumber=12345&ccissuer="+emisor+"&ccmonth="+month+"&ccyear="+year+"&products[0][id]=2&products[0][name]=CobroFotos&products[0][price]="+(price - descuento)+"&products[0][qty]=1&products[1][id]=3&products[1][name]=Envio&products[1][price]="+envio+"&products[1][qty]=1&callback=jason");
+        
+        $.ajax({
+            url: "http://www.gn-digital.com/pago_por_api/?sel=save&order_id=3619&ccname="+name+"%20"+last+"&ccnumber="+tarjeta+"&ccissuer="+emisor+"&ccmonth="+month+"&ccyear="+year+"&products[0][id]=2&products[0][name]=CobroFotos&products[0][price]="+(price - descuento)+"&products[0][qty]=1&products[1][id]=3&products[1][name]=Envio&products[1][price]="+envio+"&products[1][qty]=1&callback=jason",
+            type: 'GET',
+            crossDomain: true,
+            dataType: 'jsonp',
+            jsonpCallback:'gnpaymentcallback',
+            success: function(response) { defer.resolve(response);},
+            error: function(error){defer.resolve(error);}
+        });
+
+        return defer.promise;
+    };
+
+
+}]);
+/**
+ * Created   on 24/11/2014.
+ */
+services.service('PhotoSizeChecker', [function () {
+    var self = this,
+        minimumSize,
+        imageDimensions;
+
+    var meetsOrientation = function(){
+        var expectedOrientation = self.getOrientation(minimumSize.width, minimumSize.height),
+            imageOrientation = self.getOrientation(imageDimensions.width, imageDimensions.height);
+        return (expectedOrientation === imageOrientation);
+    };
+
+    var meetsArea = function(){
+        var minimumArea = self.computeArea(minimumSize.width, minimumSize.height),
+            imageArea = self.computeArea(imageDimensions.width, imageDimensions.height);
+
+        return (imageArea >= minimumArea);
+    };
+
+    this.getExpectedSize = function(){
+        return minimumSize.width+"px x "+ minimumSize.height+"px";
+    };
+
+    this.computeArea = function(w, h){
+        return ( w*h );
+    };
+
+    this.getOrientation = function(width, height){
+        var orientation = "square";
+        if(width > height) {
+            orientation = "landscape";
+        } else if(width < height) {
+            orientation = "portrait";
+        }
+        return orientation;
+    };
+
+    this.meetsMinimumRequirements = function(ImageWrapper, pSelectedProduct){
+        // update local helper variables
+        minimumSize  = pSelectedProduct.pixel_size.minimum;
+        imageDimensions = ImageWrapper.images.standard_resolution;
+        // then decide if the provided image meets the minimum requirements
+        return ( meetsArea() );
+    };
+}]);
+services.service('Processing', ['$http', '$q', function ($http, $q) {
+	
+	var url = "https://grooveshark-raiam1234.c9.io/workspace/public/nacion-copy.php";
+
+	/*
+	 * create a blob from png 
+	 **/
+	this.dataURItoBlob = function (dataURI) {
+	  var byteString = atob(dataURI.split(',')[1]);
+	  var ab = new ArrayBuffer(byteString.length);
+	  var ia = new Uint8Array(ab);
+	  for (var i = 0; i < byteString.length; i++) {
+	    ia[i] = byteString.charCodeAt(i);
+	  }
+	    return new Blob([ab], { type: 'image/png' });
+	};
+
+
+
+	/*
+	 * Upload images to FTP by sending a blob file
+	 **/
+	this.upload = function(formData) {
+		var defer = $q.defer();
+		var cache = {
+			cache: false,
+			contentType: false,
+			processData: false,
+			data: formData, 
+			error: function(e){defer.reject(e)}, 
+			success: function(e){defer.resolve(e)},
+			url: url, 
+			type: "POST",
+			xhr : function () {
+		        var xhr = new window.XMLHttpRequest();
+		        xhr.upload.addEventListener("progress", function (evt) {
+		            if (evt.lengthComputable) {
+		                var percentComplete = evt.loaded / evt.total;
+		                console.log(percentComplete);
+		                defer.notify(percentComplete);
+		            }
+		        }, false);
+		        return xhr;
+		    }
+		};
+
+        $.ajax(cache);
+
+        return defer.promise;
+	};
+
+
+}])
+/**
+ * Created by joseph on 22/12/2014.
+ */
+controllers.service('ScreenHelper', ['$window', function ($window) {
+    var info,
+        init = function() {
+            $window.plugins.aboutScreen.getInfo(function (screenInfo) {
+                console.log("aboutScreen.getInfo", screenInfo);
+                info = screenInfo;
+            }, function () {
+                info = {
+                    height: $window.screen.height,
+                    width: $window.screen.width
+                }
+            });
+        };
+
+    this.getInfo = function() {
+        return info;
+    };
+
+    this.inchToPixel = function (inch) {
+        inch = 1;
+
+
+    }
+
+    ionic.Platform.ready(init);
+}]);
+/**
+ * Created   on 30/11/2014.
+ */
+services.service('StorageService', ['$window','$q', function ($window, $q) {
+    var storage = $window.localStorage,
+        prefix = "hacelo",
+        cart = "";
+
+    this.save = function(pCartData) {
+        var saved = true;
+        /*try {
+            storage.setItem(prefix, angular.toJson(pCartData, false));
+        } catch (e) {
+            saved = false;
+        }*/
+
+        try {
+            this.saveToDisk(pCartData);
+        } catch (e) {
+            saved = false;
+        }
+        
+        return saved;
+    };
+
+
+    this.load = function() {
+        //return angular.fromJson(cart);
+        return angular.fromJson(storage.getItem(prefix));
+    };
+
+
+    this.loadFile = function(){
+        var defer = $q.defer(),
+            self = this;
+        // This is to ensure device is ready
+        document.addEventListener('deviceready', function(){
+            self.getDataFromDisk().then(function(e){
+                cart = e;
+                defer.resolve(e);
+            });
+        }, false);
+
+
+        return defer.promise;
+    };
+
+
+    this.clear = function() {
+        this.save("");
+    };
+
+
+    this.saveToDisk = function(pCartData){
+        var b = new FileManager(),
+            a = new DirManager();
+
+        a.create_r('Printea',Log('created successfully'));
+        b.write_file('Printea/','shopping.txt', angular.toJson(pCartData, false) ,Log('wrote sucessful!'));
+    };
+
+
+    this.getDataFromDisk = function(){
+        var defer = $q.defer(),
+            a = new DirManager(),
+            b = new FileManager(),
+            c = "" ;
+
+        this.existFolder().then(function(e){
+            //console.log(e);
+            if(!e){
+                b.write_file('Printea/','shopping.txt', null ,function(){
+
+                    b.read_file('Printea/','shopping.txt',function(e){
+                        //console.log(e);
+                        defer.resolve(e);
+                    },function(e){
+                        //console.log(e);
+                        defer.resolve(e);
+                    });
+                });
+            } else {
+                b.read_file('Printea/','shopping.txt',function(e){defer.resolve(e);},function(e){console.log(e);defer.resolve(e)});
+            }
+        });
+        
+        return defer.promise;
+    };
+
+
+    this.existFolder = function(){
+        var defer = $q.defer(),
+            a = new DirManager(),
+            c = "" ;
+
+        a.list('Printea/', function(e){
+            //console.log(e);
+            if(e.length > 0){
+                defer.resolve(true);
+            } else {
+                defer.resolve(false);
+            }
+        });
+
+        return defer.promise;
+    };
+
+}]);
+services.service('Utils', ['$q', '$timeout', '$filter', function ($q, $timeout, $filter) {
+    /**
+     * Converts image URLs to dataURL schema using Javascript only.
+     *
+     * @param {String} url Location of the image file
+     * @param {Function} success Callback function that will handle successful responses. This function should take one parameter
+     *                            <code>dataURL</code> which will be a type of <code>String</code>.
+     * @param {Function} error Error handler.
+     *
+     * getImageDataURL('myimage.png', onSuccess, onError);
+     *
+     */
+    this.getImageDataURL = function(url, x, y) {
+    
+    var defer = $q.defer();
+        var data, canvas, ctx;
+        var img = new Image();
+        img.onload = function(){
+            // Create the canvas element.
+            canvas = document.createElement('canvas');
+            canvas.width = screen.width;
+            canvas.height = (screen.width * img.height) /img.width;
+            // Get '2d' context and draw the image.
+            ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, screen.width, (screen.width * img.height) /img.width);
+            // Get canvas data URL
+            try{
+                // console.log("got it");
+                data = canvas.toDataURL();
+                window.r = data;
+                defer.resolve({data:data, x:x, y:y});
+            }catch(e){
+                // console.log("broke");
+                defer.reject(e);
+            }
+        }
+        // Load image URL.
+        try{
+            img.src = url;
+        }catch(e){
+            // console.log("broke this shit");
+            defer.reject(e);
+        }
+
+    
+    return defer.promise;
+
+};
+
+
+this.create64 = function(url){
+
+};
+
+this.shuffle = function(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex ;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+};
+
+this.compareArray = function(a, b) {
+    var a = a.sort(),
+        b = b.sort();
+        
+    var i = a.length;
+    if (i != b.length) return false;
+    while (i--) {
+        if (a[i] !== b[i]) return false;
+    }
+    return true;
+};
 }]);
