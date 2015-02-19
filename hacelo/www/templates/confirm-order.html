@@ -46,8 +46,8 @@
 			<h4 class="total">&#8353; {{cart.coupon.price}}</h4>
 	    </div>
 
-	    <h4 class="total total-full">TOTAL = &#8353;{{cart.getTotal() - cart.coupon.price}}</h4>
+	    <h4 class="total total-full">Total = &#8353;{{cart.getTotal() - cart.coupon.price}}</h4>
 		
-		<a class="button button-balanced" ng-click="pay()">Realizar Pedido</a>
+		<a class="button button-positive" ng-click="pay()">Realizar pedido</a>
 	</ion-footer-bar>
 </ion-view>

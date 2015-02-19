@@ -147,6 +147,15 @@ angular.module('hacelo', [
             }
         }
     })
+    .state('app.cart-checkout2', {
+        url: "/cart-checkout2",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/cart-checkout2.html",
+                controller: 'cartCheckoutCtrl'
+            }
+        }
+    })
     .state('app.redeem', {
         url: "/redeem",
         views: {

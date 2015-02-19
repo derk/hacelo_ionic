@@ -113,7 +113,7 @@ body{
 .button-picker{
     color: #FFF;
     width: 100%;
-    background: $orange;
+    background: $lightGreen;
     text-align: center;
     display: inline-block;
     padding: 3% 0;
@@ -712,7 +712,7 @@ body{
             margin: 2% auto 0;
             display: block;
             font-size: 1.2em;
-            line-height: 40px;
+            line-height: 47px;
         } 
     }
 }
@@ -997,7 +997,7 @@ body{
                 }
                 list-style-type: disc;
                 list-style-position: inside;
-                font-style: italic;
+                font-style: normal;
                 font-size: 0.7em;
             }
         }
@@ -1102,9 +1102,11 @@ body{
     //REPLACE FOR THE IMAGE 
     .image {
         width: 100%;
-        background: #ccc;
+        background-image: url(../img/cart-empty.png);
         height: 150px;
         margin-bottom: 30px;
+        background-size: cover;
+        background-position-y: -40px;
     }
     h3 {
         font-size: 12px;
@@ -1280,7 +1282,7 @@ body{
             padding: 5% 1%;
             background: white;
             margin: 0;
-            color: $yellowCart;
+            color: $lightOrange;
             font-weight: 700;
             text-align: center;
             font-size: 1.5em;
@@ -1307,7 +1309,7 @@ body{
     /*text-transform: capitalize;*/
     font-family: verdana;
     .loading{
-        background: $red;
+        background: $lightOrange;
         border-radius: 50%;
         width: 65px;
         height: 65px;
@@ -1317,12 +1319,12 @@ body{
         p{
             &.photos-counter{
                 font-size: 3.2em;
-                color: $red;
+                color: $lightOrange;
                 text-align: center;
                 font-weight: bold;
             }
             &.uploaded-copy{
-                color: $red;
+                color: $lightOrange;
                 text-align: center;
                 margin-top: 12%;
                 font-size: 1.2em;
@@ -1406,12 +1408,15 @@ body{
 
 .show-love-page{
     .show-love-container{
-        margin-top: 3%;
+        margin-top: 10%;
+        margin-left: 15%;
+        margin-right: 15%;
+        margin-bottom: 20%;
     }
     p{
         color: $text-grey;
         font-size: 0.9em;
-        font-style: italic;
+        font-style: none;
         width: 92%;
         margin: 0 auto 6%;
         &.thanks{
@@ -1489,7 +1494,7 @@ body{
     .button {
         display: block;
         width: 94%;
-        margin: 2% auto 0;
+        margin: 35% auto 0;
         font-size: 1.2em;
         padding: 1.8%;
     }
@@ -1511,7 +1516,7 @@ body{
     button {
         width: 80%;
         padding: 10px 0;
-        background: $red;
+        background: $lightGreen;
         outline: none;
         border: none;
         color: white;
@@ -1716,11 +1721,11 @@ body{
 }
 
 .check-photo {
-    background: #80b846 !important;
+    background: $lightGreen !important;
     height: 10%;
     font-size: 1em !important;
     top: 2px;
-    color: #FFFFFF;
+    color: $white !important;
 }
 
 .darkroom-button-group:nth-of-type(1),

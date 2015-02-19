@@ -1,12 +1,12 @@
-<ion-view title="FOTOS" class="photo-pick-page">
+<ion-view title="Fotos" class="photo-pick-page">
     <ion-nav-bar class="grey bar-stable" animation="slide-left-right">
         <ion-nav-back-button class="button-clear">
-            <div class="arrow"> ATRAS</div>
+            <div class="arrow"> Atrás</div>
         </ion-nav-back-button>
-        <h1 class="title">FOTOS</h1>
+        <h1 class="title">Fotos</h1>
         <ion-nav-buttons side="right">
             <!-- <a class="button button-icon icon check-button check-photo" href="#/app/check" ng-show="imageStack.length>0" ng-hide="imageStack.length===0">REVISAR</a> -->
-            <a class="button button-icon icon check-button check-photo" ng-click="gotoConfirm()" ng-show="imageStack.length>0" ng-hide="imageStack.length===0">REVISAR</a>
+            <a class="button button-icon icon check-button check-photo" ng-click="gotoConfirm()" ng-show="imageStack.length>0" ng-hide="imageStack.length===0">Revisar</a>
         </ion-nav-buttons>
     </ion-nav-bar>
     <ion-content class="has-header">
@@ -21,7 +21,7 @@
                     <img src="{{album.images[0].images.thumbnail.url}}">
                     <div class="content">
                         <h2>{{album.name}}</h2>
-                        <h3>{{album.images.length}} FOTOS</h3>
+                        <h3>{{album.images.length}} fotos</h3>
                     </div>
                     <!--div class="image"
                          ng-repeat="image in album.images | filter:{origin:'phone'}"

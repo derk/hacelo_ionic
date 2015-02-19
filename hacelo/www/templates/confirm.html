@@ -11,7 +11,7 @@
 			<h2>{{actualOrder.productLine.name}}<br/>{{actualOrder.product.name}}</h2>
 			<p>¿Quieres ordenar?</p>
 			<p>{{actualOrder.getQuantity()}} fotos <span>= {{actualOrder.computeSubTotal() | noFractionCurrency}}</span></p>
-			<a class="button button-balanced" ng-click="addToCart()">Añadir a Carrito</a>
+			<a class="button button-positive" ng-click="addToCart()">Añadir a carrito</a>
 		</div>
   	</ion-content>
 </ion-view>
