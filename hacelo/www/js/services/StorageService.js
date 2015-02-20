@@ -34,12 +34,12 @@ services.service('StorageService', ['$window','$q', function ($window, $q) {
         var defer = $q.defer(),
             self = this;
         // This is to ensure device is ready
-        document.addEventListener('deviceready', function(){
+        setTimeout(function(){
             self.getDataFromDisk().then(function(e){
                 cart = e;
                 defer.resolve(e);
             });
-        }, false);
+        }, 4000);
 
 
         return defer.promise;
