@@ -1,14 +1,14 @@
-<ion-view title="CONFIRMAR ORDEN" class="confirm-order-page" >
+<ion-view title="Confirmar" class="confirm-order-page" >
 	<ion-nav-bar class="red bar-stable" animation="slide-left-right">  
       <ion-nav-back-button class="button-clear">
-        <div class="arrow"> ATRAS </div>
+        <div class="arrow"> Atrás </div>
       </ion-nav-back-button>
     </ion-nav-bar>
   	<ion-content class="has-header">
     	<div class="confirm-order-container">
 			<div class="order">
 				<div>
-					<span class="sendto">ENVIAR A:</span>
+					<span class="sendto">Enviar A:</span>
 					<p> 
 						<span>{{cart.customer.firstName}} {{cart.customer.secondSurname}}</span>
 						<span>{{cart.customer.address.exacta}}</span>
@@ -16,7 +16,7 @@
 					</p>
 				</div>
 				<div>
-					<span class="contact">CONTACTO:</span>
+					<span class="contact">Contacto:</span>
 					<p>
 						<span>{{cart.customer.email}}</span>
 						<span>{{cart.customer.phone}}</span>

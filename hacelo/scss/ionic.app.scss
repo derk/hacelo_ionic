@@ -123,7 +123,7 @@ body{
 }
 
 .popup {
-    width: 98% !important;
+    width: 90% !important;
 }
 
 .popup-body {
@@ -705,7 +705,7 @@ body{
         h2 {
             font-size: 1.2em;
             margin-top: 4%;
-            color: $darkerRed;
+            color: $black;
         }
         .button {
             width: 92%;
@@ -1081,7 +1081,8 @@ body{
             }// end label
             h3{
                 font-size: 1.5em;
-                color: $orange;
+                color: $lightOrange;
+                text-align: center;
             }
 
         }// end list
@@ -1674,7 +1675,8 @@ body{
 .popup-container {
 
     .popup-body {
-        text-align: center;        
+        text-align: center;   
+        font-size: 0.8em;     
     } 
     .popup-buttons {
         .button.button-positive {
@@ -1737,15 +1739,11 @@ body{
     display: none;
 }
 
-
-
-
-
 .popup.photobook-popup {
-    border: 6px solid $blue;
+    border: 6px solid $lightOrange;
 
     .popup-head {
-        background: $blue;
+        background: $lightOrange;
         padding: 5px 10px;
 
         .popup-title {

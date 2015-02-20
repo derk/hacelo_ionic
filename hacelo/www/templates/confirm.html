@@ -1,4 +1,4 @@
-<ion-view title="CONFIRMAR" class="confirm-page" >
+<ion-view title="Confirmar" class="confirm-page" >
 	<ion-nav-bar class="grey bar-stable" animation="slide-left-right">  
       <ion-nav-back-button class="button-clear">
         <div class="arrow"> Atrás </div>
@@ -8,7 +8,7 @@
   	<ion-content class="has-header" scroll="false">
     	<div class="confirm-container">
     		<div class="photo-cover" style="background:url({{url}}) no-repeat top left/ 100% 100%; height:{{height}}px"></div>
-			<h2>{{actualOrder.productLine.name}}<br/>{{actualOrder.product.name}}</h2>
+			<h2>{{actualOrder.productLine.name}} {{actualOrder.product.name}}</h2>
 			<p>¿Quieres ordenar?</p>
 			<p>{{actualOrder.getQuantity()}} fotos <span>= {{actualOrder.computeSubTotal() | noFractionCurrency}}</span></p>
 			<a class="button button-positive" ng-click="addToCart()">Añadir a carrito</a>

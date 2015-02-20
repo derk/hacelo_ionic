@@ -288,7 +288,6 @@ angular.module('hacelo', [
       };
     } ]);
 
-var commons = angular.module('hacelo.config', []);
 var controllers = angular.module('hacelo.controllers', []);
 /**
  * Created   on 30/11/2014.
@@ -297,6 +296,7 @@ var directives = angular.module('hacelo.directives', []);
 
 var models = angular.module('hacelo.models', []);
 var services = angular.module('hacelo.services', []);
+var commons = angular.module('hacelo.config', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
         /*
