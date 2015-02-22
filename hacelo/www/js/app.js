@@ -121,7 +121,7 @@ angular.module('hacelo', [
         }
     })
     .state('app.album', {
-        url: "/album",
+        url: "/album/:albumIndex",
         views: {
             'haceloContent': {
                 templateUrl: "templates/album.html",

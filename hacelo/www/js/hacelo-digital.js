@@ -121,7 +121,7 @@ angular.module('hacelo', [
         }
     })
     .state('app.album', {
-        url: "/album",
+        url: "/album/:albumIndex",
         views: {
             'haceloContent': {
                 templateUrl: "templates/album.html",
@@ -290,12 +290,12 @@ angular.module('hacelo', [
 
 var commons = angular.module('hacelo.config', []);
 var controllers = angular.module('hacelo.controllers', []);
+var models = angular.module('hacelo.models', []);
 /**
  * Created   on 30/11/2014.
  */
 var directives = angular.module('hacelo.directives', []);
 
-var models = angular.module('hacelo.models', []);
 var services = angular.module('hacelo.services', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
@@ -1745,6 +1745,23 @@ commons.constant('PlacesConfig', {
 controllers.controller('addedCtrl', ['$scope', '$stateParams', function ($scope, $stateParams) {
     $scope.productName = $stateParams.productName;
 }]);
+controllers.controller('albumCtrl', ['$scope', '$state', '$stateParams', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $stateParams, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
+    var albumIndex = $stateParams.albumIndex,
+        currentAlbum = SelectedImagesFactory.getGallery().albums[albumIndex],
+        getToPrintCount = function() {
+            return currentAlbum.getToPrintOnes().length;
+        };
+
+    $scope.imageStack = SelectedImagesFactory.getAll();
+    $scope.albumName = currentAlbum.name;
+    $scope.toPrintCount = getToPrintCount();
+    $scope.height = screen.width / 3;
+
+    $scope.checkImage = function(image){
+        image.toPrint = !image.toPrint;
+        $scope.toPrintCount = getToPrintCount();
+    };
+}]);
 /**
  * Created   on 30/11/2014.
  */
@@ -2418,6 +2435,7 @@ controllers.controller('photobookCoverCtrl', ['$scope', '$state', '$ionicPopup',
         console.log($scope.cover);
         console.log($scope.range());
         ShoppingCartFactory.saveMessageCover($scope.cover.data,$scope.range());
+        window.e = ShoppingCartFactory;
         var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_check_screen");
             $ionicPopup.confirm(cache).then(function (res) {
                 if (res) {
@@ -2488,83 +2506,64 @@ controllers.controller('PhotoEditCtrl', ['$scope', '$stateParams', '$state', 'Se
         $state.go('app.check');
     };
 }]);
-controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
+controllers.controller('PhotoSourceCtrl',
+        ['$scope', '$state', 'SelectedImagesFactory', 'MessageService', 'FileReader','$ionicLoading',
+function ($scope,   $state,   SelectedImagesFactory,   MessageService,   FileReader,  $ionicLoading) {
     $scope.imageStack = SelectedImagesFactory.getAll();
-    $scope.galleries = SelectedImagesFactory.getGallery();
+    $scope.gallery = SelectedImagesFactory.getGallery();
+    $scope.toPrintCount = 0;
 
-    //$scope.phoneImageLoad = function () {
-    //    CordovaCameraService.getImage().then(function (result) {
-    //        var img = ImageFactory.getPhoneLoadedImg(result);
-    //        img.imageInit().then(function(result){
-    //            if(PhotoSizeChecker.meetsMinimumRequirements(result, SelectedImagesFactory.getProduct())){
-    //                $scope.imageStack.push(result);
-    //            } else {
-    //                $ionicPopup.alert({
-    //                    title: 'La imagen es muy pequenna',
-    //                    template: 'Lo sentimos :( la foto tiene que ser'+
-    //                    'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
-    //                    'una impresión de la más alta calidad.'
-    //                });
-    //            }
-    //        });
-    //    });ionicLoading
-    //};
-
-    $scope.go = function(obj){
-        SelectedImagesFactory.setCurrentGallery(obj);
-        $state.go('app.album');
+    var updateToPrintCount = function () {
+        $scope.toPrintCount = $scope.gallery.getToPrintOnes().length;
     };
 
-    $scope.gotoConfirm = function () {
-
-        if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
-            $state.go('app.photobook-check');
-        } else {
-            $state.go('app.check');
+    var updateImageStack = function () {
+        for (var i = $scope.gallery.albums.length - 1; i >= 0; i--) {
+            for (var j = $scope.gallery.albums[i].images.length - 1; j >= 0; j--) {
+                $scope.imageStack.push( $scope.gallery.albums[i].images[j] );
+            }
         }
-        
     };
 
     var init = function () {
         $ionicLoading.show({
-            template: 'Estamos cargando tus fotos<br> esto puede tardar unos minutos... '
+            template: MessageService.search('looking-for-images')
         });
-        FileReader.scanFileSystem().then(function(res) {
-            window.res = res;
-            $scope.galleries = res;
-            SelectedImagesFactory.setGallery(res);
+        FileReader.scanFileSystem().then(function(response) {
+            $scope.gallery = response;
+            updateImageStack();
+            updateToPrintCount();
+            SelectedImagesFactory.setGallery(response);
             $ionicLoading.hide();
         });
     };
 
-    if($scope.galleries.length == 0){
-        init();
-    }
-
-}]);
-
-
-controllers.controller('albumCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
-    $scope.cant = 0;
-    $scope.getCurrentGallery = SelectedImagesFactory.getCurrentGallery();
-    $scope.imageStack = SelectedImagesFactory.getAll();
-    $scope.height = screen.width / 3;
-
-    $scope.updateMarker = function() {
-        var cont = 0;
-        angular.forEach($scope.imageStack, function(v){
-            if(v.toPrint)
-                cont = cont + 1;
+    $scope.go = function(index){
+        $ionicLoading.show({
+            template: MessageService.search('looking-for-images')
         });
-        $scope.cant = cont;
+        $scope.gallery.albums[index].initImages().then(function () {
+            $ionicLoading.hide();
+            $state.go('app.album', {'albumIndex': index});
+        });
     };
 
-    $scope.checkImage = function(image){
-        image.toPrint = !image.toPrint;
-        $scope.updateMarker();
+    $scope.goToConfirm = function () {
+
+        if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
+            console.log('State app.photobook-check opened');
+            $state.go('app.photobook-check');
+        } else {
+            console.log('State app.check opened');
+            $state.go('app.check');
+        }
     };
 
-    $scope.updateMarker();
+    if (angular.isUndefined($scope.gallery.albums)) {
+        init();
+    } else {
+        updateToPrintCount();
+    }
 }]);
 controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$sce', 'SelectedImagesFactory','StorageService','ShoppingCartFactory', 'MessageService', 'Utils', 'Processing', function($scope, $state, $ionicLoading, $sce, SelectedImagesFactory, StorageService, ShoppingCartFactory, Messages, Utils, Processing) {
 
@@ -2696,13 +2695,13 @@ directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $tim
         }
     };
 }]);
-models.factory('ImageFactory', ['$q', function ($q) {
+models.factory('ImageFactory', ['$q', '$filter', '$timeout', function ($q, $filter, $timeout) {
     function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
         this.origin = pOrigin;
         this._originalSource = pOriginalSource;
         this.images = pImages;
         this.toPrint = pToPrint || false;
-        this.quantity = pQuantity || 1;
+        this.quantity = pQuantity || 0;
 
         return this;
     }
@@ -2716,9 +2715,9 @@ models.factory('ImageFactory', ['$q', function ($q) {
 
     // Class used as an abstraction of images loaded from phone gallery
     function PhoneLoadedImg (uri, gallery) {
-        ImageWrapper.call(this, ImageWrapper.sources.PHN, uri, {}, false);
+        ImageWrapper.prototype.constructor.call(this, ImageWrapper.sources.PHN, uri, {}, false);
         this.images.thumbnail = {
-            "url": uri,
+            "url": "",
             // the generated thumbnail will have this width
             "width": 150,
             "height": 0
@@ -2735,18 +2734,25 @@ models.factory('ImageFactory', ['$q', function ($q) {
         this.imageInit = function(){
             var self = this,
                 deferred = $q.defer();
-            fabric.Image.fromURL(this._originalSource, function(oImg) {
-                var imgs = self.images;
-                // Setting standard_resolution values
-                imgs.standard_resolution.width = oImg.getWidth();
-                imgs.standard_resolution.height = oImg.getHeight();
-                // Setting thumbnail values
-                oImg.scaleToWidth(imgs.thumbnail.width);
-                imgs.thumbnail.url = oImg.toDataURL({"format": "png"});
-                imgs.thumbnail.height = oImg.getHeight();
-                // All done here. Now notify the controller with success response
-                deferred.resolve(self);
-            });
+
+            if(this.images.thumbnail.url === "") {
+                fabric.Image.fromURL(this._originalSource, function(oImg) {
+                    var imgs = self.images;
+                    // Setting standard_resolution values
+                    imgs.standard_resolution.width = oImg.getWidth();
+                    imgs.standard_resolution.height = oImg.getHeight();
+                    // Setting thumbnail values
+                    oImg.scaleToWidth(imgs.thumbnail.width);
+                    imgs.thumbnail.url = oImg.toDataURL({"format": "png"});
+                    imgs.thumbnail.height = oImg.getHeight();
+                    // All done here. Now notify the controller with success response
+                    deferred.resolve(self);
+                });
+            } else {
+                $timeout(function () {
+                    deferred.resolve(self);
+                },0,!1);
+            }
 
             return deferred.promise;
         };
@@ -2761,7 +2767,58 @@ models.factory('ImageFactory', ['$q', function ($q) {
     InstagramLoadedImg.prototype = new ImageWrapper();
     InstagramLoadedImg.prototype.constructor = InstagramLoadedImg;
 
+    function Album (pName, pImages) {
+        this.name = pName;
+        this.images = pImages || [];
+
+        this.add = function (pImage) {
+            this.images.push(pImage);
+        };
+
+        this.getToPrintOnes = function () {
+            return $filter('filter')(this.images, {'toPrint':true});
+        };
+
+        this.initImages = function () {
+            var deferred = $q.defer();
+
+            async.each(this.images, function (image, callback) {
+                if (image.origin === ImageWrapper.sources.PHN) {
+                    image.imageInit().then(function () {
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            }, function(){
+                deferred.resolve();
+            });
+
+            return deferred.promise;
+        };
+    }
+
+    function Gallery (pAlbums) {
+        this.albums = pAlbums || [];
+
+        this.add = function (pAlbum) {
+            this.albums.push(pAlbum);
+        };
+
+        this.getToPrintOnes = function () {
+            return this.albums.reduce(function (previousValue, currentValue) {
+                return previousValue.concat(currentValue.getToPrintOnes());
+            }, []);
+        };
+    }
+
     return {
+        getAlbum: function (pName, pImages) {
+            return new Album(pName, pImages);
+        },
+        getGallery: function (pAlbums) {
+            return new Gallery(pAlbums);
+        },
         getPhoneLoadedImg: function (pUri) {
             return new PhoneLoadedImg(pUri);
         },
@@ -3424,39 +3481,44 @@ services.service('CordovaCameraService', ['$window','$q', function ($window,$q) 
     ionic.Platform.ready(init);
 }]);
 
-services.service('FileReader', ['$window', '$q', 'ImageFactory', 'SelectedImagesFactory', function ($window, $q, ImageFactory, SelectedImagesFactory){
-    var processFolder;
-    var galleries = [];
-    var cont = 1;
-    var imageStack = SelectedImagesFactory.getAll();
+services.service('FileReader', ['$q', '$timeout', 'ImageFactory', function ($q, $timeout, ImageFactory){
+    var gallery;
+
     /**
      * Helper of processFolder
      * Filter the given entries list.
      * Remove any entry that we are not interested to work.
-     * @param  {Array : array to process}
-     * @return {Array : filtered array}
+     * @param {Array} List of entries to process
+     * @returns {Array} filtered array
      */
     var removeInvalidEntries = function (list2Clean){
         var clean = [],
-            len = list2Clean.length;
+            len = list2Clean.length,
+            /**
+             * Indicate how deep we will go in the saning process
+             * @type {number}
+             */
+            folderDeep = 3;
 
         for (var i=0; i < len; i++) {
-            var valid = !0; // flag that indicate if this entry is valid
+            var valid = !0; // indicate if this entry is valid
 
             //==================== Start entry validations ====================
 
             if (list2Clean[i].isFile) {// validations for files ONLY
 
                 // remove any file that is not an image
-                if ( (/\.(?:jpg|jpeg|png)$/i).test(list2Clean[i].name) === !1 ) {valid = !1;}
+                if ( (/(?:jpg|jpeg|png)/i).test( list2Clean[i].name.split('.').pop() ) === !1 ) {valid = !1;}
 
             } else if (list2Clean[i].isDirectory) {// validations for directories ONLY
 
                 // remove any folder named `Android`. This is because this folder holds many cache images
                 if (list2Clean[i].name === 'Android') {valid = !1;}
+                // I don't what to process folders that exceed the deep required
+                if (list2Clean[i].fullPath.split('/').length-1 > folderDeep) {valid = !1;}
 
             }
-            // both files and directory validations
+            // file and directory validations
 
             // Remove any item that is hidden.
             if ( list2Clean[i].name.charAt(0) === '.' ) {valid = !1;}
@@ -3468,52 +3530,6 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', 'SelectedImages
             }
         }
         list2Clean = null; // garbage collector help
-        return clean;
-    };
-
-    var firstItems = function (list2Clean) {
-        var clean = [],
-            len = list2Clean.length;
-
-        window.list = list2Clean;
-
-        for (var i=0; i < len; i++) {
-            var valid = !0; // flag that indicate if this entry is valid
-
-            //==================== Start entry validations ====================
-
-            if (list2Clean[i].isFile) {// validations for files ONLY
-
-                // remove any file that is not an image
-                if ( (/\.(?:jpg|jpeg|png)$/i).test(list2Clean[i].name) === !1 ) {valid = !1;}
-
-            } else if (list2Clean[i].isDirectory) {// validations for directories ONLY
-
-                // remove any folder named `Android`. This is because this folder holds many cache images
-                if (list2Clean[i].name === 'Android') {
-                        valid = !1;
-                }
-
-                if (list2Clean[i].name == 'Pictures' || list2Clean[i].name == 'DCIM'){
-                    valid = !0;
-                } else {
-                    valid = !1;
-                }
-
-            }
-            // both files and directory validations
-
-            // Remove any item that is hidden.
-            if ( list2Clean[i].name.charAt(0) === '.' ) {valid = !1;}
-
-            //==================== End entry validations ====================
-
-            if(valid) {
-                clean.push(list2Clean[i]);
-            }
-        }
-        list2Clean = null; // garbage collector help
-        console.log(clean);
         return clean;
     };
 
@@ -3522,32 +3538,27 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', 'SelectedImages
      * This function takes care of checking if the given image
      * gallery of which it belong and needs to be added to it.
      * If there no gallery with that name, a new one will be created
-     * 
-     * @param {FileEntry : to extract the gallery name}
-     * @param {PhoneLoadedImage : instance of the image, will be used later by the UI}
+     * @param {FileEntry} Cordova´s FileEntry instance of  the image to add
+     * @param {PhoneLoadedImg} Valid instance of the image
      */
     var addImage2Gallery = function (fileEntry, phoneLoadedImg) {
-        var galleryName = fileEntry.fullPath.split('/').slice(-2)[0],
-            galleryExists = false,
-            galleryIndex = 0;
+        var albumName = fileEntry.fullPath.split('/').slice(-2)[0],
+            albumExists = !1,
+            albumIndex = 0;
 
-        for (var i=0; i < galleries.length; i++){
-            if (galleries[i].name === galleryName) {
-                galleryExists = true;
-                galleryIndex = i;
+        for (var i = gallery.albums.length - 1; i >= 0; i--) {
+            if (gallery.albums[i].name === albumName) {
+                albumExists = !0;
+                albumIndex = i;
             }
         }
-        if (galleryExists === false)  {
-            galleries.push({
-                name: galleryName,
-                images: []
-            });
-            galleryIndex = galleries.length-1;
+        if (albumExists === !1)  {
+            gallery.add( ImageFactory.getAlbum(albumName) );
+            albumIndex = gallery.albums.length-1;
         }
-        phoneLoadedImg.gallery = galleryName;
-        imageStack.push(phoneLoadedImg);
-        galleries[galleryIndex].images.push(phoneLoadedImg);
-      //  console.log();
+
+        phoneLoadedImg.gallery = albumName;
+        gallery.albums[albumIndex].add(phoneLoadedImg);
     };
 
     /**
@@ -3556,35 +3567,39 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', 'SelectedImages
      * because we don't want to have an image with something like
      * 10px of width and 30px of height.
      * If the file pass the check is added to the gallery list as an PhoneLoadedImg object
-     * */
+     * @param {FileEntry} Cordova´s FileEntry instance to process
+     * @returns {Deferred} Angular´s $q promise
+     */
     var processImage = function (fileEntry) {
         var deferred = $q.defer(),
             phoneLoadedImg = ImageFactory.getPhoneLoadedImg(fileEntry.nativeURL);
 
-            //phoneLoadedImg.imageInit().then(function (img) {
-                addImage2Gallery(fileEntry, phoneLoadedImg);
-                deferred.resolve(fileEntry.nativeURL);
-            //});
+        $timeout(function () {
+            addImage2Gallery(fileEntry, phoneLoadedImg);
+            deferred.resolve(phoneLoadedImg);
+        }, 0, !1);
 
         return deferred.promise;
     };
 
+    /**
+     * Scan the given DirectoryEntry looking for images
+     * If found a folder call it self passing the new folder to scan as parameter
+     * @param {DirectoryEntry} Cordova´s DirectoryEntry instance to process
+     * @returns {Deferred} Angular´s $q promise
+     */
     var processFolder = function (dirEntry) {
         var deferred = $q.defer();
 
         dirEntry.createReader().readEntries(function (dirtyEntries) {
-            if(cont == 1){
-                console.log(firstItems(dirtyEntries));
-                var cleanEntries = firstItems(dirtyEntries);
-                window.e = dirtyEntries;
-                cont = 0;
-            } else {
-                var cleanEntries = removeInvalidEntries(dirtyEntries);
-            }
-            if(cleanEntries.length===0) {
+            var cleanEntries = removeInvalidEntries(dirtyEntries);
+
+            // if there is nothing to process just return
+            if(cleanEntries.length === 0) {
                 return deferred.resolve(dirEntry);
             }
 
+            // See https://github.com/caolan/async#eacharr-iterator-callback for documentation details
             async.each(cleanEntries, function (entry, callback) {
                 var successCB = function () {
                     callback();
@@ -3592,12 +3607,11 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', 'SelectedImages
 
                 if (entry.isFile) {
                     processImage(entry).then(successCB);
-
                 } else if (entry.isDirectory) {
                     processFolder(entry).then(successCB);
                 }
 
-            }, function (err) {
+            }, function () {
                 deferred.resolve(dirEntry);
             });
 
@@ -3609,13 +3623,15 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', 'SelectedImages
     /**
      * Kick start
      * Request access to the file system an then start the scanning process
-     * */
+     * @returns {Deferred} Angular´s $q promise
+     */
     this.scanFileSystem = function () {
         var deferred = $q.defer();
 
+        gallery = ImageFactory.getGallery();
         fileSystemSingleton.load(function (fileSystem){
-            processFolder(fileSystem.root).then(function (res) {
-                deferred.resolve(galleries);
+            processFolder(fileSystem.root).then(function () {
+                deferred.resolve(gallery);
             });
         }, Log('Unable to get access to the FileSystem'));
 

@@ -6,7 +6,7 @@
         <h1 class="title">Fotos</h1>
         <ion-nav-buttons side="right">
             <!-- <a class="button button-icon icon check-button check-photo" href="#/app/check" ng-show="imageStack.length>0" ng-hide="imageStack.length===0">REVISAR</a> -->
-            <a class="button button-icon icon check-button check-photo" ng-click="gotoConfirm()" ng-show="imageStack.length>0" ng-hide="imageStack.length===0">Revisar</a>
+            <a class="button button-icon icon check-button check-photo" ng-click="goToConfirm()" ng-show="toPrintCount>0" ng-hide="toPrintCount===0">Revisar</a>
         </ion-nav-buttons>
     </ion-nav-bar>
     <ion-content class="has-header">
@@ -17,24 +17,12 @@
         <div class="photos">
             <div class="images-container">
 
-                <div class="album" ng-repeat="album in galleries" ng-if="album.images.length > 0" ng-click="go(album)">
-                    <img src="{{album.images[0].images.thumbnail.url}}">
+                <div class="album" ng-repeat="album in gallery.albums" ng-click="go($index)">
+                    <img ng-src="{{album.images[0].images.standard_resolution.url}}" style="width:100%;max-width:100%;height:auto;">
                     <div class="content">
                         <h2>{{album.name}}</h2>
-                        <h3>{{album.images.length}} fotos</h3>
+                        <h3>{{album.images.length}} fotos, {{album.getToPrintOnes().length}} selecionadas</h3>
                     </div>
-                    <!--div class="image"
-                         ng-repeat="image in album.images | filter:{origin:'phone'}"
-                         ng-init="mini = image.images.thumbnail"
-                         ng-class="{selected: image.toPrint}">
-                        <a ng-click="image.toPrint = !image.toPrint">
-                            <i class="icon ion-checkmark-circled"></i>
-                            <img ng-src="{{mini.url}}"
-                                 width="{{mini.width}}"
-                                 height="{{mini.height}}"
-                                 alt="Photo">
-                        </a>
-                    </div-->
                 </div>
 
             </div>

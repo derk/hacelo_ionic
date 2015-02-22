@@ -3,22 +3,24 @@
 		<ion-nav-back-button class="button-clear">
 			<div class="arrow">ATRAS</div>
 		</ion-nav-back-button>
-		<h1 class="title">{{cant}} FOTOS</h1>
+		<h1 class="title">{{toPrintCount}} FOTOS</h1>
 	
 	</ion-nav-bar>
 	<ion-content class="has-header">
   		<div class="photos">
 			<div class="images-container">
 				<div class="image"
-					 ng-repeat="image in imageStack | filter:{gallery: getCurrentGallery.name}"
+					 ng-repeat="image in imageStack | filter:{gallery: albumName}:true"
 					 ng-init="mini = image.images.thumbnail"
 					 ng-class="{selected: image.toPrint}"
-					 style="height: {{height}}px; overflow:hidden;">
+                     ng-style="{height: albumCtrl.height}"
+					 style="overflow:hidden;">
 					<a ng-click="checkImage(image)">
 						<i class="icon ion-checkmark-circled"></i>
 						<img ng-src="{{mini.url}}"
 							 width="{{mini.width}}"
 							 height="{{mini.height}}"
+                             style="max-width:100%;height:auto;"
 							 alt="Photo">
 					</a>
 				</div>

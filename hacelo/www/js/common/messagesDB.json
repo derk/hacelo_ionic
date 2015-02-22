@@ -1,6 +1,7 @@
 { 
     "info-msjs" : { 
-        "loading" : "<span>Cargando...<\/span><i class='icon ion-looping'><\/i>"
+        "loading" : "<span>Cargando...<\/span><i class='icon ion-looping'><\/i>",
+        "looking-for-images": "Estamos cargando tus fotos<br> esto puede tardar unos minutos... "
     },
     "danger-msjs" : { 
         "instagram-related" : { 

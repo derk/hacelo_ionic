@@ -1,78 +1,59 @@
-controllers.controller('PhotoSourceCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
+controllers.controller('PhotoSourceCtrl',
+        ['$scope', '$state', 'SelectedImagesFactory', 'MessageService', 'FileReader','$ionicLoading',
+function ($scope,   $state,   SelectedImagesFactory,   MessageService,   FileReader,  $ionicLoading) {
     $scope.imageStack = SelectedImagesFactory.getAll();
-    $scope.galleries = SelectedImagesFactory.getGallery();
+    $scope.gallery = SelectedImagesFactory.getGallery();
+    $scope.toPrintCount = 0;
 
-    //$scope.phoneImageLoad = function () {
-    //    CordovaCameraService.getImage().then(function (result) {
-    //        var img = ImageFactory.getPhoneLoadedImg(result);
-    //        img.imageInit().then(function(result){
-    //            if(PhotoSizeChecker.meetsMinimumRequirements(result, SelectedImagesFactory.getProduct())){
-    //                $scope.imageStack.push(result);
-    //            } else {
-    //                $ionicPopup.alert({
-    //                    title: 'La imagen es muy pequenna',
-    //                    template: 'Lo sentimos :( la foto tiene que ser'+
-    //                    'mayor a '+PhotoSizeChecker.getExpectedSize()+' para asegurarnos'+
-    //                    'una impresión de la más alta calidad.'
-    //                });
-    //            }
-    //        });
-    //    });ionicLoading
-    //};
-
-    $scope.go = function(obj){
-        SelectedImagesFactory.setCurrentGallery(obj);
-        $state.go('app.album');
+    var updateToPrintCount = function () {
+        $scope.toPrintCount = $scope.gallery.getToPrintOnes().length;
     };
 
-    $scope.gotoConfirm = function () {
-
-        if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
-            $state.go('app.photobook-check');
-        } else {
-            $state.go('app.check');
+    var updateImageStack = function () {
+        for (var i = $scope.gallery.albums.length - 1; i >= 0; i--) {
+            for (var j = $scope.gallery.albums[i].images.length - 1; j >= 0; j--) {
+                $scope.imageStack.push( $scope.gallery.albums[i].images[j] );
+            }
         }
-        
     };
 
     var init = function () {
         $ionicLoading.show({
-            template: 'Estamos cargando tus fotos<br> esto puede tardar unos minutos... '
+            template: MessageService.search('looking-for-images')
         });
-        FileReader.scanFileSystem().then(function(res) {
-            window.res = res;
-            $scope.galleries = res;
-            SelectedImagesFactory.setGallery(res);
+        FileReader.scanFileSystem().then(function(response) {
+            $scope.gallery = response;
+            updateImageStack();
+            updateToPrintCount();
+            SelectedImagesFactory.setGallery(response);
             $ionicLoading.hide();
         });
     };
 
-    if($scope.galleries.length == 0){
-        init();
-    }
-
-}]);
-
-
-controllers.controller('albumCtrl', ['$scope', '$state', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
-    $scope.cant = 0;
-    $scope.getCurrentGallery = SelectedImagesFactory.getCurrentGallery();
-    $scope.imageStack = SelectedImagesFactory.getAll();
-    $scope.height = screen.width / 3;
-
-    $scope.updateMarker = function() {
-        var cont = 0;
-        angular.forEach($scope.imageStack, function(v){
-            if(v.toPrint)
-                cont = cont + 1;
+    $scope.go = function(index){
+        $ionicLoading.show({
+            template: MessageService.search('looking-for-images')
         });
-        $scope.cant = cont;
+        $scope.gallery.albums[index].initImages().then(function () {
+            $ionicLoading.hide();
+            $state.go('app.album', {'albumIndex': index});
+        });
     };
 
-    $scope.checkImage = function(image){
-        image.toPrint = !image.toPrint;
-        $scope.updateMarker();
+    $scope.goToConfirm = function () {
+
+        if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
+            console.log('State app.photobook-check opened');
+            $state.go('app.photobook-check');
+        } else {
+            console.log('State app.check opened');
+            $state.go('app.check');
+        }
     };
 
-    $scope.updateMarker();
+    if (angular.isUndefined($scope.gallery.albums)) {
+        init();
+    } else {
+        updateToPrintCount();
+    }
 }]);
