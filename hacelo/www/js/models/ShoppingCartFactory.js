@@ -10,7 +10,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
     // ---
     // APPLICATION OBJECT MODELS
     // ---
-    function Order (pProductLine, pProduct, pItems){
+    function Order (pProductLine, pProduct, pItems, properties){
         // ---
         // PRIVATE METHODS.
         // ---
@@ -32,6 +32,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
         this.productLine = pProductLine;
         this.product = pProduct;
         this.items = pItems;
+        this.properties = properties;
 
         // ---
         // PUBLIC METHODS.
@@ -101,6 +102,11 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             code: "",
             price: 0
         };
+
+        this.photobook = {
+            message: "",
+            cover: []
+        };
         // ---
         // PUBLIC METHODS.
         // ---
@@ -111,8 +117,8 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             return this.orders[this.orders.length-1];
         };
 
-        this.getDummyOrder = function(pProductLine, pProduct, pItems){
-            return new Order(pProductLine, pProduct, pItems);
+        this.getDummyOrder = function(pProductLine, pProduct, pItems, properties){
+            return new Order(pProductLine, pProduct, pItems, properties);
         };
 
         this.removeOrder = function(pOrderId){
@@ -303,6 +309,13 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
                 }
             };
             this.saveShoppingCart();
+        },
+
+        saveMessageCover : function (message, array) {
+            ShoppingCart.photobook = {
+                message: message,
+                cover: array
+            };
         }
     };
 }]);

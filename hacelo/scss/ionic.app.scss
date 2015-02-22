@@ -1500,6 +1500,42 @@ body{
         padding: 1.8%;
     }
 }
+
+/*
+================= COver Photobook Page =================
+*/
+.cover-photobook {
+    .check-container {
+        button {
+            width: 42%;
+        }
+    }
+
+    .cover-container {
+        background: url(../img/book_02.png) 0 0/114% 100% !important;
+        height: 360px;
+        width: 75%;
+        margin: 0 auto;
+        input  {
+            background: #f9f9f9;
+        }
+
+        .photos-cover {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 55px 44px 33px 33px;
+            
+            div {
+                width: 33%;
+                display: inline-block;
+                img {
+                    width: 100%;
+                }
+            }
+        }
+    }
+}
 /*
  ================ Check Photobook page =================
 */
@@ -1533,6 +1569,11 @@ body{
             width: 48%;
         }
     }
+
+    .cover-container {
+        background: url(../img/book_02.png) 0 0/100% 100%;
+    }
+
 
     .wood-container {
         background: url(../img/wood.png) repeat-y top left/ 100% auto;

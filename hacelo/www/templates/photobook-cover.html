@@ -1,11 +1,11 @@
-<ion-view title="Revisar" class="check-page check-photobook">
+<ion-view title="Revisar" class="check-page check-photobook cover-photobook">
     <ion-nav-bar class="grey bar-stable" animation="slide-left-right">
         <ion-nav-back-button class="button-clear">
             <div class="arrow"> Atrás</div>
         </ion-nav-back-button>
         <h1 class="title">Revisar</h1>
         <ion-nav-buttons side="right">
-            <a class="button button-icon accept-button positive check-photo" ng-click="addToCart()" >Confirmar</a>
+            <a class="button button-icon accept-button positive check-photo" ng-click="addToCart(cover)" >Confirmar</a>
         </ion-nav-buttons>
     </ion-nav-bar>
 
@@ -19,10 +19,12 @@
             <button ng-click="mix()">Título</button>
         </div>
 
-        <div class="wood-container">
-
-            <div ng-repeat="image in range() track by $index">
-                    <img src="{{image.images.standard_resolution.url}}">
+        <div class="cover-container">
+            <div class="photos-cover">
+                <div ng-repeat="image in range() track by $index">
+                        <img src="{{image.images.standard_resolution.url}}">
+                </div>
+                <input type="text" ng-model="cover.data" placeholder="Tu titulo va aqui.">
             </div>
         </div>        
     </ion-content>

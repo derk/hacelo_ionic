@@ -8,6 +8,7 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         currentGallery = {},
         productLine = {},
         product = {};
+        cover = [];
 
 
     return {

@@ -2,7 +2,9 @@
  * Created   on 30/11/2014.
  */
 controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', 'SelectedImagesFactory', function ($scope, $state, $ionicPopup, Messages, ShoppingCartFactory, SelectedImagesFactory) {
-    var cart = ShoppingCartFactory.loadShoppingCart();
+    var cart = ShoppingCartFactory.loadShoppingCart(),
+        properties = null;
+        window.f = ShoppingCartFactory;
     /*
      * Create a new order based on the selected: product line, product, and images
      * */
@@ -10,10 +12,15 @@ controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'Messa
         $scope.actualOrder = null; // trash collector help
     }
 
+    if (cart.photobook.message != "" || angular.isDefined(cart.photobook.message)) {
+        properties = cart.photobook;
+    }
+
     $scope.actualOrder = cart.getDummyOrder(
         SelectedImagesFactory.getProductLine(),
         SelectedImagesFactory.getProduct(),
-        SelectedImagesFactory.getToPrintOnes()
+        SelectedImagesFactory.getToPrintOnes(),
+        properties
     );
 
     $scope.addToCart = function(){

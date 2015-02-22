@@ -288,6 +288,7 @@ angular.module('hacelo', [
       };
     } ]);
 
+var commons = angular.module('hacelo.config', []);
 var controllers = angular.module('hacelo.controllers', []);
 /**
  * Created   on 30/11/2014.
@@ -296,7 +297,6 @@ var directives = angular.module('hacelo.directives', []);
 
 var models = angular.module('hacelo.models', []);
 var services = angular.module('hacelo.services', []);
-var commons = angular.module('hacelo.config', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
         /*
@@ -592,6 +592,8 @@ commons.constant('PhotoPrintConfig', {
             id: "photobook",
             "name": "Photobook",
             "images": "img/cuadradas/PORTADA_CUADRADAS/portada_cuadradas.png",
+            "message":"",
+            "cover":"",
             "mandatory":true,
             "products": [
                 {
@@ -2039,7 +2041,9 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
  * Created   on 30/11/2014.
  */
 controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', 'SelectedImagesFactory', function ($scope, $state, $ionicPopup, Messages, ShoppingCartFactory, SelectedImagesFactory) {
-    var cart = ShoppingCartFactory.loadShoppingCart();
+    var cart = ShoppingCartFactory.loadShoppingCart(),
+        properties = null;
+        window.f = ShoppingCartFactory;
     /*
      * Create a new order based on the selected: product line, product, and images
      * */
@@ -2047,10 +2051,15 @@ controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'Messa
         $scope.actualOrder = null; // trash collector help
     }
 
+    if (cart.photobook.message != "" || angular.isDefined(cart.photobook.message)) {
+        properties = cart.photobook;
+    }
+
     $scope.actualOrder = cart.getDummyOrder(
         SelectedImagesFactory.getProductLine(),
         SelectedImagesFactory.getProduct(),
-        SelectedImagesFactory.getToPrintOnes()
+        SelectedImagesFactory.getToPrintOnes(),
+        properties
     );
 
     $scope.addToCart = function(){
@@ -2376,9 +2385,11 @@ controllers.controller('photobookCheckCtrl', ['$scope', '$state', '$ionicPopup',
 }]);
 
 
-controllers.controller('photobookCoverCtrl', ['$scope', '$state', '$ionicPopup','SelectedImagesFactory', 'PhotoPrintConfig','MessageService', 'Utils',function($scope, $state, $ionicPopup, SelectedImagesFactory, PhotoPrintConfig, Messages, Utils) {
+controllers.controller('photobookCoverCtrl', ['$scope', '$state', '$ionicPopup','SelectedImagesFactory', 'ShoppingCartFactory', 'PhotoPrintConfig','MessageService', 'Utils',function($scope, $state, $ionicPopup, SelectedImagesFactory, ShoppingCartFactory, PhotoPrintConfig, Messages, Utils) {
+    var cart = ShoppingCartFactory.loadShoppingCart();
     $scope.productLines = PhotoPrintConfig.products;
     $scope.images = SelectedImagesFactory.getToPrintOnes();
+    $scope.cover = {data :""};
 
     $scope.saveProductLine = function(pProductLine) {
         SelectedImagesFactory.setProductLine(pProductLine);
@@ -2392,11 +2403,9 @@ controllers.controller('photobookCoverCtrl', ['$scope', '$state', '$ionicPopup',
 
     $scope.range = function(){
         var el = [];
-        for(var x = 0; x > 9; x ++){
+        for(var x = 0; x < 9; x ++){
             el.push($scope.images[x]);
         }
-        window.i = el;
-        console.log(el);
         return el;
     };
 
@@ -2405,7 +2414,10 @@ controllers.controller('photobookCoverCtrl', ['$scope', '$state', '$ionicPopup',
      * en el array de imagenes, se guardan todos los tipos de fotos asi como la cantidad de cada una
      * y se redirecciona la pantalla de confirmacion.
      * */
-    $scope.addToCart = function () {
+    $scope.addToCart = function (t) {
+        console.log($scope.cover);
+        console.log($scope.range());
+        ShoppingCartFactory.saveMessageCover($scope.cover.data,$scope.range());
         var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_check_screen");
             $ionicPopup.confirm(cache).then(function (res) {
                 if (res) {
@@ -2690,7 +2702,7 @@ models.factory('ImageFactory', ['$q', function ($q) {
         this._originalSource = pOriginalSource;
         this.images = pImages;
         this.toPrint = pToPrint || false;
-        this.quantity = pQuantity || 0;
+        this.quantity = pQuantity || 1;
 
         return this;
     }
@@ -2706,7 +2718,7 @@ models.factory('ImageFactory', ['$q', function ($q) {
     function PhoneLoadedImg (uri, gallery) {
         ImageWrapper.call(this, ImageWrapper.sources.PHN, uri, {}, false);
         this.images.thumbnail = {
-            "url": "",
+            "url": uri,
             // the generated thumbnail will have this width
             "width": 150,
             "height": 0
@@ -2950,6 +2962,7 @@ models.factory('SelectedImagesFactory', ['$filter', function ($filter) {
         currentGallery = {},
         productLine = {},
         product = {};
+        cover = [];
 
 
     return {
@@ -3040,7 +3053,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
     // ---
     // APPLICATION OBJECT MODELS
     // ---
-    function Order (pProductLine, pProduct, pItems){
+    function Order (pProductLine, pProduct, pItems, properties){
         // ---
         // PRIVATE METHODS.
         // ---
@@ -3062,6 +3075,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
         this.productLine = pProductLine;
         this.product = pProduct;
         this.items = pItems;
+        this.properties = properties;
 
         // ---
         // PUBLIC METHODS.
@@ -3131,6 +3145,11 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             code: "",
             price: 0
         };
+
+        this.photobook = {
+            message: "",
+            cover: []
+        };
         // ---
         // PUBLIC METHODS.
         // ---
@@ -3141,8 +3160,8 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             return this.orders[this.orders.length-1];
         };
 
-        this.getDummyOrder = function(pProductLine, pProduct, pItems){
-            return new Order(pProductLine, pProduct, pItems);
+        this.getDummyOrder = function(pProductLine, pProduct, pItems, properties){
+            return new Order(pProductLine, pProduct, pItems, properties);
         };
 
         this.removeOrder = function(pOrderId){
@@ -3241,6 +3260,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
 
            // if (angular.isUndefined(shoppingCart)) {
                 StorageService.loadFile().then(function(e){
+                    e = (e === "") ? null : e;
                     lastShoppingCart = angular.fromJson(e);
                     if(angular.isObject(lastShoppingCart)){
                         restoredOrders = restoreOrders(lastShoppingCart.orders);
@@ -3332,6 +3352,13 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
                 }
             };
             this.saveShoppingCart();
+        },
+
+        saveMessageCover : function (message, array) {
+            ShoppingCart.photobook = {
+                message: message,
+                cover: array
+            };
         }
     };
 }]);
@@ -3534,10 +3561,10 @@ services.service('FileReader', ['$window', '$q', 'ImageFactory', 'SelectedImages
         var deferred = $q.defer(),
             phoneLoadedImg = ImageFactory.getPhoneLoadedImg(fileEntry.nativeURL);
 
-            phoneLoadedImg.imageInit().then(function (img) {
+            //phoneLoadedImg.imageInit().then(function (img) {
                 addImage2Gallery(fileEntry, phoneLoadedImg);
-                deferred.resolve(img);
-            });
+                deferred.resolve(fileEntry.nativeURL);
+            //});
 
         return deferred.promise;
     };
@@ -4043,12 +4070,12 @@ services.service('StorageService', ['$window','$q', function ($window, $q) {
         var defer = $q.defer(),
             self = this;
         // This is to ensure device is ready
-        document.addEventListener('deviceready', function(){
+        setTimeout(function(){
             self.getDataFromDisk().then(function(e){
                 cart = e;
                 defer.resolve(e);
             });
-        }, false);
+        }, 4000);
 
 
         return defer.promise;
