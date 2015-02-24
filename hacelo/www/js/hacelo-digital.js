@@ -288,14 +288,14 @@ angular.module('hacelo', [
       };
     } ]);
 
-var commons = angular.module('hacelo.config', []);
 var controllers = angular.module('hacelo.controllers', []);
-var models = angular.module('hacelo.models', []);
+var commons = angular.module('hacelo.config', []);
 /**
  * Created   on 30/11/2014.
  */
 var directives = angular.module('hacelo.directives', []);
 
+var models = angular.module('hacelo.models', []);
 var services = angular.module('hacelo.services', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
@@ -2629,9 +2629,12 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
 
         for(var x = 0; x < $scope.market.orders.length; x++){
             for(var y = 0; y < $scope.market.orders[x].items.length; y++){
-                var blob = Processing.dataURItoBlob($scope.market.orders[x].items[y].images.standard_resolution.url);
-                formData.append('images[]', blob);      
-                formData.append('category[]', $scope.market.orders[x].productLine.name+"_"+$scope.market.orders[x].product.name);          
+                for(var z = 0; z < $scope.market.orders[x].items[y].quantity; z++){
+                    var blob = Processing.dataURItoBlob($scope.market.orders[x].items[y].images.standard_resolution.url);
+                    formData.append('images[]', blob);      
+                    formData.append('category[]', $scope.market.orders[x].productLine.name+"_"+$scope.market.orders[x].product.name+"_"+$scope.market.orders[x].id);                    
+                }
+                
             }
         }
 
@@ -2678,30 +2681,13 @@ controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ion
     
     
 });
-/**
- * Created   on 30/11/2014.
- */
-directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
-    var directiveName = "whenLoaded";
-    return {
-        restrict: 'A',
-        link: function (scope, iElement, iAttrs) {
-            iElement.load(function() {
-                var fns = $parse(iAttrs[directiveName])(scope);
-                for (var i = 0; i < fns.length; i++) {
-                    fns[i]();
-                }
-            });
-        }
-    };
-}]);
 models.factory('ImageFactory', ['$q', '$filter', '$timeout', function ($q, $filter, $timeout) {
     function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
         this.origin = pOrigin;
         this._originalSource = pOriginalSource;
         this.images = pImages;
         this.toPrint = pToPrint || false;
-        this.quantity = pQuantity || 0;
+        this.quantity = pQuantity ||1;
 
         return this;
     }
@@ -3412,10 +3398,27 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
         },
 
         saveMessageCover : function (message, array) {
-            ShoppingCart.photobook = {
+            shoppingCart.photobook = {
                 message: message,
                 cover: array
             };
+        }
+    };
+}]);
+/**
+ * Created   on 30/11/2014.
+ */
+directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
+    var directiveName = "whenLoaded";
+    return {
+        restrict: 'A',
+        link: function (scope, iElement, iAttrs) {
+            iElement.load(function() {
+                var fns = $parse(iAttrs[directiveName])(scope);
+                for (var i = 0; i < fns.length; i++) {
+                    fns[i]();
+                }
+            });
         }
     };
 }]);

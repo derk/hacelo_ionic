@@ -312,7 +312,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
         },
 
         saveMessageCover : function (message, array) {
-            ShoppingCart.photobook = {
+            shoppingCart.photobook = {
                 message: message,
                 cover: array
             };

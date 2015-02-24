@@ -4,7 +4,7 @@ models.factory('ImageFactory', ['$q', '$filter', '$timeout', function ($q, $filt
         this._originalSource = pOriginalSource;
         this.images = pImages;
         this.toPrint = pToPrint || false;
-        this.quantity = pQuantity || 0;
+        this.quantity = pQuantity ||1;
 
         return this;
     }

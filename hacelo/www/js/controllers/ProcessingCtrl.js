@@ -62,9 +62,12 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
 
         for(var x = 0; x < $scope.market.orders.length; x++){
             for(var y = 0; y < $scope.market.orders[x].items.length; y++){
-                var blob = Processing.dataURItoBlob($scope.market.orders[x].items[y].images.standard_resolution.url);
-                formData.append('images[]', blob);      
-                formData.append('category[]', $scope.market.orders[x].productLine.name+"_"+$scope.market.orders[x].product.name);          
+                for(var z = 0; z < $scope.market.orders[x].items[y].quantity; z++){
+                    var blob = Processing.dataURItoBlob($scope.market.orders[x].items[y].images.standard_resolution.url);
+                    formData.append('images[]', blob);      
+                    formData.append('category[]', $scope.market.orders[x].productLine.name+"_"+$scope.market.orders[x].product.name+"_"+$scope.market.orders[x].id);                    
+                }
+                
             }
         }
 
