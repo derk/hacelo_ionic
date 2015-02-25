@@ -102,6 +102,15 @@ angular.module('hacelo', [
             }
         }
     })
+    .state('app.crop', {
+        url: "/crop/:id",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/crop.html",
+                controller: "cropController"
+            }
+        }
+    })
     .state('app.confirm', {
         url: "/confirm",
         views: {
@@ -288,8 +297,8 @@ angular.module('hacelo', [
       };
     } ]);
 
-var controllers = angular.module('hacelo.controllers', []);
 var commons = angular.module('hacelo.config', []);
+var controllers = angular.module('hacelo.controllers', []);
 /**
  * Created   on 30/11/2014.
  */
@@ -462,7 +471,7 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 300,
+                            "width": 500,
                             "height": 500
                         },
                         "minimum": {
@@ -1742,6 +1751,23 @@ commons.constant('PlacesConfig', {
         }
     }
 });
+/**
+ * Created   on 30/11/2014.
+ */
+directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
+    var directiveName = "whenLoaded";
+    return {
+        restrict: 'A',
+        link: function (scope, iElement, iAttrs) {
+            iElement.load(function() {
+                var fns = $parse(iAttrs[directiveName])(scope);
+                for (var i = 0; i < fns.length; i++) {
+                    fns[i]();
+                }
+            });
+        }
+    };
+}]);
 controllers.controller('addedCtrl', ['$scope', '$stateParams', function ($scope, $stateParams) {
     $scope.productName = $stateParams.productName;
 }]);
@@ -2060,7 +2086,7 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
 controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', 'SelectedImagesFactory', function ($scope, $state, $ionicPopup, Messages, ShoppingCartFactory, SelectedImagesFactory) {
     var cart = ShoppingCartFactory.loadShoppingCart(),
         properties = null;
-        window.f = ShoppingCartFactory;
+        window.s = SelectedImagesFactory;
     /*
      * Create a new order based on the selected: product line, product, and images
      * */
@@ -2153,11 +2179,76 @@ controllers.controller('confirmOrderCtrl', ['$scope', '$state' ,'$ionicPopup','$
 controllers.controller('congratsCtrl', ['clearSelection', function (clearSelection) {
     clearSelection.clearSelection();
 }]);
+/**
+ * Created   on 30/11/2014.
+ */
+controllers.controller('cropController', ['$scope', '$stateParams', '$state', '$window', 'SelectedImagesFactory', function ($scope, $stateParams, $state, $window, SelectedImagesFactory) {
+    $scope.image = SelectedImagesFactory.getOne($stateParams.id);
+    $scope.sResolution = $scope.image.images.standard_resolution;
+
+    var selectedProduct = SelectedImagesFactory.getProduct(),
+        width = ($window.screen.width*0.9),
+        height = (width * selectedProduct.pixel_size.optimal.height) / selectedProduct.pixel_size.optimal.width,
+        foo;
+
+    $scope.style = {
+        "margin-left" : ($window.screen.width * 0.1) / 2,
+        "margin-top" : (($window.screen.height - 48) - height ) / 2
+    };
+
+    var init = function(){
+        foo = new CROP();
+        foo.init({
+            // element to load the cropper into
+            container: '.canvas',
+            // image to load, accepts base64 string
+            image: $scope.sResolution.url,
+            // aspect ratio
+            width: width,
+            height: height,
+            // prevent image from leaking outside of container. boolean
+            mask: false,
+            // input[range] attributes
+            zoom: {
+                // slider step change
+                steps: 0.01,
+                // minimum and maximum zoom
+                min: 1,
+                max: 5
+            },
+            // optional preview. remove this array if you wish to hide it
+            preview: {
+                // element to load the preview into
+                container: '.pre',
+                // preview dimensions
+                width: 200,
+                height: 200
+            }
+        });
+    };
+
+    $scope.done = function(){
+        $scope.sResolution.url = foo.data(width, height, 'png').image;
+        $state.go('app.check');
+    };
+
+    init();
+}]);
 /* InfoCtrl Accordion List
  * $scope - Scope de la pantalla
  */
 
 controllers.controller('infoCtrl', function($scope) {
+
+	$scope.sucursales = {
+		"desamparados": false,
+		"guadalupe": false,
+		"llorente": false,
+		"alajuela": false,
+		"rohrmoser": false,
+		"san_jose": false,
+		"cartago": false
+	};
 
 	$scope.toggleGroup = function(group){
 		if($scope.isGroupShown(group)){
@@ -2169,6 +2260,14 @@ controllers.controller('infoCtrl', function($scope) {
 
 	$scope.isGroupShown = function(group){
 		return $scope.shownGroup === group;
+	};
+
+	$scope.toogleSucursal = function (sucursal) {
+		if($scope.sucursales[sucursal]){
+			$scope.sucursales[sucursal] = false;
+		}else{ 
+			$scope.sucursales[sucursal] = true;
+		}
 	};
 
 	$scope.shareFb = function(){
@@ -2574,15 +2673,13 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
     $scope.progress = 0;
     var data = '';
 
-    window.el = $scope.market;
-
     var prefix = "data:image/png;base64,",
         cache = angular.isDefined(cache) ? cache: Messages.search("processing"),
         uploading = angular.isDefined(uploading) ? uploading : Messages.search();
         photos = 0,
         cont = 0;
 
-
+    // Creates an array for iterating
     $scope.range = function(n) {
         return new Array(n);
     };
@@ -2597,14 +2694,13 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
             for(var y = 0; y < $scope.market.orders[x].items.length; y++){
                 $scope.all = $scope.all + $scope.market.orders[x].items[y].quantity;
                 if ($scope.market.orders[x].items[y].images.standard_resolution.url.indexOf(prefix) == -1) {
-                    console.log($scope.market.orders[x].items[y].images.standard_resolution.url);
                     photos = photos + 1;
                     el.push({x:x, y:y});
                 } //Close of if
             }
         }
 
-        if (el.length < 0 ) {
+        if (el.length <= 0 ) {
             $ionicLoading.hide();
             createAjaxCall();
         } else {
@@ -2624,6 +2720,9 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
 
     };
 
+
+    // Sends the pictures to the API
+    // in order to save them
     var createAjaxCall = function() {
         var formData = new FormData();
 
@@ -2639,19 +2738,18 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
         }
 
         formData.append('data',$scope.market.customer.name+"_"+$scope.market.customer.secondSurname);
+
         
         Processing.upload(formData).then(function(e){
-            window.e = e;
             var response = angular.fromJson(e);
 
             if(response.data === 'ok'){
                 setTimeout(function(){$state.go('app.order-sent');});
                 StorageService.clear();
             } else {
-                alert("Ha ocurrido un error interno.");
+                alert("Ha ocurrido un error interno. Vamos a intentarlo de nuevo.");
+                preparePhotos();
             }
-
-            
         }, function(e) {
             alert('Ha habido un error, vamos a intentarlo de nuevo');
             preparePhotos();
@@ -3402,23 +3500,6 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
                 message: message,
                 cover: array
             };
-        }
-    };
-}]);
-/**
- * Created   on 30/11/2014.
- */
-directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
-    var directiveName = "whenLoaded";
-    return {
-        restrict: 'A',
-        link: function (scope, iElement, iAttrs) {
-            iElement.load(function() {
-                var fns = $parse(iAttrs[directiveName])(scope);
-                for (var i = 0; i < fns.length; i++) {
-                    fns[i]();
-                }
-            });
         }
     };
 }]);

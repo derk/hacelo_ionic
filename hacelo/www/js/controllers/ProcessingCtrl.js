@@ -7,15 +7,13 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
     $scope.progress = 0;
     var data = '';
 
-    window.el = $scope.market;
-
     var prefix = "data:image/png;base64,",
         cache = angular.isDefined(cache) ? cache: Messages.search("processing"),
         uploading = angular.isDefined(uploading) ? uploading : Messages.search();
         photos = 0,
         cont = 0;
 
-
+    // Creates an array for iterating
     $scope.range = function(n) {
         return new Array(n);
     };
@@ -30,14 +28,13 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
             for(var y = 0; y < $scope.market.orders[x].items.length; y++){
                 $scope.all = $scope.all + $scope.market.orders[x].items[y].quantity;
                 if ($scope.market.orders[x].items[y].images.standard_resolution.url.indexOf(prefix) == -1) {
-                    console.log($scope.market.orders[x].items[y].images.standard_resolution.url);
                     photos = photos + 1;
                     el.push({x:x, y:y});
                 } //Close of if
             }
         }
 
-        if (el.length < 0 ) {
+        if (el.length <= 0 ) {
             $ionicLoading.hide();
             createAjaxCall();
         } else {
@@ -57,6 +54,9 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
 
     };
 
+
+    // Sends the pictures to the API
+    // in order to save them
     var createAjaxCall = function() {
         var formData = new FormData();
 
@@ -72,19 +72,18 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
         }
 
         formData.append('data',$scope.market.customer.name+"_"+$scope.market.customer.secondSurname);
+
         
         Processing.upload(formData).then(function(e){
-            window.e = e;
             var response = angular.fromJson(e);
 
             if(response.data === 'ok'){
                 setTimeout(function(){$state.go('app.order-sent');});
                 StorageService.clear();
             } else {
-                alert("Ha ocurrido un error interno.");
+                alert("Ha ocurrido un error interno. Vamos a intentarlo de nuevo.");
+                preparePhotos();
             }
-
-            
         }, function(e) {
             alert('Ha habido un error, vamos a intentarlo de nuevo');
             preparePhotos();

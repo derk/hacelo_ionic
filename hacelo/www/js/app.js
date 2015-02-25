@@ -102,6 +102,15 @@ angular.module('hacelo', [
             }
         }
     })
+    .state('app.crop', {
+        url: "/crop/:id",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/crop.html",
+                controller: "cropController"
+            }
+        }
+    })
     .state('app.confirm', {
         url: "/confirm",
         views: {

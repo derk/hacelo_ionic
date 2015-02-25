@@ -34,7 +34,7 @@
                              ng-repeat="image in images"
                              ng-init="sResolution = image.images.standard_resolution">
 
-                            <a ng-href="#/app/edit/{{$index}}">
+                            <a ng-href="#/app/crop/{{$index}}">
                                 <img ng-src="{{sResolution.url}}"
                                      style="max-width: 100%;height: auto;">
                             </a>

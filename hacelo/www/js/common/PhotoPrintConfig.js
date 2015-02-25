@@ -163,7 +163,7 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 300,
+                            "width": 500,
                             "height": 500
                         },
                         "minimum": {
