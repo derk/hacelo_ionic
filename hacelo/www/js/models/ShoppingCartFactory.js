@@ -32,7 +32,8 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
         this.productLine = pProductLine;
         this.product = pProduct;
         this.items = pItems;
-        this.properties = properties;
+        this.properties = properties || null;
+        this.quantity = 1;
 
         // ---
         // PUBLIC METHODS.
@@ -42,12 +43,14 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             for (var i = this.items.length - 1; i >= 0; i--) {
                 numberOfItems += this.items[i].quantity;
             }
+            numberOfOrders = numberOfOrders * this.quantity;
             return numberOfItems;
         };
 
         this.computeSubTotal = function () {
             var subTotal = 0,
                 numberOfItems = this.getQuantity(),
+                numberOfOrders = this.quantity,
                 firstItems = this.product.prices.first_items,
                 additionalItem = this.product.prices.additional;
 
@@ -58,6 +61,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
                 subTotal = firstItems.price + (numberOfAdditionalItems * additionalItem.price);
             }
 
+            subTotal = subTotal * numberOfOrders;
             return subTotal;
         };
     }

@@ -13,8 +13,7 @@
 					 ng-repeat="image in imageStack | filter:{gallery: albumName}:true"
 					 ng-init="mini = image.images.thumbnail"
 					 ng-class="{selected: image.toPrint}"
-                     ng-style="{height: albumCtrl.height}"
-					 style="overflow:hidden;">
+					 ng-style="style">
 					<a ng-click="checkImage(image)">
 						<i class="icon ion-checkmark-circled"></i>
 						<img ng-src="{{mini.url}}"

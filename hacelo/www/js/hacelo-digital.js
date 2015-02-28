@@ -888,6 +888,7 @@ commons.constant('PhotoPrintConfig', {
         {
             id: "photostrips",
             "name": "Photostrips",
+            "isStrip":"true",
             "images": "img/photostrips/Photostrips_Categoria/photostrips_categoria.png",
             "products": [
                 {
@@ -1751,23 +1752,6 @@ commons.constant('PlacesConfig', {
         }
     }
 });
-/**
- * Created   on 30/11/2014.
- */
-directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
-    var directiveName = "whenLoaded";
-    return {
-        restrict: 'A',
-        link: function (scope, iElement, iAttrs) {
-            iElement.load(function() {
-                var fns = $parse(iAttrs[directiveName])(scope);
-                for (var i = 0; i < fns.length; i++) {
-                    fns[i]();
-                }
-            });
-        }
-    };
-}]);
 controllers.controller('addedCtrl', ['$scope', '$stateParams', function ($scope, $stateParams) {
     $scope.productName = $stateParams.productName;
 }]);
@@ -1783,6 +1767,11 @@ controllers.controller('albumCtrl', ['$scope', '$state', '$stateParams', '$ionic
     $scope.toPrintCount = getToPrintCount();
     $scope.height = screen.width / 3;
 
+    $scope.style = {
+        "overflow":"hidden",
+        "height": $scope.height+"px"
+    };
+
     $scope.checkImage = function(image){
         image.toPrint = !image.toPrint;
         $scope.toPrintCount = getToPrintCount();
@@ -1796,6 +1785,7 @@ controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', '
     $scope.discount = {valid: false, class : ''};
     $scope.coupon = '';
     console.log($scope.cart);
+    window.e = $scope.cart;
 
     $scope.removeOrder = function (pOrderToRemove) {
         var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_order_delete"),
@@ -1809,7 +1799,15 @@ controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', '
     };
 
     $scope.minus = function(order){
+        if (order.quantity === 1) {
+            $scope.removeOrder(order);
+        } else {
+            order.quantity -= 1;
+        }
+    };
 
+    $scope.add = function (order) {
+        order.quantity += 1;
     };
 
     $scope.validate = function(code) {
@@ -2779,6 +2777,23 @@ controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ion
     
     
 });
+/**
+ * Created   on 30/11/2014.
+ */
+directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
+    var directiveName = "whenLoaded";
+    return {
+        restrict: 'A',
+        link: function (scope, iElement, iAttrs) {
+            iElement.load(function() {
+                var fns = $parse(iAttrs[directiveName])(scope);
+                for (var i = 0; i < fns.length; i++) {
+                    fns[i]();
+                }
+            });
+        }
+    };
+}]);
 models.factory('ImageFactory', ['$q', '$filter', '$timeout', function ($q, $filter, $timeout) {
     function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
         this.origin = pOrigin;
@@ -3216,7 +3231,8 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
         this.productLine = pProductLine;
         this.product = pProduct;
         this.items = pItems;
-        this.properties = properties;
+        this.properties = properties || null;
+        this.quantity = 1;
 
         // ---
         // PUBLIC METHODS.
@@ -3226,12 +3242,14 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             for (var i = this.items.length - 1; i >= 0; i--) {
                 numberOfItems += this.items[i].quantity;
             }
+            numberOfOrders = numberOfOrders * this.quantity;
             return numberOfItems;
         };
 
         this.computeSubTotal = function () {
             var subTotal = 0,
                 numberOfItems = this.getQuantity(),
+                numberOfOrders = this.quantity,
                 firstItems = this.product.prices.first_items,
                 additionalItem = this.product.prices.additional;
 
@@ -3242,6 +3260,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
                 subTotal = firstItems.price + (numberOfAdditionalItems * additionalItem.price);
             }
 
+            subTotal = subTotal * numberOfOrders;
             return subTotal;
         };
     }

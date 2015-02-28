@@ -10,6 +10,11 @@ controllers.controller('albumCtrl', ['$scope', '$state', '$stateParams', '$ionic
     $scope.toPrintCount = getToPrintCount();
     $scope.height = screen.width / 3;
 
+    $scope.style = {
+        "overflow":"hidden",
+        "height": $scope.height+"px"
+    };
+
     $scope.checkImage = function(image){
         image.toPrint = !image.toPrint;
         $scope.toPrintCount = getToPrintCount();

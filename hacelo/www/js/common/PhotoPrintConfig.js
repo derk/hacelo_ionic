@@ -580,6 +580,7 @@ commons.constant('PhotoPrintConfig', {
         {
             id: "photostrips",
             "name": "Photostrips",
+            "isStrip":"true",
             "images": "img/photostrips/Photostrips_Categoria/photostrips_categoria.png",
             "products": [
                 {

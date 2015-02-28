@@ -188,7 +188,7 @@ body{
                 height: 34px;
                 text-align: right;
                 padding-right: 8px;
-                background: url('../img/arrow-buttons-grey.png') no-repeat center;
+                background: url('../img/arrow-buttons-grey.png') no-repeat;
             }
         }
         &.bar-stable .title{
@@ -476,6 +476,7 @@ body{
         max-width: 33.3333%;
         position: relative;
         text-align: center;
+        box-sizing: border-box;
 
         img {
             max-width: 100%;
@@ -495,6 +496,16 @@ body{
             .icon {
                 color: $orange;
             }
+        }
+    }
+
+    .load-more {
+        button {
+            width: 100%;
+            height: 55px;
+            background: $orange;
+            outline: none;
+            border: none;
         }
     }
 }
@@ -788,7 +799,7 @@ body{
             .quantity-container {
                 position: absolute;
                 top: 12px;
-                width: 32%;
+                width: 36%;
                 padding: 3% 0;
                 background: #d73833;
                 right: 0;
@@ -1894,3 +1905,9 @@ body{
 .button.button-balanced.active {
     background: $orange;
 }
+
+
+/*
+    CUstom clases
+*/
+

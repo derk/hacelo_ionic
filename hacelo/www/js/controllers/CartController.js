@@ -6,6 +6,7 @@ controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', '
     $scope.discount = {valid: false, class : ''};
     $scope.coupon = '';
     console.log($scope.cart);
+    window.e = $scope.cart;
 
     $scope.removeOrder = function (pOrderToRemove) {
         var cache = angular.isDefined(cache) ? cache: Messages.search("confirm_order_delete"),
@@ -19,7 +20,15 @@ controllers.controller('cartCtrl', ['$scope', '$ionicPopup', 'MessageService', '
     };
 
     $scope.minus = function(order){
+        if (order.quantity === 1) {
+            $scope.removeOrder(order);
+        } else {
+            order.quantity -= 1;
+        }
+    };
 
+    $scope.add = function (order) {
+        order.quantity += 1;
     };
 
     $scope.validate = function(code) {

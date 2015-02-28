@@ -9,7 +9,6 @@
 		</ion-nav-buttons>
 	</ion-nav-bar>
 	<ion-content class="has-header">
-	<ion-list>
   		<div class="photos">
 			<div class="images-container">
 				<div class="image"
@@ -29,12 +28,7 @@
 		<div class="load-more">
 			<button ng-show="canLoadMore" ng-click="loadMore(true)">Cargar Mas</button>
 		</div>
-  	</ion-list>
-	<ion-infinite-scroll
-	    on-infinite="loadMore(true)"
-	    distance = "1%"
-	    ng-if="canLoadMore">	
-	 </ion-infinite-scroll>
+
 		
 	</ion-content>
 </ion-view>

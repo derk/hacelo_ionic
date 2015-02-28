@@ -18,11 +18,10 @@
                 <div ng-repeat="order in cart.orders" ng-animate="'animate'" class="animate-repeat orders" style="background:url({{order.product.images}}) no-repeat top left/100% 100%;">
                     <div class="quantity-container">
                         <button class="minus"
-                                        ng-disabled="order.getQuantity()==1"
                                         ng-click="minus(order)">-</button>
-                                &times;{{order.getQuantity()}}
+                                &times;{{order.quantity}}
                                 <button class="add"
-                                        ng-click="">+</button></div>
+                                        ng-click="add(order)">+</button></div>
 
                     <span ng-click="removeOrder(order)" class="delete">-</span>
                     <div class="left-column">
