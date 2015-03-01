@@ -14,9 +14,7 @@ controllers.controller('photobookCheckCtrl', ['$scope', '$state', '$ionicPopup',
         $scope.images = SelectedImagesFactory.getToPrintOnes();
 
     }
-
-    window.el = SelectedImagesFactory;
-
+    
     $scope.saveProductLine = function(pProductLine) {
         SelectedImagesFactory.setProductLine(pProductLine);
         $state.go("app.category");

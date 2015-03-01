@@ -232,6 +232,15 @@ angular.module('hacelo', [
             }
         }
     })
+    .state('app.photostrip', {
+        url: "/photostrip",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/photostrips.html",
+                controller: "photostripCtrl"
+            }
+        }
+    })
     .state('app.photobook-check', {
         url: "/photobook-check",
         views: {

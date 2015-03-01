@@ -37,6 +37,12 @@
             "okText" : "Aceptar" 
         },
 
+        "photostrip_few" :{
+           "title" : "Houston, tenemos un problema",
+            "template" : "El photostrip solo permite 36 fotos, no tienes esa cantidad.",
+            "okText" : "Aceptar" 
+        },
+
         "loss_of_selected_images" : {
             "title" : "¿Estas segur@ de continuar?",
             "template" : "Si cambias de categoría perderás las imágenes que tienes seleccionadas hasta el momento."

@@ -520,6 +520,22 @@ body{
     /*border-left:1px solid #000; */
 }
 
+/*
+================ PhotoStrip ============
+*/
+
+.photostrip-page {
+
+    .group {
+        width: 33% !important;
+        background: white;
+        box-shadow: 10px 10px 26px -6px #000;
+        float: left;
+        margin: 10px;
+    }
+
+}
+
 /* 
    =============  Info page  ============= 
 */

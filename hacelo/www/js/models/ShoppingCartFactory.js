@@ -43,7 +43,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             for (var i = this.items.length - 1; i >= 0; i--) {
                 numberOfItems += this.items[i].quantity;
             }
-            numberOfOrders = numberOfOrders * this.quantity;
+            numberOfItems = numberOfItems * this.quantity;
             return numberOfItems;
         };
 

@@ -43,10 +43,10 @@ function ($scope,   $state,   SelectedImagesFactory,   MessageService,   FileRea
     $scope.goToConfirm = function () {
 
         if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
-            console.log('State app.photobook-check opened');
             $state.go('app.photobook-check');
+        } else if (angular.isDefined(SelectedImagesFactory.getProductLine().isStrip)) {
+             $state.go('app.photostrip');
         } else {
-            console.log('State app.check opened');
             $state.go('app.check');
         }
     };

@@ -1,0 +1,22 @@
+<ion-view title="Revisar" class="check-page check-photobook photostrip-page">
+    <ion-nav-bar class="grey bar-stable" animation="slide-left-right">
+        <ion-nav-back-button class="button-clear">
+            <div class="arrow"> Atrás</div>
+        </ion-nav-back-button>
+        <h1 class="title">Portada</h1>
+        <ion-nav-buttons side="right">
+            <a class="button button-icon accept-button positive check-photo" ng-click="addToCart()" >Aceptar</a>
+        </ion-nav-buttons>
+    </ion-nav-bar>
+
+
+    <ion-content class="has-header">
+        	<ion-scroll direction="x" class="item wide-item">
+        		<div class="group" ng-repeat="item in groups track by $index">
+		        	<div ng-repeat="image in item track by $index" style="height:{{getHeight()}}px; background:url('{{image.images.standard_resolution.url}}') no-repeat;">
+						<img src="">
+		        	</div>
+		        </div>
+        	</ion-scroll>
+    </ion-content>
+</ion-view>

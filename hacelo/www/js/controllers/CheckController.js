@@ -37,6 +37,7 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
          * If the image has other quantity already just preserve that value.
          * Also create a new array of image locations (URLs) to be preloaded
          * */
+         
         var imageLocations = [];
          for (var i = $scope.images.length - 1; i >= 0; i--) {
              if ($scope.images[i].quantity === 0) {

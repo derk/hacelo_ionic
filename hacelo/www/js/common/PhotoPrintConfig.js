@@ -594,8 +594,8 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 300,
-                            "height": 500
+                            "width": 408,
+                            "height": 1706
                         },
                         "minimum": {
                             "width": 333,
@@ -605,7 +605,7 @@ commons.constant('PhotoPrintConfig', {
                     },
                     "prices": {
                         "first_items": {
-                            "quantity": 12,
+                            "quantity": 36,
                             // use `.` for decimals
                             // for example one dollar with fifty cents = 1.50
                             // do not separate big numbers like 20,000.50
