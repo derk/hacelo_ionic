@@ -1,4 +1,4 @@
-<ion-view title="Revisar" class="check-page check-photobook photostrip-page">
+<ion-view class="check-page check-photobook photostrip-page">
     <ion-nav-bar class="grey bar-stable" animation="slide-left-right">
         <ion-nav-back-button class="button-clear">
             <div class="arrow"> Atrás</div>
@@ -10,13 +10,11 @@
     </ion-nav-bar>
 
 
-    <ion-content class="has-header">
-        	<ion-scroll direction="x" class="item wide-item">
-        		<div class="group" ng-repeat="item in groups track by $index">
-		        	<div ng-repeat="image in item track by $index" style="height:{{getHeight()}}px; background:url('{{image.images.standard_resolution.url}}') no-repeat;">
-						<img src="">
+    <ion-content class="has-header" scrollbar-x="true">
+        		<div class="group" ng-repeat="item in groups track by $index" ng-init="groupIndex = $index">
+		        	<div ng-repeat="image in item track by $index" ng-class="{'checked':image.checked}" ng-init="index = $index" ng-click="image.checked = !image.checked;pick(groupIndex, index, image); ">
+						<img src="{{image.url.images.standard_resolution.url}}" width="{{getHeight()}}" height="{{getHeight()}}">
 		        	</div>
 		        </div>
-        	</ion-scroll>
     </ion-content>
 </ion-view>

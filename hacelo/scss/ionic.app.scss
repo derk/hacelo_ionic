@@ -528,12 +528,26 @@ body{
 
     .group {
         width: 33% !important;
-        background: white;
-        box-shadow: 10px 10px 26px -6px #000;
         float: left;
-        margin: 10px;
-    }
+        margin: 30px 0;
+        box-sizing: border-box;
+        text-align: center;
 
+        & div {
+            width: 80%;
+            margin: 0 auto;
+        }
+        .checked {
+
+        }
+    }
+    .wide-as-needed {
+      overflow: scroll;
+      white-space: nowrap;
+    }
+    .scroll { 
+      min-width: 100%;
+    }
 }
 
 /* 

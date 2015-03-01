@@ -3,6 +3,10 @@
  */
 controllers.controller('photostripCtrl', ['$scope', '$state', '$ionicPopup','SelectedImagesFactory', 'PhotoPrintConfig','MessageService', 'Utils',function($scope, $state, $ionicPopup, SelectedImagesFactory, PhotoPrintConfig, Messages, Utils) {
     var popup = angular.isDefined(popup) ? popup: Messages.search("photostrip_few");
+    var pick = {
+        picked : false,
+        index: null
+    };
     $scope.groups = [];
 
     if(SelectedImagesFactory.getProduct().prices.first_items.quantity   !=  SelectedImagesFactory.getToPrintOnes().length){
@@ -26,19 +30,21 @@ controllers.controller('photostripCtrl', ['$scope', '$state', '$ionicPopup','Sel
     $scope.createGroups = function () {
         var jumps = 0,
             group = [];
+            $scope.groups = [];
         angular.forEach($scope.images, function (e, i) {
-            group.push(e);
+            group.push({url:e, checked : false});
             if ( (i + 1 ) % 4 == 0 ) {
                 $scope.groups.push(group);
                 group = [];
             }
         });
-        window.g = $scope.groups;
+
+        return $scope.groups;
     };
 
     $scope.getHeight = function () {
         var width = screen.width;
-        return width * 0.333;
+        return (width * 0.333) * 0.8;
     };
     /*
      * Se encarga de ingresar en el carrito de compras los datos que ya se encuentran
@@ -53,6 +59,35 @@ controllers.controller('photostripCtrl', ['$scope', '$state', '$ionicPopup','Sel
             }
         });
 
+    };
+
+    $scope.pick = function (i, a, image) {
+        if (image.checked) {
+            var index = (i * 4) + a; 
+            if (pick.picked == true) {
+                var tmp = $scope.images[index];
+                var tmp2 = $scope.images[pick.index];
+                $scope.images[index] = tmp2;
+                $scope.images[pick.index] = tmp;
+                pick = {picked:false, index: null};
+                $scope.createGroups();
+            } else {
+                pick = {picked:true, index: index};  
+            }
+            
+        } else {
+            pick = {picked:false, index: null};
+        }
+        console.log(pick);
+    };
+
+    $scope.cleanCheck = function () {
+        for (var i = $scope.groups.length - 1; i >= 0; i--) {
+            for (var y = $scope.groups[i].length - 1; y >= 0; y--) {
+                $scope.groups[i][y].checked = false;
+            };
+        };
+        window.g = $scope.groups;
     };
 
     $scope.createGroups();
