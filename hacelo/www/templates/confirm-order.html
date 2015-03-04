@@ -11,8 +11,9 @@
 					<span class="sendto">Enviar A:</span>
 					<p> 
 						<span>{{cart.customer.firstName}} {{cart.customer.secondSurname}}</span>
-						<span>{{cart.customer.address.exacta}}</span>
-						<span>{{cart.customer.address.district}}, {{cart.customer.address.canton}}, {{cart.customer.address.province}}, Costa Rica.</span> 
+						<span ng-show="cart.customer.address.isSucursal == true">{{cart.customer.address.sucursal}}</span>
+						<span ng-show="cart.customer.address.isSucursal == false">{{cart.customer.address.exacta}}</span>
+						<span ng-show="cart.customer.address.isSucursal == false">{{cart.customer.address.district}}, {{cart.customer.address.canton}}, {{cart.customer.address.province}}, Costa Rica.</span> 
 					</p>
 				</div>
 				<div>

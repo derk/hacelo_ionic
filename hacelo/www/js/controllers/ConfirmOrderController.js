@@ -14,19 +14,16 @@ controllers.controller('confirmOrderCtrl', ['$scope', '$state' ,'$ionicPopup','$
     $scope.hide = function(){
         $ionicLoading.hide();
     };
-
    
    $scope.pay = function(){
    		$scope.show();
       if (angular.isDefined($scope.cart.coupon.code) && $scope.cart.coupon.code != "")  {
           CartService.redeem($scope.cart.coupon.code, true).then(function(e){
-            console.log(e);
             $scope.payment();           
           });
       } else {
           $scope.payment();           
       }
-         
    };
 
    $scope.payment = function () {

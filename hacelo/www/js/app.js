@@ -156,6 +156,15 @@ angular.module('hacelo', [
             }
         }
     })
+    .state('app.firstProcess', {
+        url: "/firstProcess",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/cart-process_first.html",
+                controller: 'cartProcessFirstCtrl'
+            }
+        }
+    })
     .state('app.cart-checkout2', {
         url: "/cart-checkout2",
         views: {

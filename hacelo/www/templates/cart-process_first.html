@@ -1,0 +1,61 @@
+<ion-view title="Envío" class="cart-checkout-page process-page" >
+    <ion-nav-bar class="red bar-stable" animation="slide-left-right">  
+      <ion-nav-back-button class="button-clear">
+        <div class="arrow"> Atrás </div>
+      </ion-nav-back-button>
+    </ion-nav-bar>
+    <ion-content class="has-header">
+        <div class="cart-checkout-container">
+            <div class="list list-inset">
+                <h3>Te enviamos tus fotos a: </h3>
+                <label class="item btn sucursales casa" ng-class="{'picked': sucursal == true}">
+                  <button ng-click="sucursal = true;" class="button button-block button-positive" type="submit">Sucursales (gratis)</button>
+                </label>
+                    <div ng-show="sucursal">
+                        <select 
+                              ng-model="info.sucursal" 
+                              ng-options="sucursal.name for sucursal in sucursales"
+                              ng-init="info.sucursal=sucursales[0]">
+                        </select>
+                    </div>
+
+                <label class="item btn casa" ng-class="{'picked': sucursal == false}">
+                      <button ng-click="sucursal = false;" class="button button-block" type="submit">Casa</button>
+                    </label>
+
+                <div ng-show="sucursal == false">
+
+                    <label class="item item-input">
+                        <textarea name="comment" ng-model="info.exact" rows="7" cols="5" placeholder="DIRECCIÓN">
+                        </textarea>
+                    </label>
+
+                    <select 
+                          ng-model="info.province" 
+                          ng-options="province.name for province in provinces"
+                          ng-change= "showCanton()">
+                    </select>
+                    <span class="advise">(Ej: San José)</span>
+                    <select 
+                          ng-model="info.canton" 
+                          ng-options="canton.name for canton in cantones"
+                          ng-change= "showDistrict()">
+                    </select>
+                    <span class="advise">(Ej. Tibás)</span>
+                    <select 
+                          ng-model="info.district" 
+                          ng-options="district.name for district in districts">
+                    </select>
+                    <span class="advise">(Ej. Llorente)</span>
+                    <!-- <label class="item input-checkbox">
+                        <input type="checkbox">
+                        <span>Recordar para la próxima compra</span>
+                    </label> -->
+                </div>
+                
+                <a ng-click="saveInformation(sucursal);calculatePrice();" class="button button-balanced" >Pagar</a>
+            </div>
+            
+        </div>
+    </ion-content>
+</ion-view>

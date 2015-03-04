@@ -1,4 +1,5 @@
 commons.constant('PlacesConfig', {
+    "sucursales":["San Jose", "LLorente", "Alajuela", "Heredia"],
     "places":{
         "San José":{
             "Cantones": {    

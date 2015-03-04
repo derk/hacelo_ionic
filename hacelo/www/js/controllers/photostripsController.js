@@ -78,7 +78,6 @@ controllers.controller('photostripCtrl', ['$scope', '$state', '$ionicPopup','Sel
         } else {
             pick = {picked:false, index: null};
         }
-        console.log(pick);
     };
 
     $scope.cleanCheck = function () {

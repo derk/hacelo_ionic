@@ -107,7 +107,8 @@ controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading',
     };
 
     $scope.saveInformation = function(){
-        ShoppingCartFactory.saveCustomer($scope.info.name, $scope.info.last, $scope.info.phone,  $scope.info.email, $scope.info.province.name, $scope.info.canton.name, $scope.info.district.name, $scope.info.exact);
+        ShoppingCartFactory.saveCustomer($scope.info.name, $scope.info.last, $scope.info.phone,  $scope.info.email);
+        $state.go("app.firstProcess");
     };
 
     $scope.calculatePrice = function(){
@@ -128,6 +129,77 @@ controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading',
     
 }]);
 
+controllers.controller('cartProcessFirstCtrl', ['$scope', '$state', '$ionicLoading','$ionicPopup', 'MessageService', 'ShoppingCartFactory','PlacesConfig','Payment', function($scope, $state, $ionicLoading, $ionicPopup, Messages, ShoppingCartFactory, PlacesConfig, Payment) {
+    $scope.cart = ShoppingCartFactory.loadShoppingCart();
+    $scope.sucursal = null;
+    $scope.provinces = [];
+    $scope.cantones = [];
+    $scope.districts = [];
+    $scope.sucursales = [];
+    $scope.info = {};  
+
+    var places = PlacesConfig.places,
+        sucursales = PlacesConfig.sucursales;
+
+    angular.forEach(Object.keys(places), function(v){
+        $scope.provinces.push({"name":v});
+    });
+
+    angular.forEach(sucursales, function(v){
+        $scope.sucursales.push({"name":v});
+    });
+
+    $scope.showCanton = function(){
+        $scope.cantones = [];
+        $scope.districts = [];
+
+         angular.forEach(Object.keys(places[$scope.info.province.name].Cantones), function(v){
+            $scope.cantones.push({"name":v});
+        });
+    };
+
+    $scope.showDistrict = function(){
+        $scope.districts = [];
+
+         angular.forEach(places[$scope.info.province.name].Cantones[$scope.info.canton.name], function(v){
+            $scope.districts.push({"name":v});
+        });
+    };
+
+    $scope.show = function() {
+        $ionicLoading.show({
+          template: 'Calculando Transporte'
+        });
+    };
+
+    $scope.hide = function(){
+        $ionicLoading.hide();
+    };
+
+    $scope.changeSucursal = function(s) {
+       $scope.sucursal = s;
+    };
+
+    $scope.saveInformation = function(is) {
+        ShoppingCartFactory.saveTravelInfo(is, $scope.info.sucursal ? $scope.info.sucursal.name : "", $scope.info.province ? $scope.info.province.name : "" , $scope.info.canton ? $scope.info.canton.name : "", $scope.info.district ? $scope.info.district.name : "", $scope.info.exact || "");
+    };
+
+    $scope.calculatePrice = function(){
+
+        if($scope.sucursal == true){
+            ShoppingCartFactory.saveTravel(0);
+            $state.go("app.redeem");
+        } else {
+            $scope.show();
+            Payment.sendWeight($scope.cart.getWeight()).then(function(response){
+                ShoppingCartFactory.saveTravel(response.message.precio);
+                $scope.hide();
+                $state.go("app.redeem");
+            });
+        }
+        
+    };
+}]);
 
 /**
  * Created by Raiam on 02/01/2015.

@@ -1,10 +1,10 @@
-<ion-view title="Envío" class="cart-checkout-page" >
+<ion-view title="Envío" class="cart-checkout-page direction-page" >
 	<ion-nav-bar class="red bar-stable" animation="slide-left-right">  
       <ion-nav-back-button class="button-clear">
         <div class="arrow"> Atrás </div>
       </ion-nav-back-button>
     </ion-nav-bar>
-  	<ion-content class="has-header">
+  	<ion-content class="has-header" scroll="false">
     	<div class="cart-checkout-container">
     		<ul>
     			<li>Se te solicitará una firma a la hora de hacer la entrega.</li>
@@ -13,25 +13,41 @@
     		<a class="info" href="#">Ver información completa de envío</a>
 			
 			<div class="list list-inset">
-				
-			    <div class="maininfo">
-			    	<label class="item item-input name">
-					<input class="" ng-model="info.name" type="text" name="name" placeholder="NOMBRE">
+				<form name="myForm" novalidate>
+				    <div class="maininfo">
+				    	<label class="item item-input name">
+						<input class="" ng-model="info.name" type="text" name="name" placeholder="NOMBRE" required>
+						<span style="color:red" ng-show="myForm.name.$dirty || myForm.name.$invalid">
+							<span ng-show="myForm.name.$error.required">El Nombre es requerido.</span>
+						</span>
+						</label>
+						<label class="item item-input lastname">
+							<input class="" ng-model="info.last" type="text" name="lastname" placeholder="APELLIDO" required>
+							<span style="color:red" ng-show="myForm.lastname.$dirty || myForm.lastname.$invalid">
+								<span ng-show="myForm.lastname.$error.required">El Apellido es requerido.</span>
+							</span>
+						</label>
+				    </div>
+					<label class="item item-input no-mg-bottom">
+						<input name="email" ng-model="info.email" type="email" placeholder="CORREO" required>
 					</label>
-					<label class="item item-input lastname">
-						<input class="" ng-model="info.last" type="text" name="lastname" placeholder="APELLIDO">
-					</label>
-			    </div>
-				<label class="item item-input no-mg-bottom">
-					<input name="email" ng-model="info.email" type="email" placeholder="CORREO">
-				</label>
-				<span class="advise">(Para enviarte la factura)</span>
-				<label class="item item-input no-mg-bottom">
-					<input name="tel" ng-model="info.phone" type="text" placeholder="TELÉFONO">
-				</label>
-				<span class="advise">(para llamarte por si algo sucede durante la entrega)</span>
+					<span class="error" style="color:red" ng-show="myForm.email.$dirty || myForm.email.$invalid">
+							<span ng-show="myForm.email.$error.required">El email es requerido.</span>
+							<span ng-show="myForm.email.$error.email">El email no parece ser correcto.</span>
+						</span>
+					<span class="advise">(Para enviarte la factura)</span>
 
-				<h3>Te enviamos tus fotos a: </h3>
+					<label class="item item-input no-mg-bottom">
+						<input name="tel" ng-model="info.phone" type="number" placeholder="TELÉFONO" min="11111111" max="99999999" required>
+					</label>
+					<span class="error" style="color:red" ng-show="myForm.tel.$dirty || myForm.tel.$invalid">
+							<span ng-show="myForm.tel.$error.required">El telefono es requerido.</span>
+							<span ng-show="myForm.tel.$error.max || myForm.tel.$error.number || myForm.tel.$error.min">Digite solo numeros y no mayores a 8 digitos.</span>
+						</span>
+					<span class="advise">(para llamarte por si algo sucede durante la entrega)</span>
+				</form>
+
+				<!-- <h3>Te enviamos tus fotos a: </h3>
 				<label class="item btn sucursales">
 			      <button ng-click="changeSucursal(true);" class="button button-block button-positive" type="submit">Sucursales (gratis)</button>
 			    </label>
@@ -65,10 +81,11 @@
 				    <label class="item input-checkbox">
 						<input type="checkbox">
 						<span>Recordar para la próxima compra</span>
-					</label>
+					</label> -->
 			    </div>
 			    
-				<a ng-click="saveInformation();calculatePrice();" class="button button-balanced" >Pagar</a>
+				<a ng-click="saveInformation();" class="button button-balanced" ng-disabled="myForm.name.$invalid ||  
+ myForm.lastname.$invalid || myForm.email.$invalid || myForm.tel.$invalid">Pagar</a>
 			</div>
     		
 		</div>

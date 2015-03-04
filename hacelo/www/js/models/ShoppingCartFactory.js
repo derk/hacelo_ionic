@@ -43,7 +43,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             for (var i = this.items.length - 1; i >= 0; i--) {
                 numberOfItems += this.items[i].quantity;
             }
-            numberOfItems = numberOfItems * this.quantity;
+            //numberOfItems = numberOfItems * this.quantity;
             return numberOfItems;
         };
 
@@ -80,7 +80,9 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
                 province: "",
                 canton: "",
                 district: "",
-                exacta: ""
+                exacta: "",
+                isSucursal: "",
+                sucursal: ""
             }
         };
         this.orders = pOrders || [];
@@ -298,20 +300,29 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             this.saveShoppingCart();
         },
 
-        saveCustomer : function(name, secondSurname, phone, email, province, canton, district, exacta){
-            shoppingCart.customer = {
+        saveCustomer : function(name, secondSurname, phone, email){
+            var model = {
                 name: name,
                 firstName: name,
                 secondSurname: secondSurname,
                 phone: phone,
-                email: email,
-                address: {
-                    province: province,
-                    canton: canton,
-                    district: district,
-                    exacta: exacta
-                }
+                email: email
             };
+            angular.extend(shoppingCart.customer, model);
+            this.saveShoppingCart();
+        },
+
+        saveTravelInfo : function (isSucursal, sucursal, province, canton, district, exacta) {
+            var model = {
+                isSucursal: isSucursal,
+                sucursal: sucursal,
+                province: province,
+                canton: canton,
+                district: district,
+                exacta: exacta
+            };
+
+            angular.extend(shoppingCart.customer.address, model);
             this.saveShoppingCart();
         },
 

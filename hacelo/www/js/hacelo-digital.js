@@ -156,6 +156,15 @@ angular.module('hacelo', [
             }
         }
     })
+    .state('app.firstProcess', {
+        url: "/firstProcess",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/cart-process_first.html",
+                controller: 'cartProcessFirstCtrl'
+            }
+        }
+    })
     .state('app.cart-checkout2', {
         url: "/cart-checkout2",
         views: {
@@ -306,15 +315,15 @@ angular.module('hacelo', [
       };
     } ]);
 
-var commons = angular.module('hacelo.config', []);
 var controllers = angular.module('hacelo.controllers', []);
+var commons = angular.module('hacelo.config', []);
 /**
  * Created   on 30/11/2014.
  */
 var directives = angular.module('hacelo.directives', []);
 
-var services = angular.module('hacelo.services', []);
 var models = angular.module('hacelo.models', []);
+var services = angular.module('hacelo.services', []);
 commons.constant('PhotoPrintConfig', {
     "products": [
         /*
@@ -1156,6 +1165,7 @@ commons.constant('PhotoPrintConfig', {
     ]
 });
 commons.constant('PlacesConfig', {
+    "sucursales":["San Jose", "LLorente", "Alajuela", "Heredia"],
     "places":{
         "San José":{
             "Cantones": {    
@@ -1761,23 +1771,6 @@ commons.constant('PlacesConfig', {
         }
     }
 });
-/**
- * Created   on 30/11/2014.
- */
-directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
-    var directiveName = "whenLoaded";
-    return {
-        restrict: 'A',
-        link: function (scope, iElement, iAttrs) {
-            iElement.load(function() {
-                var fns = $parse(iAttrs[directiveName])(scope);
-                for (var i = 0; i < fns.length; i++) {
-                    fns[i]();
-                }
-            });
-        }
-    };
-}]);
 controllers.controller('addedCtrl', ['$scope', '$stateParams', function ($scope, $stateParams) {
     $scope.productName = $stateParams.productName;
 }]);
@@ -1912,7 +1905,8 @@ controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading',
     };
 
     $scope.saveInformation = function(){
-        ShoppingCartFactory.saveCustomer($scope.info.name, $scope.info.last, $scope.info.phone,  $scope.info.email, $scope.info.province.name, $scope.info.canton.name, $scope.info.district.name, $scope.info.exact);
+        ShoppingCartFactory.saveCustomer($scope.info.name, $scope.info.last, $scope.info.phone,  $scope.info.email);
+        $state.go("app.firstProcess");
     };
 
     $scope.calculatePrice = function(){
@@ -1933,6 +1927,77 @@ controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading',
     
 }]);
 
+controllers.controller('cartProcessFirstCtrl', ['$scope', '$state', '$ionicLoading','$ionicPopup', 'MessageService', 'ShoppingCartFactory','PlacesConfig','Payment', function($scope, $state, $ionicLoading, $ionicPopup, Messages, ShoppingCartFactory, PlacesConfig, Payment) {
+    $scope.cart = ShoppingCartFactory.loadShoppingCart();
+    $scope.sucursal = null;
+    $scope.provinces = [];
+    $scope.cantones = [];
+    $scope.districts = [];
+    $scope.sucursales = [];
+    $scope.info = {};  
+
+    var places = PlacesConfig.places,
+        sucursales = PlacesConfig.sucursales;
+
+    angular.forEach(Object.keys(places), function(v){
+        $scope.provinces.push({"name":v});
+    });
+
+    angular.forEach(sucursales, function(v){
+        $scope.sucursales.push({"name":v});
+    });
+
+    $scope.showCanton = function(){
+        $scope.cantones = [];
+        $scope.districts = [];
+
+         angular.forEach(Object.keys(places[$scope.info.province.name].Cantones), function(v){
+            $scope.cantones.push({"name":v});
+        });
+    };
+
+    $scope.showDistrict = function(){
+        $scope.districts = [];
+
+         angular.forEach(places[$scope.info.province.name].Cantones[$scope.info.canton.name], function(v){
+            $scope.districts.push({"name":v});
+        });
+    };
+
+    $scope.show = function() {
+        $ionicLoading.show({
+          template: 'Calculando Transporte'
+        });
+    };
+
+    $scope.hide = function(){
+        $ionicLoading.hide();
+    };
+
+    $scope.changeSucursal = function(s) {
+       $scope.sucursal = s;
+    };
+
+    $scope.saveInformation = function(is) {
+        ShoppingCartFactory.saveTravelInfo(is, $scope.info.sucursal ? $scope.info.sucursal.name : "", $scope.info.province ? $scope.info.province.name : "" , $scope.info.canton ? $scope.info.canton.name : "", $scope.info.district ? $scope.info.district.name : "", $scope.info.exact || "");
+    };
+
+    $scope.calculatePrice = function(){
+
+        if($scope.sucursal == true){
+            ShoppingCartFactory.saveTravel(0);
+            $state.go("app.redeem");
+        } else {
+            $scope.show();
+            Payment.sendWeight($scope.cart.getWeight()).then(function(response){
+                ShoppingCartFactory.saveTravel(response.message.precio);
+                $scope.hide();
+                $state.go("app.redeem");
+            });
+        }
+        
+    };
+}]);
 
 /**
  * Created by Raiam on 02/01/2015.
@@ -2168,19 +2233,16 @@ controllers.controller('confirmOrderCtrl', ['$scope', '$state' ,'$ionicPopup','$
     $scope.hide = function(){
         $ionicLoading.hide();
     };
-
    
    $scope.pay = function(){
    		$scope.show();
       if (angular.isDefined($scope.cart.coupon.code) && $scope.cart.coupon.code != "")  {
           CartService.redeem($scope.cart.coupon.code, true).then(function(e){
-            console.log(e);
             $scope.payment();           
           });
       } else {
           $scope.payment();           
       }
-         
    };
 
    $scope.payment = function () {
@@ -2866,27 +2928,15 @@ controllers.controller('photostripCtrl', ['$scope', '$state', '$ionicPopup','Sel
     };
 
     $scope.pick = function (i, a, image) {
-        console.log(i + " " +a);
-        window.i = $scope.images;
-
         if (image.checked) {
             var index = (i * 4) + a; 
-
             if (pick.picked == true) {
                 var tmp = $scope.images[index];
                 var tmp2 = $scope.images[pick.index];
-                console.log(tmp);
-                console.log(tmp2);
-                console.log(index); 
                 $scope.images[index] = tmp2;
                 $scope.images[pick.index] = tmp;
-                console.log(pick);
-                window.i = $scope.images;
                 pick = {picked:false, index: null};
-                $scope.cleanCheck();
-                window.g = $scope.createGroups();
-
-                if (!$scope.$$phase) $scope.$apply();
+                $scope.createGroups();
             } else {
                 pick = {picked:true, index: index};  
             }
@@ -2894,7 +2944,6 @@ controllers.controller('photostripCtrl', ['$scope', '$state', '$ionicPopup','Sel
         } else {
             pick = {picked:false, index: null};
         }
-        console.log(pick);
     };
 
     $scope.cleanCheck = function () {
@@ -2909,6 +2958,23 @@ controllers.controller('photostripCtrl', ['$scope', '$state', '$ionicPopup','Sel
     $scope.createGroups();
 }]);
 
+/**
+ * Created   on 30/11/2014.
+ */
+directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
+    var directiveName = "whenLoaded";
+    return {
+        restrict: 'A',
+        link: function (scope, iElement, iAttrs) {
+            iElement.load(function() {
+                var fns = $parse(iAttrs[directiveName])(scope);
+                for (var i = 0; i < fns.length; i++) {
+                    fns[i]();
+                }
+            });
+        }
+    };
+}]);
 models.factory('ImageFactory', ['$q', '$filter', '$timeout', function ($q, $filter, $timeout) {
     function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
         this.origin = pOrigin;
@@ -3357,7 +3423,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             for (var i = this.items.length - 1; i >= 0; i--) {
                 numberOfItems += this.items[i].quantity;
             }
-            numberOfItems = numberOfItems * this.quantity;
+            //numberOfItems = numberOfItems * this.quantity;
             return numberOfItems;
         };
 
@@ -3394,7 +3460,9 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
                 province: "",
                 canton: "",
                 district: "",
-                exacta: ""
+                exacta: "",
+                isSucursal: "",
+                sucursal: ""
             }
         };
         this.orders = pOrders || [];
@@ -3612,20 +3680,29 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
             this.saveShoppingCart();
         },
 
-        saveCustomer : function(name, secondSurname, phone, email, province, canton, district, exacta){
-            shoppingCart.customer = {
+        saveCustomer : function(name, secondSurname, phone, email){
+            var model = {
                 name: name,
                 firstName: name,
                 secondSurname: secondSurname,
                 phone: phone,
-                email: email,
-                address: {
-                    province: province,
-                    canton: canton,
-                    district: district,
-                    exacta: exacta
-                }
+                email: email
             };
+            angular.extend(shoppingCart.customer, model);
+            this.saveShoppingCart();
+        },
+
+        saveTravelInfo : function (isSucursal, sucursal, province, canton, district, exacta) {
+            var model = {
+                isSucursal: isSucursal,
+                sucursal: sucursal,
+                province: province,
+                canton: canton,
+                district: district,
+                exacta: exacta
+            };
+
+            angular.extend(shoppingCart.customer.address, model);
             this.saveShoppingCart();
         },
 
@@ -4188,7 +4265,7 @@ services.service('PhotoSizeChecker', [function () {
 }]);
 services.service('Processing', ['$http', '$q', function ($http, $q) {
 	
-	var url = "https://grooveshark-raiam1234.c9.io/workspace/public/nacion-copy.php";
+	var url = "https://printea-nacion-raiam1234.c9.io/upload.php";
 
 	/*
 	 * create a blob from png 

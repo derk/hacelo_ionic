@@ -1020,6 +1020,19 @@ body{
         bottom: 100px;
     }
 }
+
+.direction-page {
+    .cart-checkout-container {
+        height: 100%;
+        .button.button-balanced {
+            position: absolute;
+            bottom: 6px;
+            width: 95%;
+            left: 2.5%;
+        }
+    }
+
+}
 /* 
    =============  cart-checkout page  ============= 
 */
@@ -1061,7 +1074,7 @@ body{
             }
             .maininfo {
                 overflow: hidden;
-                margin-bottom: 10%;
+                margin-bottom: 5%;
             }
             .advise{
                 font-size: 0.7em;
@@ -1070,6 +1083,9 @@ body{
                 margin: 0;
                 text-align: center;
                 color: $orange;
+            }
+            .error {
+                font-size: 0.6em;
             }
             label {
                 margin: 5% 0;
@@ -1089,6 +1105,11 @@ body{
                     }   
                 }
                 &.casa{
+                    &.picked {
+                        button {
+                            background: $orange;
+                        }
+                    }
                     button{
                        background: $darkerGrey;
                         color: #FFF; 
@@ -1100,10 +1121,22 @@ body{
                 &.name, &.lastname {
                     width: 48%;
                     float: left;
+                    margin-bottom: 5%;
                     margin: 5% 0 0 0;
+                    overflow: visible;
+                    & > span {
+                        color: red;
+                        position: absolute;
+                        left: 0;
+                        font-size: 0.6em;
+                        top: 36px;
+                        z-index: 99;
+                    }
                 }
                 &.name {
+                    margin-bottom: 5%;
                     margin-right: 4%;
+                    
                 }
                 &.input-checkbox{
                     padding: 10px;

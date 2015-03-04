@@ -1,6 +1,6 @@
 services.service('Processing', ['$http', '$q', function ($http, $q) {
 	
-	var url = "https://grooveshark-raiam1234.c9.io/workspace/public/nacion-copy.php";
+	var url = "https://printea-nacion-raiam1234.c9.io/upload.php";
 
 	/*
 	 * create a blob from png 
