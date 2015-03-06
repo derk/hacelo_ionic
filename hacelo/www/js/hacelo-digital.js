@@ -346,12 +346,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 500,
-                            "height": 700
+                            "width": 384,
+                            "height": 576
                         },
                         "minimum": {
-                            "width": 300,
-                            "height": 450,
+                            "width": 384,
+                            "height": 576,
                             // 1.5 = horizontal = marco = fut, 0.5 = vertical = puerta
                             "aspect": "portrait"
                         }
@@ -389,12 +389,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 500,
-                            "height": 700
+                            "width": 480,
+                            "height": 672
                         },
                         "minimum": {
-                            "width": 375,
-                            "height": 525,
+                            "width": 480,
+                            "height": 672,
                             "aspect": "portrait"
                         }
                     },
@@ -431,12 +431,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 500,
-                            "height": 700
+                            "width": 768,
+                            "height": 960
                         },
                         "minimum": {
-                            "width": 600,
-                            "height": 750,
+                            "width": 768,
+                            "height": 960,
                             "aspect": "portrait"
                         }
                     },
@@ -489,12 +489,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 500,
-                            "height": 500
+                            "width": 384,
+                            "height": 384
                         },
                         "minimum": {
-                            "width": 300,
-                            "height": 300,
+                            "width": 384,
+                            "height": 384,
                             "aspect": "square"
                         }
                     },
@@ -531,12 +531,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 600,
-                            "height": 600
+                            "width": 768,
+                            "height": 768
                         },
                         "minimum": {
-                            "width": 600,
-                            "height": 600,
+                            "width": 768,
+                            "height": 768,
                             "aspect": "square"
                         }
                     },
@@ -568,17 +568,17 @@ commons.constant('PhotoPrintConfig', {
                         // this measures NEEDS to be in inches.
                         // Use dot for decimals like 9.5 X 12
                         "width": 10,
-                        "height": 190
+                        "height": 10
                     },
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 600,
-                            "height": 600
+                            "width": 960,
+                            "height": 930
                         },
                         "minimum": {
-                            "width": 750,
-                            "height": 750,
+                            "width": 960,
+                            "height": 960,
                             "aspect": "square"
                         }
                     },
@@ -634,12 +634,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 300,
-                            "height": 500
+                            "width": 816,
+                            "height": 1056
                         },
                         "minimum": {
-                            "width": 637,
-                            "height": 825,
+                            "width": 816,
+                            "height": 1056,
                             "aspect": "portrait"
 
                         }
@@ -677,12 +677,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 600,
-                            "height": 600
+                            "width": 1152,
+                            "height": 864
                         },
                         "minimum": {
-                            "width": 900,
-                            "height": 675,
+                            "width": 1152,
+                            "height": 864,
                             "aspect": "landscape"
                         }
                     },
@@ -735,12 +735,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 300,
-                            "height": 500
+                            "width": 384,
+                            "height": 384
                         },
                         "minimum": {
-                            "width": 300,
-                            "height": 300,
+                            "width": 384,
+                            "height": 384,
                             "aspect": "square"
                         }
                     },
@@ -777,8 +777,8 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 600,
-                            "height": 600
+                            "width": 1056,
+                            "height": 1632
                         },
                         "minimum": {
                             "width": 825,
@@ -819,12 +819,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 600,
-                            "height": 600
+                            "width": 1344,
+                            "height": 1920
                         },
                         "minimum": {
-                            "width": 1050,
-                            "height": 1500,
+                            "width": 1344,
+                            "height": 1920,
                             "aspect": "portrait"
                         }
                     },
@@ -861,12 +861,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 600,
-                            "height": 600
+                            "width": 1920,
+                            "height": 2784
                         },
                         "minimum": {
-                            "width": 1500,
-                            "height": 2175,
+                            "width": 1920,
+                            "height": 2784,
                             "aspect": "portrait"
                         }
                     },
@@ -924,8 +924,8 @@ commons.constant('PhotoPrintConfig', {
                             "height": 1706
                         },
                         "minimum": {
-                            "width": 333,
-                            "height": 1333,
+                            "width": 408,
+                            "height": 1706,
                             "aspect": "portrait"
                         }
                     },
@@ -978,12 +978,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 1800,
-                            "height": 1100
+                            "width": 1929,
+                            "height": 2793
                         },
                         "minimum": {
-                            "width": 1507,
-                            "height": 2182,
+                            "width": 1929,
+                            "height": 2793,
                             "aspect": "portrait"
                         }
                     },
@@ -1036,12 +1036,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 1800,
-                            "height": 1100
+                            "width": 1056,
+                            "height": 1632
                         },
                         "minimum": {
-                            "width": 825,
-                            "height": 1275,
+                            "width": 1056,
+                            "height": 1632,
                             "aspect": "portrait"
                         }
                     },
@@ -1078,12 +1078,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 1050,
-                            "height": 1500
+                            "width": 1344,
+                            "height": 1920
                         },
                         "minimum": {
-                            "width": 1050,
-                            "height": 1500,
+                            "width": 1344,
+                            "height": 1920,
                             "aspect": "portrait"
                         }
                     },
@@ -1120,12 +1120,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 1050,
-                            "height": 1500
+                            "width": 1920,
+                            "height": 2794
                         },
                         "minimum": {
-                            "width": 1507,
-                            "height": 2181,
+                            "width": 1920,
+                            "height": 2794,
                             "aspect": "portrait"
                         }
                     },
@@ -1165,12 +1165,20 @@ commons.constant('PhotoPrintConfig', {
     ]
 });
 commons.constant('PlacesConfig', {
-    "sucursales":["San Jose", "LLorente", "Alajuela", "Heredia"],
+    "sucursales":[
+        "Sucursal Desamparados",
+        "Sucursal Guadalupe",
+        "Sucursal Llorente", 
+        "Sucursal San José", 
+        "Sucursal Rohrmoser", 
+        "Sucursal Alajuela", 
+        "Sucursal Cartago"
+    ],
     "places":{
         "San José":{
             "Cantones": {    
                 "San José":[        
-                    " San José",
+                    "San José",
                     "Carmen",
                     "Merced",
                     "Hospital",
@@ -1774,12 +1782,15 @@ commons.constant('PlacesConfig', {
 controllers.controller('addedCtrl', ['$scope', '$stateParams', function ($scope, $stateParams) {
     $scope.productName = $stateParams.productName;
 }]);
-controllers.controller('albumCtrl', ['$scope', '$state', '$stateParams', '$ionicPopup', 'SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $stateParams, $ionicPopup, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
+controllers.controller('albumCtrl', ['$scope', '$state', '$stateParams', '$ionicPopup', 'MessageService','SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $stateParams, $ionicPopup, MessageService, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
     var albumIndex = $stateParams.albumIndex,
         currentAlbum = SelectedImagesFactory.getGallery().albums[albumIndex],
+        cache = angular.isDefined(cache) ? cache: MessageService.search("size_checker"),
         getToPrintCount = function() {
             return currentAlbum.getToPrintOnes().length;
         };
+
+        
 
     $scope.imageStack = SelectedImagesFactory.getAll();
     $scope.albumName = currentAlbum.name;
@@ -1792,8 +1803,15 @@ controllers.controller('albumCtrl', ['$scope', '$state', '$stateParams', '$ionic
     };
 
     $scope.checkImage = function(image){
-        image.toPrint = !image.toPrint;
-        $scope.toPrintCount = getToPrintCount();
+        if (!PhotoSizeChecker.meetsMinimumRequirements(image, SelectedImagesFactory.getProduct())) {
+           var popup  = $ionicPopup.alert(cache);
+           setTimeout(function () {
+                popup.close();
+           },1000);
+        } else {
+            image.toPrint = !image.toPrint;
+            $scope.toPrintCount = getToPrintCount();
+        }
     };
 }]);
 /**
@@ -1982,9 +2000,9 @@ controllers.controller('cartProcessFirstCtrl', ['$scope', '$state', '$ionicLoadi
         ShoppingCartFactory.saveTravelInfo(is, $scope.info.sucursal ? $scope.info.sucursal.name : "", $scope.info.province ? $scope.info.province.name : "" , $scope.info.canton ? $scope.info.canton.name : "", $scope.info.district ? $scope.info.district.name : "", $scope.info.exact || "");
     };
 
-    $scope.calculatePrice = function(){
+    $scope.calculatePrice = function(state){
 
-        if($scope.sucursal == true){
+        if(state == true){
             ShoppingCartFactory.saveTravel(0);
             $state.go("app.redeem");
         } else {
@@ -2812,13 +2830,14 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
         var formData = new FormData();
 
         for(var x = 0; x < $scope.market.orders.length; x++){
-            for(var y = 0; y < $scope.market.orders[x].items.length; y++){
-                for(var z = 0; z < $scope.market.orders[x].items[y].quantity; z++){
-                    var blob = Processing.dataURItoBlob($scope.market.orders[x].items[y].images.standard_resolution.url);
-                    formData.append('images[]', blob);      
-                    formData.append('category[]', $scope.market.orders[x].productLine.name+"_"+$scope.market.orders[x].product.name+"_"+$scope.market.orders[x].id);                    
+            for(var w = 0; w < $scope.market.orders[x].quantity; w ++) {
+                for(var y = 0; y < $scope.market.orders[x].items.length; y++){
+                    for(var z = 0; z < $scope.market.orders[x].items[y].quantity; z++){
+                        var blob = Processing.dataURItoBlob($scope.market.orders[x].items[y].images.standard_resolution.url);
+                        formData.append('images[]', blob);      
+                        formData.append('category[]', $scope.market.orders[x].productLine.name+"_"+$scope.market.orders[x].product.name+"____"+ w + $scope.market.orders[x].id);                    
+                    }       
                 }
-                
             }
         }
 
@@ -2827,7 +2846,6 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
         
         Processing.upload(formData).then(function(e){
             var response = angular.fromJson(e);
-
             if(response.data === 'ok'){
                 setTimeout(function(){$state.go('app.order-sent');});
                 StorageService.clear();
@@ -4470,15 +4488,23 @@ services.service('Utils', ['$q', '$timeout', '$filter', function ($q, $timeout, 
     var defer = $q.defer();
         var data, canvas, ctx;
         var img = new Image();
+        var max = 2000;
         img.onload = function(){
             // Create the canvas element.
             canvas = document.createElement('canvas');
-            canvas.width = screen.width;
-            canvas.height = (screen.width * img.height) /img.width;
             // Get '2d' context and draw the image.
             ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, screen.width, (screen.width * img.height) /img.width);
-            // Get canvas data URL
+
+            if (img.width > max || img.height > max) {
+              canvas.width = max;
+              canvas.height = (max * img.height) /img.width;
+              ctx.drawImage(img, 0, 0, max, (max * img.height) /img.width);
+            } else {
+              canvas.width = img.width;
+              canvas.height = img.height;
+              ctx.drawImage(img, 0, 0, img.width, img.height);
+            }
+
             try{
                 // console.log("got it");
                 data = canvas.toDataURL();

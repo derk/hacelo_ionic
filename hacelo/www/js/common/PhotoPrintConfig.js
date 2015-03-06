@@ -20,12 +20,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 500,
-                            "height": 700
+                            "width": 384,
+                            "height": 576
                         },
                         "minimum": {
-                            "width": 300,
-                            "height": 450,
+                            "width": 384,
+                            "height": 576,
                             // 1.5 = horizontal = marco = fut, 0.5 = vertical = puerta
                             "aspect": "portrait"
                         }
@@ -63,12 +63,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 500,
-                            "height": 700
+                            "width": 480,
+                            "height": 672
                         },
                         "minimum": {
-                            "width": 375,
-                            "height": 525,
+                            "width": 480,
+                            "height": 672,
                             "aspect": "portrait"
                         }
                     },
@@ -105,12 +105,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 500,
-                            "height": 700
+                            "width": 768,
+                            "height": 960
                         },
                         "minimum": {
-                            "width": 600,
-                            "height": 750,
+                            "width": 768,
+                            "height": 960,
                             "aspect": "portrait"
                         }
                     },
@@ -163,12 +163,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 500,
-                            "height": 500
+                            "width": 384,
+                            "height": 384
                         },
                         "minimum": {
-                            "width": 300,
-                            "height": 300,
+                            "width": 384,
+                            "height": 384,
                             "aspect": "square"
                         }
                     },
@@ -205,12 +205,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 600,
-                            "height": 600
+                            "width": 768,
+                            "height": 768
                         },
                         "minimum": {
-                            "width": 600,
-                            "height": 600,
+                            "width": 768,
+                            "height": 768,
                             "aspect": "square"
                         }
                     },
@@ -242,17 +242,17 @@ commons.constant('PhotoPrintConfig', {
                         // this measures NEEDS to be in inches.
                         // Use dot for decimals like 9.5 X 12
                         "width": 10,
-                        "height": 190
+                        "height": 10
                     },
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 600,
-                            "height": 600
+                            "width": 960,
+                            "height": 930
                         },
                         "minimum": {
-                            "width": 750,
-                            "height": 750,
+                            "width": 960,
+                            "height": 960,
                             "aspect": "square"
                         }
                     },
@@ -308,12 +308,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 300,
-                            "height": 500
+                            "width": 816,
+                            "height": 1056
                         },
                         "minimum": {
-                            "width": 637,
-                            "height": 825,
+                            "width": 816,
+                            "height": 1056,
                             "aspect": "portrait"
 
                         }
@@ -351,12 +351,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 600,
-                            "height": 600
+                            "width": 1152,
+                            "height": 864
                         },
                         "minimum": {
-                            "width": 900,
-                            "height": 675,
+                            "width": 1152,
+                            "height": 864,
                             "aspect": "landscape"
                         }
                     },
@@ -409,12 +409,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 300,
-                            "height": 500
+                            "width": 384,
+                            "height": 384
                         },
                         "minimum": {
-                            "width": 300,
-                            "height": 300,
+                            "width": 384,
+                            "height": 384,
                             "aspect": "square"
                         }
                     },
@@ -451,8 +451,8 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 600,
-                            "height": 600
+                            "width": 1056,
+                            "height": 1632
                         },
                         "minimum": {
                             "width": 825,
@@ -493,12 +493,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 600,
-                            "height": 600
+                            "width": 1344,
+                            "height": 1920
                         },
                         "minimum": {
-                            "width": 1050,
-                            "height": 1500,
+                            "width": 1344,
+                            "height": 1920,
                             "aspect": "portrait"
                         }
                     },
@@ -535,12 +535,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 600,
-                            "height": 600
+                            "width": 1920,
+                            "height": 2784
                         },
                         "minimum": {
-                            "width": 1500,
-                            "height": 2175,
+                            "width": 1920,
+                            "height": 2784,
                             "aspect": "portrait"
                         }
                     },
@@ -598,8 +598,8 @@ commons.constant('PhotoPrintConfig', {
                             "height": 1706
                         },
                         "minimum": {
-                            "width": 333,
-                            "height": 1333,
+                            "width": 408,
+                            "height": 1706,
                             "aspect": "portrait"
                         }
                     },
@@ -652,12 +652,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 1800,
-                            "height": 1100
+                            "width": 1929,
+                            "height": 2793
                         },
                         "minimum": {
-                            "width": 1507,
-                            "height": 2182,
+                            "width": 1929,
+                            "height": 2793,
                             "aspect": "portrait"
                         }
                     },
@@ -710,12 +710,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 1800,
-                            "height": 1100
+                            "width": 1056,
+                            "height": 1632
                         },
                         "minimum": {
-                            "width": 825,
-                            "height": 1275,
+                            "width": 1056,
+                            "height": 1632,
                             "aspect": "portrait"
                         }
                     },
@@ -752,12 +752,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 1050,
-                            "height": 1500
+                            "width": 1344,
+                            "height": 1920
                         },
                         "minimum": {
-                            "width": 1050,
-                            "height": 1500,
+                            "width": 1344,
+                            "height": 1920,
                             "aspect": "portrait"
                         }
                     },
@@ -794,12 +794,12 @@ commons.constant('PhotoPrintConfig', {
                     "pixel_size": {
                         // any measure inside here should to be in pixels
                         "optimal": {
-                            "width": 1050,
-                            "height": 1500
+                            "width": 1920,
+                            "height": 2794
                         },
                         "minimum": {
-                            "width": 1507,
-                            "height": 2181,
+                            "width": 1920,
+                            "height": 2794,
                             "aspect": "portrait"
                         }
                     },
