@@ -151,7 +151,31 @@ services.service('FileReader', ['$q', '$timeout', 'ImageFactory', function ($q, 
                 deferred.resolve(gallery);
             });
         }, Log('Unable to get access to the FileSystem'));
+                                
+        
 
+        return deferred.promise;
+    };
+    this.openIosGallery = function () {
+        var deferred = $q.defer();
+        gallery = ImageFactory.getGallery();
+        window.imagePicker.getPictures(
+           function(results) {
+               for (var i = 0; i < results.length; i++) {
+                   var a = {
+                   "nativeURL" :results[i],
+                   "fullPath" :"Carrete"
+                   }
+                   processImage(a);
+               }
+               deferred.resolve(gallery);
+           }, function (error) {
+               console.log('Error: ' + error);
+           },{
+               maximumImagesCount: 100,
+           }
+       );
+        
         return deferred.promise;
     };
 

@@ -29,7 +29,34 @@ function ($scope,   $state,   SelectedImagesFactory,   MessageService,   FileRea
             $ionicLoading.hide();
         });
     };
+         
+     $scope.goToIosGallery = function() {
+         var isMobile = {
+             Android: function() {
+                 return navigator.userAgent.match(/Android/i);
+             },
+             iOS: function() {
+                 return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+             }
+         };
+         if(isMobile.iOS()){
+             $ionicLoading.show({
+                template: MessageService.search('looking-for-images')
+             });
+             FileReader.openIosGallery().then(function(response) {
+                  angular.forEach(response.albums[0].images, function(v) {
+                      v.toPrint = true;
+                  });
+                  $scope.gallery = response;
+                  updateImageStack();
+                  updateToPrintCount();
+                  SelectedImagesFactory.setGallery(response);
+                  $ionicLoading.hide();
+              });
+         }
+         
 
+     };
     $scope.go = function(index){
         $ionicLoading.show({
             template: MessageService.search('looking-for-images')
