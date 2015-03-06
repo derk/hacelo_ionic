@@ -1,10 +1,18 @@
 commons.constant('PlacesConfig', {
-    "sucursales":["San Jose", "LLorente", "Alajuela", "Heredia"],
+    "sucursales":[
+        "Sucursal Desamparados",
+        "Sucursal Guadalupe",
+        "Sucursal Llorente", 
+        "Sucursal San José", 
+        "Sucursal Rohrmoser", 
+        "Sucursal Alajuela", 
+        "Sucursal Cartago"
+    ],
     "places":{
         "San José":{
             "Cantones": {    
                 "San José":[        
-                    " San José",
+                    "San José",
                     "Carmen",
                     "Merced",
                     "Hospital",

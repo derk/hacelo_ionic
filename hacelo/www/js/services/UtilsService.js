@@ -15,15 +15,23 @@ services.service('Utils', ['$q', '$timeout', '$filter', function ($q, $timeout, 
     var defer = $q.defer();
         var data, canvas, ctx;
         var img = new Image();
+        var max = 2000;
         img.onload = function(){
             // Create the canvas element.
             canvas = document.createElement('canvas');
-            canvas.width = screen.width;
-            canvas.height = (screen.width * img.height) /img.width;
             // Get '2d' context and draw the image.
             ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, screen.width, (screen.width * img.height) /img.width);
-            // Get canvas data URL
+
+            if (img.width > max || img.height > max) {
+              canvas.width = max;
+              canvas.height = (max * img.height) /img.width;
+              ctx.drawImage(img, 0, 0, max, (max * img.height) /img.width);
+            } else {
+              canvas.width = img.width;
+              canvas.height = img.height;
+              ctx.drawImage(img, 0, 0, img.width, img.height);
+            }
+
             try{
                 // console.log("got it");
                 data = canvas.toDataURL();

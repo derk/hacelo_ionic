@@ -25,6 +25,9 @@
             "cancelText" : "Cancelar",
             "okText" : "Aceptar"
         },
+        "size_checker" : {
+            "template" : "Esta imágen no posee el tamaño requerido."
+        },
         "shopping_cart_full" : {
             "title" : "Houston, tenemos un problema",
             "template" : "Parece que tu carrito de compras esta completamente lleno. \n Intenta quitar algunos fotos o completar el proceso de compra de las que ya tienes seleccionadas.",
@@ -55,7 +58,7 @@
         },
         "photobook_alert":{
             "title": "PHOTOBOOK",
-            "template": "Selecciona 38 de tus mejores fotos para crear un increíble photobook de tapa dura. Pondremos una sóla imagen por página, podrás acomodar las fotos a tu gusto en el orden que quieras. Personaliza la portada de tu Photobook con 9 imágenes aleatorias de tu selección. Incluso podrás agregar un titulo personalizada como: -Creo que ahora puedo borrar mis fotos.",
+            "template": "Selecciona 38 de tus mejores fotos para crear un increíble photobook de tapa dura. Pondremos una sóla imágen por página, podrás acomodar las fotos a tu gusto en el orden que quieras. Personaliza la portada de tu Photobook con 9 imágenes aleatorias de tu selección. Incluso podrás agregar un titulo personalizada como: -Creo que ahora puedo borrar mis fotos.",
             "okText": "Cerrar",
             "cssClass": "photobook-popup"
         }

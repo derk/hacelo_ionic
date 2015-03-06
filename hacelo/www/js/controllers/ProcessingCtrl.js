@@ -61,13 +61,14 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
         var formData = new FormData();
 
         for(var x = 0; x < $scope.market.orders.length; x++){
-            for(var y = 0; y < $scope.market.orders[x].items.length; y++){
-                for(var z = 0; z < $scope.market.orders[x].items[y].quantity; z++){
-                    var blob = Processing.dataURItoBlob($scope.market.orders[x].items[y].images.standard_resolution.url);
-                    formData.append('images[]', blob);      
-                    formData.append('category[]', $scope.market.orders[x].productLine.name+"_"+$scope.market.orders[x].product.name+"_"+$scope.market.orders[x].id);                    
+            for(var w = 0; w < $scope.market.orders[x].quantity; w ++) {
+                for(var y = 0; y < $scope.market.orders[x].items.length; y++){
+                    for(var z = 0; z < $scope.market.orders[x].items[y].quantity; z++){
+                        var blob = Processing.dataURItoBlob($scope.market.orders[x].items[y].images.standard_resolution.url);
+                        formData.append('images[]', blob);      
+                        formData.append('category[]', $scope.market.orders[x].productLine.name+"_"+$scope.market.orders[x].product.name+"____"+ w + $scope.market.orders[x].id);                    
+                    }       
                 }
-                
             }
         }
 
@@ -76,7 +77,6 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
         
         Processing.upload(formData).then(function(e){
             var response = angular.fromJson(e);
-
             if(response.data === 'ok'){
                 setTimeout(function(){$state.go('app.order-sent');});
                 StorageService.clear();

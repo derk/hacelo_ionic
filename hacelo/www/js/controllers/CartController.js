@@ -184,9 +184,9 @@ controllers.controller('cartProcessFirstCtrl', ['$scope', '$state', '$ionicLoadi
         ShoppingCartFactory.saveTravelInfo(is, $scope.info.sucursal ? $scope.info.sucursal.name : "", $scope.info.province ? $scope.info.province.name : "" , $scope.info.canton ? $scope.info.canton.name : "", $scope.info.district ? $scope.info.district.name : "", $scope.info.exact || "");
     };
 
-    $scope.calculatePrice = function(){
+    $scope.calculatePrice = function(state){
 
-        if($scope.sucursal == true){
+        if(state == true){
             ShoppingCartFactory.saveTravel(0);
             $state.go("app.redeem");
         } else {
