@@ -147,6 +147,15 @@ angular.module('hacelo', [
             }
         }
     })
+    .state('app.test', {
+        url: "/test",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/test.html",
+                controller: 'testCtrl'
+            }
+        }
+    })
     .state('app.cart-checkout', {
         url: "/cart-checkout",
         views: {
@@ -315,8 +324,8 @@ angular.module('hacelo', [
       };
     } ]);
 
-var controllers = angular.module('hacelo.controllers', []);
 var commons = angular.module('hacelo.config', []);
+var controllers = angular.module('hacelo.controllers', []);
 /**
  * Created   on 30/11/2014.
  */
@@ -1803,11 +1812,11 @@ controllers.controller('albumCtrl', ['$scope', '$state', '$stateParams', '$ionic
     };
 
     $scope.checkImage = function(image){
-        if (!PhotoSizeChecker.meetsMinimumRequirements(image, SelectedImagesFactory.getProduct())) {
+        if (!PhotoSizeChecker.meetsMinimumRequirements(image, SelectedImagesFactory.getProduct()) && !angular.isDefined(SelectedImagesFactory.getProductLine().isStrip)) {
            var popup  = $ionicPopup.alert(cache);
            setTimeout(function () {
                 popup.close();
-           },1000);
+           },2000);
         } else {
             image.toPrint = !image.toPrint;
             $scope.toPrintCount = getToPrintCount();
@@ -2876,6 +2885,24 @@ controllers.controller('productCrtl', ['$scope', '$state', 'SelectedImagesFactor
 
 
 
+controllers.controller('testCtrl', ['$scope', '$state', 'SelectedImagesFactory', 'PhotoPrintConfig', function($scope, $state, SelectedImagesFactory, PhotoPrintConfig) {
+	var myScroll;
+
+	function loaded () {
+		myScroll = new IScroll('#wrapper', { scrollX: true, scrollY: false, mouseWheel: true });
+	}
+
+	document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+			
+	
+	$scope.test = function () {
+		alert('test');
+	};
+	loaded();
+}]);
+
+
+
 
 
 controllers.controller('ShareCtrl', function($scope, $ionicModal, $timeout, $ionicLoading, Nacion_Service) {
@@ -2891,8 +2918,11 @@ controllers.controller('photostripCtrl', ['$scope', '$state', '$ionicPopup','Sel
         picked : false,
         index: null
     };
-    $scope.groups = [];
 
+    var scrollWidth,
+        widthScroll;
+    $scope.groups = [];
+    
     if(SelectedImagesFactory.getProduct().prices.first_items.quantity   !=  SelectedImagesFactory.getToPrintOnes().length){
         $ionicPopup.alert(popup).then(function(res){
             window.history.back();
@@ -2973,26 +3003,20 @@ controllers.controller('photostripCtrl', ['$scope', '$state', '$ionicPopup','Sel
         window.g = $scope.groups;
     };
 
+    $scope.getScrollWidth = function () {
+        return getHeight() * 36;
+    };
+    
+    var makeScroll = function () {
+        myScroll = new IScroll('#wrapper', { scrollX: true, scrollY: false, mouseWheel: true });
+    };
+
+    document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+    
     $scope.createGroups();
+    makeScroll();
 }]);
 
-/**
- * Created   on 30/11/2014.
- */
-directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
-    var directiveName = "whenLoaded";
-    return {
-        restrict: 'A',
-        link: function (scope, iElement, iAttrs) {
-            iElement.load(function() {
-                var fns = $parse(iAttrs[directiveName])(scope);
-                for (var i = 0; i < fns.length; i++) {
-                    fns[i]();
-                }
-            });
-        }
-    };
-}]);
 models.factory('ImageFactory', ['$q', '$filter', '$timeout', function ($q, $filter, $timeout) {
     function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
         this.origin = pOrigin;
@@ -3729,6 +3753,23 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
                 message: message,
                 cover: array
             };
+        }
+    };
+}]);
+/**
+ * Created   on 30/11/2014.
+ */
+directives.directive('whenLoaded', ['$parse', '$timeout', function ($parse, $timeout) {
+    var directiveName = "whenLoaded";
+    return {
+        restrict: 'A',
+        link: function (scope, iElement, iAttrs) {
+            iElement.load(function() {
+                var fns = $parse(iAttrs[directiveName])(scope);
+                for (var i = 0; i < fns.length; i++) {
+                    fns[i]();
+                }
+            });
         }
     };
 }]);

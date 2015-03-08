@@ -19,7 +19,7 @@ controllers.controller('albumCtrl', ['$scope', '$state', '$stateParams', '$ionic
     };
 
     $scope.checkImage = function(image){
-        if (!PhotoSizeChecker.meetsMinimumRequirements(image, SelectedImagesFactory.getProduct())) {
+        if (!PhotoSizeChecker.meetsMinimumRequirements(image, SelectedImagesFactory.getProduct()) && !angular.isDefined(SelectedImagesFactory.getProductLine().isStrip)) {
            var popup  = $ionicPopup.alert(cache);
            setTimeout(function () {
                 popup.close();
