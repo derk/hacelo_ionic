@@ -1,31 +1,46 @@
-<ion-view title="Fotos" class="photo-pick-page">
+<ion-view class="photo-pick-page">
+
     <ion-nav-bar class="grey bar-stable" animation="slide-left-right">
         <ion-nav-back-button class="button-clear">
             <div class="arrow"> Atrás</div>
         </ion-nav-back-button>
-        <h1 class="title">Fotos</h1>
+
+        <h1 class="title">{{ (imageStack | filter:{toPrint:true}).length }}Fotos</h1>
+
         <ion-nav-buttons side="right">
-            <!-- <a class="button button-icon icon check-button check-photo" href="#/app/check" ng-show="imageStack.length>0" ng-hide="imageStack.length===0">REVISAR</a> -->
-            <a class="button button-icon icon check-button check-photo" ng-click="goToConfirm()" ng-show="toPrintCount>0" ng-hide="toPrintCount===0">Revisar</a>
+            <a class="button button-icon icon check-button check-photo" ng-click="goToConfirm()" ng-show="(imageStack | filter:{toPrint:true}).length>0" ng-hide="(imageStack | filter:{toPrint:true}).length===0">Revisar</a>
         </ion-nav-buttons>
     </ion-nav-bar>
+
     <ion-content class="has-header">
         <div class="photo-pick-container">
             <a class="button-picker" href="#/app/instagram">Instagram</a>
             <a class="button-picker" ng-click="goToIosGallery()">Albums</a>
         </div>
-        <div class="photos">
-            <div class="images-container">
 
+        <div class="photos">
+
+            <div class="images-container">
                 <div class="album" ng-repeat="album in gallery.albums" ng-click="go($index)">
                     <img ng-src="{{album.images[0].images.standard_resolution.url}}" style="width:100%;max-width:100%;height:auto;">
                     <div class="content">
                         <h2>{{album.name}}</h2>
-                        <h3>{{album.images.length}} fotos, {{album.getToPrintOnes().length}} selecionadas</h3>
+                        <h3>
+                            <ng-pluralize
+                                    count="album.images.length"
+                                    when="{'one': '1 foto',
+                                            'other': '{} fotos'}">
+                            </ng-pluralize>,
+                            <ng-pluralize
+                                    count="(imageStack | filter:{gallery:album.name,toPrint:true}:true).length"
+                                    when="{'one': '1 selecionada',
+                                            'other': '{} selecionadas'}">
+                            </ng-pluralize>
+                        </h3>
                     </div>
                 </div>
-
             </div>
+
         </div>
     </ion-content>
 </ion-view>

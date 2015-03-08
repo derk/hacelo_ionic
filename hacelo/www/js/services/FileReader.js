@@ -1,5 +1,7 @@
 services.service('FileReader', ['$q', '$timeout', 'ImageFactory', function ($q, $timeout, ImageFactory){
-    var gallery;
+    var gallery,
+        IOS_ALBUM_NAME = "Carrete",
+        IOS_MAXIMUN_IMAGES_COUNT = 100;
 
     /**
      * Helper of processFolder
@@ -58,8 +60,9 @@ services.service('FileReader', ['$q', '$timeout', 'ImageFactory', function ($q, 
      * @param {FileEntry} Cordova´s FileEntry instance of  the image to add
      * @param {PhoneLoadedImg} Valid instance of the image
      */
-    var addImage2Gallery = function (fileEntry, phoneLoadedImg) {
+    var addImage2Gallery = function (fileEntry) {
         var albumName = fileEntry.fullPath.split('/').slice(-2)[0],
+            phoneLoadedImg = ImageFactory.getPhoneLoadedImg(fileEntry.nativeURL),
             albumExists = !1,
             albumIndex = 0;
 
@@ -76,27 +79,6 @@ services.service('FileReader', ['$q', '$timeout', 'ImageFactory', function ($q, 
 
         phoneLoadedImg.gallery = albumName;
         gallery.albums[albumIndex].add(phoneLoadedImg);
-    };
-
-    /**
-     * Helper of processFolder
-     * Check if this image has a valid size
-     * because we don't want to have an image with something like
-     * 10px of width and 30px of height.
-     * If the file pass the check is added to the gallery list as an PhoneLoadedImg object
-     * @param {FileEntry} Cordova´s FileEntry instance to process
-     * @returns {Deferred} Angular´s $q promise
-     */
-    var processImage = function (fileEntry) {
-        var deferred = $q.defer(),
-            phoneLoadedImg = ImageFactory.getPhoneLoadedImg(fileEntry.nativeURL);
-
-        $timeout(function () {
-            addImage2Gallery(fileEntry, phoneLoadedImg);
-            deferred.resolve(phoneLoadedImg);
-        }, 0, !1);
-
-        return deferred.promise;
     };
 
     /**
@@ -118,14 +100,14 @@ services.service('FileReader', ['$q', '$timeout', 'ImageFactory', function ($q, 
 
             // See https://github.com/caolan/async#eacharr-iterator-callback for documentation details
             async.each(cleanEntries, function (entry, callback) {
-                var successCB = function () {
-                    callback();
-                };
 
                 if (entry.isFile) {
-                    processImage(entry).then(successCB);
+                    addImage2Gallery(entry);
+                    callback();
                 } else if (entry.isDirectory) {
-                    processFolder(entry).then(successCB);
+                    processFolder(entry).then(function () {
+                        callback();
+                    });
                 }
 
             }, function () {
@@ -156,23 +138,24 @@ services.service('FileReader', ['$q', '$timeout', 'ImageFactory', function ($q, 
 
         return deferred.promise;
     };
+
     this.openIosGallery = function () {
         var deferred = $q.defer();
         gallery = ImageFactory.getGallery();
         window.imagePicker.getPictures(
            function(results) {
                for (var i = 0; i < results.length; i++) {
-                   var a = {
-                   "nativeURL" :results[i],
-                   "fullPath" :"Carrete"
-                   }
-                   processImage(a);
+                   var aux = {
+                       "nativeURL" :results[i],
+                       "fullPath" : IOS_ALBUM_NAME
+                   };
+                   addImage2Gallery(aux);
                }
                deferred.resolve(gallery);
            }, function (error) {
                console.log('Error: ' + error);
            },{
-               maximumImagesCount: 100,
+               maximumImagesCount: IOS_MAXIMUN_IMAGES_COUNT
            }
        );
         

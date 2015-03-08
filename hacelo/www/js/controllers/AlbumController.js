@@ -1,32 +1,25 @@
 controllers.controller('albumCtrl', ['$scope', '$state', '$stateParams', '$ionicPopup', 'MessageService','SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $stateParams, $ionicPopup, MessageService, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
     var albumIndex = $stateParams.albumIndex,
         currentAlbum = SelectedImagesFactory.getGallery().albums[albumIndex],
-        cache = angular.isDefined(cache) ? cache: MessageService.search("size_checker"),
-        getToPrintCount = function() {
-            return currentAlbum.getToPrintOnes().length;
-        };
-
-        
+        selectedProduct = SelectedImagesFactory.getProduct(),
+        imageSizeMsj = MessageService.search("size_checker");
 
     $scope.imageStack = SelectedImagesFactory.getAll();
     $scope.albumName = currentAlbum.name;
-    $scope.toPrintCount = getToPrintCount();
-    $scope.height = screen.width / 3;
 
     $scope.style = {
         "overflow":"hidden",
-        "height": $scope.height+"px"
+        "height": screen.width/3+"px"
     };
 
     $scope.checkImage = function(image){
-        if (!PhotoSizeChecker.meetsMinimumRequirements(image, SelectedImagesFactory.getProduct())) {
-           var popup  = $ionicPopup.alert(cache);
-           setTimeout(function () {
-                popup.close();
-           },2000);
-        } else {
+        if (PhotoSizeChecker.meetsMinimumRequirements(image, selectedProduct)) {
             image.toPrint = !image.toPrint;
-            $scope.toPrintCount = getToPrintCount();
+        } else {
+            var popup  = $ionicPopup.alert(imageSizeMsj);
+            setTimeout(function () {
+                popup.close();
+            },2000);
         }
     };
 }]);

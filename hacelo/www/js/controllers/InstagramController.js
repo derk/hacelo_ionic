@@ -2,16 +2,12 @@ controllers.controller('InstagramCrtl', ['$scope', '$state', '$filter', '$ionicP
     $scope.loading = false;
     $scope.imageStack = SelectedImagesFactory.getAll();
     $scope.canLoadMore = false;
-    $scope.cant = 0;
 
     $scope.$watch('loading', function(newVal, oldVal) {// for showing and hiding load spinner
-        var cache = angular.isDefined(cache)? cache: MessageService.search("loading");
-        if (newVal !== oldVal) {
-            if (newVal === true) {
-                $ionicLoading.show(cache);
-            } else {
-                $ionicLoading.hide();
-            }
+        if (newVal) {
+            $ionicLoading.show(MessageService.search("loading"));
+        } else {
+            $ionicLoading.hide();
         }
     });
 
@@ -111,6 +107,7 @@ controllers.controller('InstagramCrtl', ['$scope', '$state', '$filter', '$ionicP
 
     $scope.loadMore = getRecentMedia;
 
+    // SIN USAR, BLOQUE DE CODIGO CANDIDATO A SER ELIMINADO --->
     $scope.checkRequirements = function(image){
         if(image.toPrint === true) {
             image.toPrint = false;
@@ -127,15 +124,7 @@ controllers.controller('InstagramCrtl', ['$scope', '$state', '$filter', '$ionicP
             }
         }
     };
-
-    $scope.updateMarker = function() {
-        var cont = 0;
-        angular.forEach($scope.imageStack, function(v){
-            if(v.toPrint)
-                cont = cont + 1;
-        });
-        $scope.cant = cont;
-    };
+    // <--- SIN USAR, BLOQUE DE CODIGO CANDIDATO A SER ELIMINADO
 
     $scope.gotoConfirm = function () {
         if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
@@ -145,11 +134,5 @@ controllers.controller('InstagramCrtl', ['$scope', '$state', '$filter', '$ionicP
         }  
     };
 
-    $scope.checkImage = function(image){
-        image.toPrint = !image.toPrint;
-        $scope.updateMarker();
-    };
-
     init();
-    $scope.updateMarker();
 }]);

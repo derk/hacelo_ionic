@@ -3,9 +3,9 @@
 		<ion-nav-back-button class="button-clear">
 			<div class="arrow">Atrás</div>
 		</ion-nav-back-button>
-		<h1 class="title">{{cant}} fotos</h1>
+		<h1 class="title">{{ (imageStack | filter:{origin:'instagram',toPrint:true}).length }} fotos</h1>
 		<ion-nav-buttons side="right">
-			<a class="button button-icon icon check-button check-photo" ng-click="gotoConfirm()" ng-show="imageStack.length>0" ng-hide="imageStack.length===0">Revisar</a>
+			<a class="button button-icon icon check-button check-photo" ng-click="gotoConfirm()" ng-show="(imageStack | filter:{toPrint:true}).length>0" ng-hide="(imageStack | filter:{toPrint:true}).length===0">Revisar</a>
 		</ion-nav-buttons>
 	</ion-nav-bar>
 	<ion-content class="has-header">
@@ -15,7 +15,7 @@
 					 ng-repeat="image in imageStack | filter:{origin:'instagram'}"
 					 ng-init="mini = image.images.thumbnail"
 					 ng-class="{selected: image.toPrint}">
-					<a ng-click="checkImage(image)">
+					<a ng-click="image.toPrint = !image.toPrint">
 						<i class="icon ion-checkmark-circled"></i>
 						<img ng-src="{{mini.url}}"
 							 width="{{mini.width}}"

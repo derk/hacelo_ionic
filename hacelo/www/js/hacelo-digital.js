@@ -39,6 +39,7 @@ angular.module('hacelo', [
             }
         }
     })
+        // Shows the line of products
     .state('app.products', {
         url: "/products",
         views: {
@@ -48,6 +49,7 @@ angular.module('hacelo', [
             }
         }
     })
+        // Shows products inside the given product line
     .state('app.category', {
         url: "/category",
         views: {
@@ -57,15 +59,7 @@ angular.module('hacelo', [
             }
         }
     })
-    .state('app.info', {
-        url: "/info",
-        views: {
-            'haceloContent': {
-                templateUrl: "templates/info.html",
-                controller: "infoCtrl"
-            }
-        }
-    })
+        // Shows the detail of the given product
     .state('app.photo', {
         url: "/photo",
         views: {
@@ -75,6 +69,7 @@ angular.module('hacelo', [
             }
         }
     })
+        // Show album list
     .state('app.choose', {
         url: "/choose",
         views: {
@@ -84,6 +79,17 @@ angular.module('hacelo', [
             }
         }
     })
+        // Show album details
+    .state('app.album', {
+        url: "/album/:albumIndex",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/album.html",
+                controller: "albumCtrl"
+            }
+        }
+    })
+        // View to change number of prints and adjust the images
     .state('app.check', {
         url: "/check",
         views: {
@@ -93,15 +99,7 @@ angular.module('hacelo', [
             }
         }
     })
-    .state('app.photoEdit', {
-        url: "/edit/:id",
-        views: {
-            'haceloContent': {
-                templateUrl: "templates/edit-photo.html",
-                controller: 'PhotoEditCtrl'
-            }
-        }
-    })
+        // Adjust an specific image
     .state('app.crop', {
         url: "/crop/:id",
         views: {
@@ -111,6 +109,7 @@ angular.module('hacelo', [
             }
         }
     })
+        // Ask to the user if want to add the order to the cart
     .state('app.confirm', {
         url: "/confirm",
         views: {
@@ -120,6 +119,7 @@ angular.module('hacelo', [
             }
         }
     })
+        // Confirm item added to the cart
     .state('app.added', {
         url: "/added",
         views: {
@@ -129,12 +129,12 @@ angular.module('hacelo', [
             }
         }
     })
-    .state('app.album', {
-        url: "/album/:albumIndex",
+    .state('app.info', {
+        url: "/info",
         views: {
             'haceloContent': {
-                templateUrl: "templates/album.html",
-                controller: "albumCtrl"
+                templateUrl: "templates/info.html",
+                controller: "infoCtrl"
             }
         }
     })
@@ -162,15 +162,6 @@ angular.module('hacelo', [
             'haceloContent': {
                 templateUrl: "templates/cart-process_first.html",
                 controller: 'cartProcessFirstCtrl'
-            }
-        }
-    })
-    .state('app.cart-checkout2', {
-        url: "/cart-checkout2",
-        views: {
-            'haceloContent': {
-                templateUrl: "templates/cart-checkout2.html",
-                controller: 'cartCheckoutCtrl'
             }
         }
     })
@@ -315,8 +306,8 @@ angular.module('hacelo', [
       };
     } ]);
 
-var controllers = angular.module('hacelo.controllers', []);
 var commons = angular.module('hacelo.config', []);
+var controllers = angular.module('hacelo.controllers', []);
 /**
  * Created   on 30/11/2014.
  */
@@ -1785,32 +1776,25 @@ controllers.controller('addedCtrl', ['$scope', '$stateParams', function ($scope,
 controllers.controller('albumCtrl', ['$scope', '$state', '$stateParams', '$ionicPopup', 'MessageService','SelectedImagesFactory', 'MessageService', 'CordovaCameraService', 'ImageFactory', 'PhotoSizeChecker', 'FileReader','$ionicLoading', function ($scope, $state, $stateParams, $ionicPopup, MessageService, SelectedImagesFactory, MessageService, CordovaCameraService, ImageFactory, PhotoSizeChecker, FileReader, $ionicLoading) {
     var albumIndex = $stateParams.albumIndex,
         currentAlbum = SelectedImagesFactory.getGallery().albums[albumIndex],
-        cache = angular.isDefined(cache) ? cache: MessageService.search("size_checker"),
-        getToPrintCount = function() {
-            return currentAlbum.getToPrintOnes().length;
-        };
-
-        
+        selectedProduct = SelectedImagesFactory.getProduct(),
+        imageSizeMsj = MessageService.search("size_checker");
 
     $scope.imageStack = SelectedImagesFactory.getAll();
     $scope.albumName = currentAlbum.name;
-    $scope.toPrintCount = getToPrintCount();
-    $scope.height = screen.width / 3;
 
     $scope.style = {
         "overflow":"hidden",
-        "height": $scope.height+"px"
+        "height": screen.width/3+"px"
     };
 
     $scope.checkImage = function(image){
-        if (!PhotoSizeChecker.meetsMinimumRequirements(image, SelectedImagesFactory.getProduct())) {
-           var popup  = $ionicPopup.alert(cache);
-           setTimeout(function () {
-                popup.close();
-           },1000);
-        } else {
+        if (PhotoSizeChecker.meetsMinimumRequirements(image, selectedProduct)) {
             image.toPrint = !image.toPrint;
-            $scope.toPrintCount = getToPrintCount();
+        } else {
+            var popup  = $ionicPopup.alert(imageSizeMsj);
+            setTimeout(function () {
+                popup.close();
+            },2000);
         }
     };
 }]);
@@ -2194,7 +2178,6 @@ controllers.controller('checkCtrl', ["$scope", "$state", "$ionicPopup", "Selecte
 controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', 'SelectedImagesFactory', function ($scope, $state, $ionicPopup, Messages, ShoppingCartFactory, SelectedImagesFactory) {
     var cart = ShoppingCartFactory.loadShoppingCart(),
         properties = null;
-        window.s = SelectedImagesFactory;
     /*
      * Create a new order based on the selected: product line, product, and images
      * */
@@ -2392,16 +2375,12 @@ controllers.controller('InstagramCrtl', ['$scope', '$state', '$filter', '$ionicP
     $scope.loading = false;
     $scope.imageStack = SelectedImagesFactory.getAll();
     $scope.canLoadMore = false;
-    $scope.cant = 0;
 
     $scope.$watch('loading', function(newVal, oldVal) {// for showing and hiding load spinner
-        var cache = angular.isDefined(cache)? cache: MessageService.search("loading");
-        if (newVal !== oldVal) {
-            if (newVal === true) {
-                $ionicLoading.show(cache);
-            } else {
-                $ionicLoading.hide();
-            }
+        if (newVal) {
+            $ionicLoading.show(MessageService.search("loading"));
+        } else {
+            $ionicLoading.hide();
         }
     });
 
@@ -2501,6 +2480,7 @@ controllers.controller('InstagramCrtl', ['$scope', '$state', '$filter', '$ionicP
 
     $scope.loadMore = getRecentMedia;
 
+    // SIN USAR, BLOQUE DE CODIGO CANDIDATO A SER ELIMINADO --->
     $scope.checkRequirements = function(image){
         if(image.toPrint === true) {
             image.toPrint = false;
@@ -2517,15 +2497,7 @@ controllers.controller('InstagramCrtl', ['$scope', '$state', '$filter', '$ionicP
             }
         }
     };
-
-    $scope.updateMarker = function() {
-        var cont = 0;
-        angular.forEach($scope.imageStack, function(v){
-            if(v.toPrint)
-                cont = cont + 1;
-        });
-        $scope.cant = cont;
-    };
+    // <--- SIN USAR, BLOQUE DE CODIGO CANDIDATO A SER ELIMINADO
 
     $scope.gotoConfirm = function () {
         if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
@@ -2535,13 +2507,7 @@ controllers.controller('InstagramCrtl', ['$scope', '$state', '$filter', '$ionicP
         }  
     };
 
-    $scope.checkImage = function(image){
-        image.toPrint = !image.toPrint;
-        $scope.updateMarker();
-    };
-
     init();
-    $scope.updateMarker();
 }]);
 /**
  * Created by joseph on 25/01/2015.
@@ -2708,43 +2674,38 @@ controllers.controller('PhotoEditCtrl', ['$scope', '$stateParams', '$state', 'Se
         $state.go('app.check');
     };
 }]);
-controllers.controller('PhotoSourceCtrl',
-        ['$scope', '$state', 'SelectedImagesFactory', 'MessageService', 'FileReader','$ionicLoading',
-function ($scope,   $state,   SelectedImagesFactory,   MessageService,   FileReader,  $ionicLoading) {
-    $scope.imageStack = SelectedImagesFactory.getAll();
+controllers.controller('PhotoSourceCtrl', ['$scope', '$state', 'SelectedImagesFactory', 'MessageService', 'FileReader','$ionicLoading', function ($scope,   $state,   SelectedImagesFactory,   MessageService,   FileReader,  $ionicLoading) {
+    var imageStack = SelectedImagesFactory.getAll(),
+        isMobile = {
+            Android: navigator.userAgent.match(/Android/i),
+            iOS: navigator.userAgent.match(/iPhone|iPad|iPod/i)
+        },
+        productLine = SelectedImagesFactory.getProductLine();
+
+    $scope.imageStack = imageStack;
     $scope.gallery = SelectedImagesFactory.getGallery();
-    $scope.toPrintCount = 0;
+    $scope.loading = false;
+    
+    $scope.$watch('loading', function (newValue) {
+        if (newValue) {
+            $ionicLoading.show({
+                template: MessageService.search('looking-for-images')
+            });
+        } else {
+            $ionicLoading.hide();
+        }
+    });
 
-    var updateToPrintCount = function () {
-        $scope.toPrintCount = $scope.gallery.getToPrintOnes().length;
-    };
-
-    var updateImageStack = function () {
-        for (var i = $scope.gallery.albums.length - 1; i >= 0; i--) {
-            for (var j = $scope.gallery.albums[i].images.length - 1; j >= 0; j--) {
-                $scope.imageStack.push( $scope.gallery.albums[i].images[j] );
-            }
+    var updateImageStack = function (albumImages) {
+        for (var i = albumImages.length - 1; i >= 0; i--) {
+            imageStack.push( angular.copy( albumImages[i] ) );
         }
     };
 
-    var init = function () {
-        $ionicLoading.show({
-            template: MessageService.search('looking-for-images')
-        });
-        FileReader.scanFileSystem().then(function(response) {
-            $scope.gallery = response;
-            updateImageStack();
-            updateToPrintCount();
-            SelectedImagesFactory.setGallery(response);
-            $ionicLoading.hide();
-        });
-    };
-
     $scope.go = function(index){
-        $ionicLoading.show({
-            template: MessageService.search('looking-for-images')
-        });
+        $scope.loading = true;
         $scope.gallery.albums[index].initImages().then(function () {
+            updateImageStack( $scope.gallery.albums[index].images );
             $ionicLoading.hide();
             $state.go('app.album', {'albumIndex': index});
         });
@@ -2752,19 +2713,49 @@ function ($scope,   $state,   SelectedImagesFactory,   MessageService,   FileRea
 
     $scope.goToConfirm = function () {
 
-        if(angular.isDefined(SelectedImagesFactory.getProductLine().mandatory)){
+        if(angular.isDefined(productLine.mandatory)){
             $state.go('app.photobook-check');
-        } else if (angular.isDefined(SelectedImagesFactory.getProductLine().isStrip)) {
-             $state.go('app.photostrip');
+        } else if (angular.isDefined(productLine.isStrip)) {
+            $state.go('app.photostrip');
         } else {
             $state.go('app.check');
         }
     };
 
+
+    $scope.goToIosGallery = function () {
+        if (isMobile.iOS) {
+            $scope.loading = true;
+
+            FileReader.openIosGallery().then(function(gallery) {
+                $scope.loading = false;
+                angular.forEach(gallery.albums[0].images, function(image) {
+                    image.toPrint = true;
+                });
+
+                if ( angular.isUndefined($scope.gallery.albums) ) {
+                    SelectedImagesFactory.setGallery(gallery);
+                    $scope.gallery = gallery;
+                } else {
+                    $scope.gallery.albums[0].images.concat( gallery.albums[0].images );
+                    SelectedImagesFactory.setGallery($scope.gallery);
+                }
+            });
+        }
+    };
+
+    var androidInit = function () {
+        $scope.loading = true;
+
+        FileReader.scanFileSystem().then(function(gallery) {
+            $scope.loading = false;
+            SelectedImagesFactory.setGallery(gallery);
+            $scope.gallery = gallery;
+        });
+    };
+
     if (angular.isUndefined($scope.gallery.albums)) {
-        init();
-    } else {
-        updateToPrintCount();
+        androidInit();
     }
 }]);
 controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$sce', 'SelectedImagesFactory','StorageService','ShoppingCartFactory', 'MessageService', 'Utils', 'Processing', function($scope, $state, $ionicLoading, $sce, SelectedImagesFactory, StorageService, ShoppingCartFactory, Messages, Utils, Processing) {
@@ -3795,7 +3786,9 @@ services.service('CordovaCameraService', ['$window','$q', function ($window,$q) 
 }]);
 
 services.service('FileReader', ['$q', '$timeout', 'ImageFactory', function ($q, $timeout, ImageFactory){
-    var gallery;
+    var gallery,
+        IOS_ALBUM_NAME = "Carrete",
+        IOS_MAXIMUN_IMAGES_COUNT = 100;
 
     /**
      * Helper of processFolder
@@ -3854,8 +3847,9 @@ services.service('FileReader', ['$q', '$timeout', 'ImageFactory', function ($q, 
      * @param {FileEntry} Cordova´s FileEntry instance of  the image to add
      * @param {PhoneLoadedImg} Valid instance of the image
      */
-    var addImage2Gallery = function (fileEntry, phoneLoadedImg) {
+    var addImage2Gallery = function (fileEntry) {
         var albumName = fileEntry.fullPath.split('/').slice(-2)[0],
+            phoneLoadedImg = ImageFactory.getPhoneLoadedImg(fileEntry.nativeURL),
             albumExists = !1,
             albumIndex = 0;
 
@@ -3872,27 +3866,6 @@ services.service('FileReader', ['$q', '$timeout', 'ImageFactory', function ($q, 
 
         phoneLoadedImg.gallery = albumName;
         gallery.albums[albumIndex].add(phoneLoadedImg);
-    };
-
-    /**
-     * Helper of processFolder
-     * Check if this image has a valid size
-     * because we don't want to have an image with something like
-     * 10px of width and 30px of height.
-     * If the file pass the check is added to the gallery list as an PhoneLoadedImg object
-     * @param {FileEntry} Cordova´s FileEntry instance to process
-     * @returns {Deferred} Angular´s $q promise
-     */
-    var processImage = function (fileEntry) {
-        var deferred = $q.defer(),
-            phoneLoadedImg = ImageFactory.getPhoneLoadedImg(fileEntry.nativeURL);
-
-        $timeout(function () {
-            addImage2Gallery(fileEntry, phoneLoadedImg);
-            deferred.resolve(phoneLoadedImg);
-        }, 0, !1);
-
-        return deferred.promise;
     };
 
     /**
@@ -3914,14 +3887,14 @@ services.service('FileReader', ['$q', '$timeout', 'ImageFactory', function ($q, 
 
             // See https://github.com/caolan/async#eacharr-iterator-callback for documentation details
             async.each(cleanEntries, function (entry, callback) {
-                var successCB = function () {
-                    callback();
-                };
 
                 if (entry.isFile) {
-                    processImage(entry).then(successCB);
+                    addImage2Gallery(entry);
+                    callback();
                 } else if (entry.isDirectory) {
-                    processFolder(entry).then(successCB);
+                    processFolder(entry).then(function () {
+                        callback();
+                    });
                 }
 
             }, function () {
@@ -3947,7 +3920,32 @@ services.service('FileReader', ['$q', '$timeout', 'ImageFactory', function ($q, 
                 deferred.resolve(gallery);
             });
         }, Log('Unable to get access to the FileSystem'));
+                                
+        
 
+        return deferred.promise;
+    };
+
+    this.openIosGallery = function () {
+        var deferred = $q.defer();
+        gallery = ImageFactory.getGallery();
+        window.imagePicker.getPictures(
+           function(results) {
+               for (var i = 0; i < results.length; i++) {
+                   var aux = {
+                       "nativeURL" :results[i],
+                       "fullPath" : IOS_ALBUM_NAME
+                   };
+                   addImage2Gallery(aux);
+               }
+               deferred.resolve(gallery);
+           }, function (error) {
+               console.log('Error: ' + error);
+           },{
+               maximumImagesCount: IOS_MAXIMUN_IMAGES_COUNT
+           }
+       );
+        
         return deferred.promise;
     };
 
