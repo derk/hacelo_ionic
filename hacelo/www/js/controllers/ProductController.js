@@ -8,4 +8,22 @@ controllers.controller('productCrtl', ['$scope', '$state', 'SelectedImagesFactor
 
 
 
+controllers.controller('testCtrl', ['$scope', '$state', 'SelectedImagesFactory', 'PhotoPrintConfig', function($scope, $state, SelectedImagesFactory, PhotoPrintConfig) {
+	var myScroll;
+
+	function loaded () {
+		myScroll = new IScroll('#wrapper', { scrollX: true, scrollY: false, mouseWheel: true });
+	}
+
+	document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+			
+	
+	$scope.test = function () {
+		alert('test');
+	};
+	loaded();
+}]);
+
+
+
 

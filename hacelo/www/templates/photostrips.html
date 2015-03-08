@@ -3,18 +3,25 @@
         <ion-nav-back-button class="button-clear">
             <div class="arrow"> Atrás</div>
         </ion-nav-back-button>
-        <h1 class="title">Portada</h1>
+        <h1 class="title">Photostrips</h1>
         <ion-nav-buttons side="right">
             <a class="button button-icon accept-button positive check-photo" ng-click="addToCart()" >Aceptar</a>
         </ion-nav-buttons>
     </ion-nav-bar>
 
 
-    <ion-content class="has-header" scrollbar-x="true">
-        		<div class="group" ng-repeat="item in groups track by $index" ng-init="groupIndex = $index">
-		        	<div ng-repeat="image in item track by $index" ng-class="{'checked':image.checked}" ng-init="index = $index" ng-click="image.checked = !image.checked;pick(groupIndex, index, image); ">
-						<img src="{{image.url.images.standard_resolution.url}}" width="{{getHeight()}}" height="{{getHeight()}}">
-		        	</div>
-		        </div>
+    <ion-content class="has-header">
+    <p class="title">Haz click en una foto luego en la otra para ajustar su posicion. Sus fotos van a quedar como se muestran</p> 		
+            <div id="wrapper">
+                <div id="scroller" style="width:{{getScrollWidth()}}px">
+                    <ul>
+                        <li class="group" ng-repeat="item in groups track by $index" ng-init="groupIndex = $index">
+                            <div ng-repeat="image in item track by $index" ng-class="{'checked':image.checked}" ng-init="index = $index" ng-click="image.checked = !image.checked;pick(groupIndex, index, image); ">
+                                <img src="{{image.url.images.standard_resolution.url}}" width="{{getHeight()}}" height="{{getHeight()}}">
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
     </ion-content>
 </ion-view>

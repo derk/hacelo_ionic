@@ -7,8 +7,11 @@ controllers.controller('photostripCtrl', ['$scope', '$state', '$ionicPopup','Sel
         picked : false,
         index: null
     };
-    $scope.groups = [];
 
+    var scrollWidth,
+        widthScroll;
+    $scope.groups = [];
+    
     if(SelectedImagesFactory.getProduct().prices.first_items.quantity   !=  SelectedImagesFactory.getToPrintOnes().length){
         $ionicPopup.alert(popup).then(function(res){
             window.history.back();
@@ -89,5 +92,16 @@ controllers.controller('photostripCtrl', ['$scope', '$state', '$ionicPopup','Sel
         window.g = $scope.groups;
     };
 
+    $scope.getScrollWidth = function () {
+        return getHeight() * 36;
+    };
+    
+    var makeScroll = function () {
+        myScroll = new IScroll('#wrapper', { scrollX: true, scrollY: false, mouseWheel: true });
+    };
+
+    document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+    
     $scope.createGroups();
+    makeScroll();
 }]);
