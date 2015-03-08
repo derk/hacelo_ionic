@@ -39,6 +39,7 @@ angular.module('hacelo', [
             }
         }
     })
+        // Shows the line of products
     .state('app.products', {
         url: "/products",
         views: {
@@ -48,6 +49,7 @@ angular.module('hacelo', [
             }
         }
     })
+        // Shows products inside the given product line
     .state('app.category', {
         url: "/category",
         views: {
@@ -57,15 +59,7 @@ angular.module('hacelo', [
             }
         }
     })
-    .state('app.info', {
-        url: "/info",
-        views: {
-            'haceloContent': {
-                templateUrl: "templates/info.html",
-                controller: "infoCtrl"
-            }
-        }
-    })
+        // Shows the detail of the given product
     .state('app.photo', {
         url: "/photo",
         views: {
@@ -75,6 +69,7 @@ angular.module('hacelo', [
             }
         }
     })
+        // Show album list
     .state('app.choose', {
         url: "/choose",
         views: {
@@ -84,6 +79,17 @@ angular.module('hacelo', [
             }
         }
     })
+        // Show album details
+    .state('app.album', {
+        url: "/album/:albumIndex",
+        views: {
+            'haceloContent': {
+                templateUrl: "templates/album.html",
+                controller: "albumCtrl"
+            }
+        }
+    })
+        // View to change number of prints and adjust the images
     .state('app.check', {
         url: "/check",
         views: {
@@ -93,15 +99,7 @@ angular.module('hacelo', [
             }
         }
     })
-    .state('app.photoEdit', {
-        url: "/edit/:id",
-        views: {
-            'haceloContent': {
-                templateUrl: "templates/edit-photo.html",
-                controller: 'PhotoEditCtrl'
-            }
-        }
-    })
+        // Adjust an specific image
     .state('app.crop', {
         url: "/crop/:id",
         views: {
@@ -111,6 +109,7 @@ angular.module('hacelo', [
             }
         }
     })
+        // Ask to the user if want to add the order to the cart
     .state('app.confirm', {
         url: "/confirm",
         views: {
@@ -120,6 +119,7 @@ angular.module('hacelo', [
             }
         }
     })
+        // Confirm item added to the cart
     .state('app.added', {
         url: "/added",
         views: {
@@ -129,12 +129,12 @@ angular.module('hacelo', [
             }
         }
     })
-    .state('app.album', {
-        url: "/album/:albumIndex",
+    .state('app.info', {
+        url: "/info",
         views: {
             'haceloContent': {
-                templateUrl: "templates/album.html",
-                controller: "albumCtrl"
+                templateUrl: "templates/info.html",
+                controller: "infoCtrl"
             }
         }
     })
@@ -162,15 +162,6 @@ angular.module('hacelo', [
             'haceloContent': {
                 templateUrl: "templates/cart-process_first.html",
                 controller: 'cartProcessFirstCtrl'
-            }
-        }
-    })
-    .state('app.cart-checkout2', {
-        url: "/cart-checkout2",
-        views: {
-            'haceloContent': {
-                templateUrl: "templates/cart-checkout2.html",
-                controller: 'cartCheckoutCtrl'
             }
         }
     })
