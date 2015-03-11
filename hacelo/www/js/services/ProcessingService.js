@@ -1,7 +1,7 @@
 services.service('Processing', ['$http', '$q', function ($http, $q) {
 	
 	var url = "https://printea-nacion-raiam1234.c9.io/upload.php";
-
+	var photoUrl = "https://printea-nacion-raiam1234.c9.io/upload-photobook.php";
 	/*
 	 * create a blob from png 
 	 **/
@@ -20,7 +20,7 @@ services.service('Processing', ['$http', '$q', function ($http, $q) {
 	/*
 	 * Upload images to FTP by sending a blob file
 	 **/
-	this.upload = function(formData) {
+	this.upload = function(formData, photobook) {
 		var defer = $q.defer();
 		var cache = {
 			cache: false,
@@ -29,7 +29,7 @@ services.service('Processing', ['$http', '$q', function ($http, $q) {
 			data: formData, 
 			error: function(e){defer.reject(e)}, 
 			success: function(e){defer.resolve(e)},
-			url: url, 
+			url: photobook ? photoUrl : url, 
 			type: "POST",
 			xhr : function () {
 		        var xhr = new window.XMLHttpRequest();
@@ -47,6 +47,10 @@ services.service('Processing', ['$http', '$q', function ($http, $q) {
         $.ajax(cache);
 
         return defer.promise;
+	};
+
+	this.uploadPhotobook = function () {
+
 	};
 
 

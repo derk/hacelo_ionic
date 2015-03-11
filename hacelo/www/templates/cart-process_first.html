@@ -52,8 +52,7 @@
                         <span>Recordar para la próxima compra</span>
                     </label> -->
                 </div>
-                
-                <a ng-click="saveInformation(sucursal);calculatePrice(sucursal);" class="button button-balanced" >Pagar</a>
+                <a ng-disabled="isDisabled(sucursal)()"ng-click="saveInformation(sucursal);calculatePrice(sucursal);" class="button button-balanced" >Pagar</a>
             </div>
             
         </div>

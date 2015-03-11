@@ -4,6 +4,7 @@
 controllers.controller('confirmCtrl', ['$scope', '$state', '$ionicPopup', 'MessageService', 'ShoppingCartFactory', 'SelectedImagesFactory', function ($scope, $state, $ionicPopup, Messages, ShoppingCartFactory, SelectedImagesFactory) {
     var cart = ShoppingCartFactory.loadShoppingCart(),
         properties = null;
+        window.shopping = cart;
     /*
      * Create a new order based on the selected: product line, product, and images
      * */

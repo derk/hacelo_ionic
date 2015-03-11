@@ -26,7 +26,7 @@
 				</div>
 			</div>
 			<label class="item input-checkbox">
-				<input type="checkbox">
+				<input type="checkbox" ng-model="master.checked">
 				<span>Confirmo que los datos de envío son correctos</span>
 			</label>
 		</div>
@@ -34,21 +34,21 @@
   	<ion-footer-bar>
   		<div class="product-to-pay">
   			<h3 class="photos">{{cart.getTotalQuantity()}} Fotos</h3>
-			<h4 class="total">&#8353; {{cart.computeSubTotal()}}</h4>
+			<h4 class="total">{{cart.computeSubTotal() | noFractionCurrency}}</h4>
   		</div>
 	    
 	    <div class="product-to-pay">
 	    	<h3 class="photos">Transporte</h3>
-			<h4 class="total">&#8353; {{cart.travel.price}}</h4>
+			<h4 class="total">{{cart.travel.price | noFractionCurrency}}</h4>
 	    </div>
 
 	    <div class="product-to-pay" ng-if="cart.coupon.price != 0">
 	    	<h3 class="photos">Descuento</h3>
-			<h4 class="total">&#8353; {{cart.coupon.price}}</h4>
+			<h4 class="total">{{cart.coupon.price | noFractionCurrency}}</h4>
 	    </div>
 
-	    <h4 class="total total-full">Total = &#8353;{{cart.getTotal() - cart.coupon.price}}</h4>
+	    <h4 class="total total-full">Total = {{cart.getTotal() - cart.coupon.price | noFractionCurrency}}</h4>
 		
-		<a class="button button-positive" ng-click="pay()">Realizar pedido</a>
+		<a class="button button-positive" ng-click="pay()" ng-disabled="isDisabled(master.checked)">Realizar pedido</a>
 	</ion-footer-bar>
 </ion-view>

@@ -1,4 +1,5 @@
-controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$sce', 'SelectedImagesFactory','StorageService','ShoppingCartFactory', 'MessageService', 'Utils', 'Processing', function($scope, $state, $ionicLoading, $sce, SelectedImagesFactory, StorageService, ShoppingCartFactory, Messages, Utils, Processing) {
+controllers.controller('processingCtrl', 
+    ['$scope', '$state','$ionicLoading', '$sce', 'SelectedImagesFactory','StorageService','ShoppingCartFactory', 'MessageService', 'Utils', 'Processing', function($scope, $state, $ionicLoading, $sce, SelectedImagesFactory, StorageService, ShoppingCartFactory, Messages, Utils, Processing) {
 
     $scope.market = ShoppingCartFactory.loadShoppingCart();
     $scope.images = SelectedImagesFactory.getToPrintOnes();
@@ -20,10 +21,9 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
 
     // Prepating photos
     var preparePhotos = function(url){
-        var el = [];
         $ionicLoading.show(cache);
+        var el = [];
 
-        // $scope.market.orders[0].items[0].images.standard_resolution.url
         for(var x = 0; x < $scope.market.orders.length; x++){
             for(var y = 0; y < $scope.market.orders[x].items.length; y++){
                 $scope.all = $scope.all + $scope.market.orders[x].items[y].quantity;
@@ -59,14 +59,28 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
     // in order to save them
     var createAjaxCall = function() {
         var formData = new FormData();
-
+        var photobook = [];
+        var empty = false;
         for(var x = 0; x < $scope.market.orders.length; x++){
             for(var w = 0; w < $scope.market.orders[x].quantity; w ++) {
                 for(var y = 0; y < $scope.market.orders[x].items.length; y++){
                     for(var z = 0; z < $scope.market.orders[x].items[y].quantity; z++){
                         var blob = Processing.dataURItoBlob($scope.market.orders[x].items[y].images.standard_resolution.url);
-                        formData.append('images[]', blob);      
-                        formData.append('category[]', $scope.market.orders[x].productLine.name+"_"+$scope.market.orders[x].product.name+"____"+ w + $scope.market.orders[x].id);                    
+                        var category = $scope.market.orders[x].productLine.name+"_"+$scope.market.orders[x].product.name+"____"+ w + $scope.market.orders[x].id;
+                        var properties = $scope.market.orders[x].properties;
+                        if ($scope.market.orders[x].productLine.mandatory != true) {
+                            formData.append('images[]', blob);      
+                            formData.append('category[]', category);      
+                            empty = true;              
+                        } else {
+                            var status = "none";
+                            for (var v = 0; v < properties.cover.length; v++) {
+                                if ($scope.market.orders[x].items[y]._originalSource == properties.cover[v]._originalSource) {
+                                    status = "Portada"
+                                }
+                            }
+                            photobook.push({blob: blob, category: category, title: properties.message, status: status});
+                        }
                     }       
                 }
             }
@@ -74,22 +88,77 @@ controllers.controller('processingCtrl', ['$scope', '$state','$ionicLoading', '$
 
         formData.append('data',$scope.market.customer.name+"_"+$scope.market.customer.secondSurname);
 
-        
-        Processing.upload(formData).then(function(e){
+        var model = {data: formData, photobook: false};
+
+        if (photobook.length > 0 && empty == false) 
+            model = {data: photobookProcess(photobook), photobook: true};
+
+        Processing.upload(model.data, model.photobook).then(function(e){
             var response = angular.fromJson(e);
+            console.log(response);
+            window.res = response;
             if(response.data === 'ok'){
-                setTimeout(function(){$state.go('app.order-sent');});
-                StorageService.clear();
+                if (photobook.length > 0 && empty == true) {
+                    var init = $scope.initial;
+                    // console.log(photobookProcess(photobook, response.folder));
+                    Processing.upload(photobookProcess(photobook, response.folder), true).then(function (response) {
+                        var response = angular.fromJson(response);
+                        if (response.data === 'ok') {
+                            successHandler();
+                        } else {
+                            handleError();
+                        }
+                    }, function(e) {
+                        handleError();
+                    }, function(e){
+                        $scope.initial = Math.floor((photobook.length * e) + init);
+                    });
+                } else {
+                    successHandler();
+                }
             } else {
-                alert("Ha ocurrido un error interno. Vamos a intentarlo de nuevo.");
-                preparePhotos();
+                handleError();
             }
         }, function(e) {
-            alert('Ha habido un error, vamos a intentarlo de nuevo');
-            preparePhotos();
+            handleError();
         }, function(e){
-            $scope.initial = Math.floor($scope.all * e);
+            if (photobook.length > 0 && !model.photobook) {
+                $scope.initial = Math.floor(($scope.all - photobook.length) * e);
+            } else if (model.photobook) {
+                $scope.initial = Math.floor($scope.all * e);
+            } else {
+                $scope.initial = Math.floor($scope.all * e);
+            }
         });
+    };
+
+    var photobookProcess = function (obj, folder) {
+        var formData = new FormData();
+        for (var i = 0; i < obj.length; i ++) {
+            formData.append('images[]', obj[i].blob);
+            formData.append('category[]', obj[i].category);  
+            formData.append('title[]', obj[i].title);
+            formData.append('status[]', obj[i].status);
+        }
+        if (folder) {
+            formData.append('data',folder);
+            formData.append('create', "no crear");
+            
+        } else {
+            formData.append('data',$scope.market.customer.name+"_"+$scope.market.customer.secondSurname);
+            formData.append('create', "crear");
+        }
+        return formData;
+    };
+
+    var handleError = function () {
+        alert('Ha habido un error, vamos a intentarlo de nuevo');
+        preparePhotos();
+    };
+    
+    var successHandler = function () {
+        setTimeout(function(){$state.go('app.order-sent');});
+        StorageService.clear();
     };
 
     preparePhotos();

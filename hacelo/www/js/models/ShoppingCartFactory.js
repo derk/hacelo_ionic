@@ -195,7 +195,8 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
                 new Order(
                     pOrders2Restore[i].productLine,
                     pOrders2Restore[i].product,
-                    restoreImages(pOrders2Restore[i].items)
+                    restoreImages(pOrders2Restore[i].items),
+                    pOrders2Restore[i].properties   
                 )
             );
         }
@@ -223,6 +224,7 @@ models.factory('ShoppingCartFactory', ['$q','StorageService', 'ImageFactory', fu
 
            // if (angular.isUndefined(shoppingCart)) {
                 StorageService.loadFile().then(function(e){
+                    window.res = e;
                     e = (e === "") ? null : e;
                     lastShoppingCart = angular.fromJson(e);
                     if(angular.isObject(lastShoppingCart)){

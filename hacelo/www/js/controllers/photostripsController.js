@@ -66,14 +66,19 @@ controllers.controller('photostripCtrl', ['$scope', '$state', '$ionicPopup','Sel
 
     $scope.pick = function (i, a, image) {
         if (image.checked) {
-            var index = (i * 4) + a; 
+            var index = {x: i, y: a}
+            // var index = (i * 4) + a; 
             if (pick.picked == true) {
-                var tmp = $scope.images[index];
+               /* var tmp = $scope.images[index];
                 var tmp2 = $scope.images[pick.index];
                 $scope.images[index] = tmp2;
                 $scope.images[pick.index] = tmp;
                 pick = {picked:false, index: null};
-                $scope.createGroups();
+                $scope.createGroups();*/
+                var tmp = $scope.groups[pick.index.x][pick.index.y];
+                $scope.groups[pick.index.x][pick.index.y] = $scope.groups[index.x][index.y];
+                $scope.groups[index.x][index.y] = tmp;
+
             } else {
                 pick = {picked:true, index: index};  
             }
@@ -93,9 +98,9 @@ controllers.controller('photostripCtrl', ['$scope', '$state', '$ionicPopup','Sel
     };
 
     $scope.getScrollWidth = function () {
-        return getHeight() * 36;
+        return ($scope.getHeight()+20) * 9;
     };
-    
+
     var makeScroll = function () {
         myScroll = new IScroll('#wrapper', { scrollX: true, scrollY: false, mouseWheel: true });
     };

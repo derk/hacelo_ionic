@@ -1,10 +1,7 @@
 controllers.controller('confirmOrderCtrl', ['$scope', '$state' ,'$ionicPopup','$ionicLoading', 'MessageService', 'ShoppingCartFactory','Payment','CartService', function($scope, $state, $ionicPopup, $ionicLoading, Messages, ShoppingCartFactory,Payment, CartService) {
     $scope.cart = ShoppingCartFactory.loadShoppingCart();
-
-   console.log($scope.cart);
-
-   window.el = $scope.cart;
-
+    $scope.master = {checked:false};
+  
    $scope.show = function() {
         $ionicLoading.show({
           template: 'Realizando Pago...'
@@ -24,6 +21,10 @@ controllers.controller('confirmOrderCtrl', ['$scope', '$state' ,'$ionicPopup','$
       } else {
           $scope.payment();           
       }
+   };
+
+   $scope.isDisabled = function (e) {
+    return !e;
    };
 
    $scope.payment = function () {

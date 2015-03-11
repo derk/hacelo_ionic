@@ -91,7 +91,6 @@ controllers.controller('cartCheckoutCtrl', ['$scope', '$state', '$ionicLoading',
         });
     };
 
-
     $scope.show = function() {
         $ionicLoading.show({
           template: 'Calculando Transporte'
@@ -170,6 +169,12 @@ controllers.controller('cartProcessFirstCtrl', ['$scope', '$state', '$ionicLoadi
         $ionicLoading.show({
           template: 'Calculando Transporte'
         });
+    };
+
+    $scope.isDisabled = function (sucursal) {
+        return function () {
+            if (!angular.isDefined(sucursal) || sucursal == null) {return true}else{return false};
+        }
     };
 
     $scope.hide = function(){
