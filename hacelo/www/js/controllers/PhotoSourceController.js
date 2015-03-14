@@ -1,4 +1,8 @@
-controllers.controller('PhotoSourceCtrl', ['$scope', '$state', 'SelectedImagesFactory', 'MessageService', 'FileReader','$ionicLoading', function ($scope,   $state,   SelectedImagesFactory,   MessageService,   FileReader,  $ionicLoading) {
+controllers.controller('PhotoSourceCtrl', ['$scope', '$state', 'SelectedImagesFactory', 'MessageService', 'FileReader','$ionicLoading', 'PreloaderFactory', function ($scope,   $state,   SelectedImagesFactory,   MessageService,   FileReader,  $ionicLoading, preloader) {
+    $scope.isLoading = true;
+    $scope.isSuccessful = false;
+    $scope.percentLoaded = 0;
+
     var imageStack = SelectedImagesFactory.getAll(),
         isMobile = {
             Android: navigator.userAgent.match(/Android/i),
@@ -68,6 +72,48 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', 'SelectedImagesFa
         }
     };
 
+
+    var preload = function (imageLocations) {
+        preloader.preloadImages( imageLocations ).then(
+            function handleResolve( imageLocations ) {
+
+                // Loading was successful.
+                $scope.isLoading = false;
+                $scope.isSuccessful = true;
+            },
+            function handleReject( imageLocation ) {
+
+                // Loading failed on at least one image.
+                $scope.isLoading = false;
+                $scope.isSuccessful = true;
+
+                console.error( "Image Failed", imageLocation );
+                console.info( "Preload Failure" );
+
+            },
+            function handleNotify( event ) {
+
+                // Update UI to show progress percentage
+                $scope.percentLoaded = event.percent;
+            }
+        );
+    };
+
+    var init = function (obj) {
+        /*
+         * Ensure that every selected image have at least a quantity equals to one
+         * If the image has other quantity already just preserve that value.
+         * Also create a new array of image locations (URLs) to be preloaded
+         * */
+         
+        var imageLocations = [];
+         for (var i = obj.albums.length - 1; i >= 0; i--) {
+             imageLocations.push(obj.albums[i].images[0].images.standard_resolution.url);
+        }
+        preload(imageLocations);
+    };
+
+
     var androidInit = function () {
         $scope.loading = true;
 
@@ -75,10 +121,15 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', 'SelectedImagesFa
             $scope.loading = false;
             SelectedImagesFactory.setGallery(gallery);
             $scope.gallery = gallery;
+            init($scope.gallery);
+            console.log($scope.gallery);
         });
     };
 
     if (angular.isUndefined($scope.gallery.albums)) {
         androidInit();
+    } else {
+        console.log($scope.gallery);
+        init($scope.gallery);
     }
 }]);

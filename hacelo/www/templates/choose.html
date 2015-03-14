@@ -5,7 +5,7 @@
             <div class="arrow"> Atrás</div>
         </ion-nav-back-button>
 
-        <h1 class="title">{{ (imageStack | filter:{toPrint:true}).length }}Fotos</h1>
+        <h1 class="title">{{ (imageStack | filter:{toPrint:true}).length }} Fotos</h1>
 
         <ion-nav-buttons side="right">
             <a class="button button-icon icon check-button check-photo" ng-click="goToConfirm()" ng-show="(imageStack | filter:{toPrint:true}).length>0" ng-hide="(imageStack | filter:{toPrint:true}).length===0">Revisar</a>
@@ -18,29 +18,52 @@
             <a class="button-picker" ng-click="goToIosGallery()">Albums</a>
         </div>
 
-        <div class="photos">
+        <div ng-switch="isLoading">
+                <!-- BEGIN: Loading View. -->
+                <p ng-switch-when="true" style="text-align:center;">
+                    Sus imágenes se están cargando... {{ percentLoaded }}%
+                </p>
+                <!-- END: Loading View. -->
 
-            <div class="images-container">
-                <div class="album" ng-repeat="album in gallery.albums" ng-click="go($index)">
-                    <img ng-src="{{album.images[0].images.standard_resolution.url}}" style="width:100%;max-width:100%;height:auto;">
-                    <div class="content">
-                        <h2>{{album.name}}</h2>
-                        <h3>
-                            <ng-pluralize
-                                    count="album.images.length"
-                                    when="{'one': '1 foto',
-                                            'other': '{} fotos'}">
-                            </ng-pluralize>,
-                            <ng-pluralize
-                                    count="(imageStack | filter:{gallery:album.name,toPrint:true}:true).length"
-                                    when="{'one': '1 selecionada',
-                                            'other': '{} selecionadas'}">
-                            </ng-pluralize>
-                        </h3>
+                <!-- BEGIN: Results View. -->
+                <div ng-switch-when="false"
+                     ng-switch="isSuccessful">
+
+                    <div ng-switch-when="true">
+                        <div class="photos">
+
+                            <div class="images-container">
+                                <div class="album" ng-repeat="album in gallery.albums" ng-click="go($index)">
+                                    <img ng-src="{{album.images[0].images.standard_resolution.url}}" style="width:100%;max-width:100%;height:auto;">
+                                    <div class="content">
+                                        <h2>{{album.name}}</h2>
+                                        <h3>
+                                            <ng-pluralize
+                                                    count="album.images.length"
+                                                    when="{'one': '1 foto',
+                                                            'other': '{} fotos'}">
+                                            </ng-pluralize>,
+                                            <ng-pluralize
+                                                    count="(imageStack | filter:{gallery:album.name,toPrint:true}:true).length"
+                                                    when="{'one': '1 selecionada',
+                                                            'other': '{} selecionadas'}">
+                                            </ng-pluralize>
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    <p ng-switch-when="false">
+                        <strong>Ups</strong>: Una de sus imágenes no se pudo cargar :(
+                    </p>
+
                 </div>
+                <!-- END: Results View. -->
             </div>
 
-        </div>
+
+
     </ion-content>
 </ion-view>

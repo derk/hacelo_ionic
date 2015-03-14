@@ -40,7 +40,7 @@ controllers.controller('processingCtrl',
         } else {
             window.p = [];
             angular.forEach(el, function(v){
-                Utils.getImageDataURL($scope.market.orders[v.x].items[v.y].images.standard_resolution.url, v.x, v.y).then(function(e){
+                Utils.getImageDataURL($scope.market.orders[v.x].items[v.y].images.standard_resolution.url, v.x, v.y, $scope.market.orders[v.x].product.pixel_size.optimal).then(function(e){
                     p.push(e.data);
                     cont = cont + 1;
                     $scope.market.orders[e.x].items[e.y].images.standard_resolution.url = e.data;

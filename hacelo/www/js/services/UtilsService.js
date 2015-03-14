@@ -10,7 +10,7 @@ services.service('Utils', ['$q', '$timeout', '$filter', function ($q, $timeout, 
      * getImageDataURL('myimage.png', onSuccess, onError);
      *
      */
-    this.getImageDataURL = function(url, x, y) {
+    this.getImageDataURL = function(url, x, y, obj) {
     
     var defer = $q.defer();
         var data, canvas, ctx;
@@ -22,15 +22,21 @@ services.service('Utils', ['$q', '$timeout', '$filter', function ($q, $timeout, 
             // Get '2d' context and draw the image.
             ctx = canvas.getContext("2d");
 
-            if (img.width > max || img.height > max) {
-              canvas.width = max;
-              canvas.height = (max * img.height) /img.width;
-              ctx.drawImage(img, 0, 0, max, (max * img.height) /img.width);
-            } else {
-              canvas.width = img.width;
-              canvas.height = img.height;
-              ctx.drawImage(img, 0, 0, img.width, img.height);
-            }
+
+            console.log(obj);
+            // if (img.width > max || img.height > max) {
+              // canvas.width = max;
+              // canvas.height = (max * img.height) /img.width;
+              // ctx.drawImage(img, 0, 0, max, (max * img.height) /img.width);
+            // } else {
+            //   canvas.width = img.width;
+            //   canvas.height = img.height;
+            //   ctx.drawImage(img, 0, 0, img.width, img.height);
+            // }
+
+              canvas.width = obj.width;
+              canvas.height = (obj.width * img.height) /img.width;
+              ctx.drawImage(img, 0, 0, obj.width, (obj.width * img.height) /img.width);
 
             try{
                 // console.log("got it");
