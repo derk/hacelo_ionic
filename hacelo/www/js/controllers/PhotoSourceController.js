@@ -25,8 +25,18 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', 'SelectedImagesFa
     });
 
     var updateImageStack = function (albumImages) {
-        for (var i = albumImages.length - 1; i >= 0; i--) {
-            imageStack.push( angular.copy( albumImages[i] ) );
+        for (var i = 0,x = albumImages.length; i < x; i++) {
+            var notFound = 1;
+
+            for (var j = imageStack.length - 1; j >= 0 && notFound; j--) {
+                if (albumImages[i].id === imageStack[j].id) {
+                    notFound = 0;
+                }
+            }
+
+            if (notFound) {
+                imageStack.push( angular.copy( albumImages[i] ) );
+            }
         }
     };
 
@@ -44,6 +54,7 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', 'SelectedImagesFa
         if(angular.isDefined(productLine.mandatory)){
             $state.go('app.photobook-check');
         } else if (angular.isDefined(productLine.isStrip)) {
+        
             $state.go('app.photostrip');
         } else {
             $state.go('app.check');
@@ -129,7 +140,6 @@ controllers.controller('PhotoSourceCtrl', ['$scope', '$state', 'SelectedImagesFa
     if (angular.isUndefined($scope.gallery.albums)) {
         androidInit();
     } else {
-        console.log($scope.gallery);
         init($scope.gallery);
     }
 }]);

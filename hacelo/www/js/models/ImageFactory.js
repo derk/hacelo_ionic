@@ -1,6 +1,7 @@
 models.factory('ImageFactory', ['$q', '$filter', '$timeout', function ($q, $filter, $timeout) {
     function ImageWrapper (pOrigin, pOriginalSource, pImages, pToPrint, pQuantity) {
         this.origin = pOrigin;
+         this.id = Math.random()*10000;
         this._originalSource = pOriginalSource;
         this.images = pImages;
         this.toPrint = pToPrint || false;
